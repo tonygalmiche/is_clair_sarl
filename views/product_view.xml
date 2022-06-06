@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- product.template -->
+    <record id="is_product_template_form_view" model="ir.ui.view">
+        <field name="name">is.product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+
+
+           <div name="options" position="inside" >
+                <span class="d-inline-block">
+                    <field name="is_tache"/>
+                    <label for="is_tache"/>
+                </span>
+            </div>
+
+
+       <!-- <div name="options" groups="base.group_user">
+                        <span class="d-inline-block">
+                            <field name="sale_ok"/>
+                            <label for="sale_ok"/>
+                        </span>
+                        <span class="d-inline-block">
+                            <field name="purchase_ok"/>
+                            <label for="purchase_ok"/>
+                        </span>
+                    </div>
+
+            <field name="standard_price" position="attributes" >
+                 <attribute name="widget"></attribute>
+            </field>
+
+
+            <field name="categ_id" position="before" >
+                <field name="is_currency_id"/>
+            </field>
+
+
+
+
+           <field name="description_purchase" position="before" >
+                <group col="4">
+                    <group>
+                        <field name="is_fournisseurs" />
+                    </group>
+                </group>
+            </field> -->
+
+        </field>
+    </record> 
+
+
+</odoo>
