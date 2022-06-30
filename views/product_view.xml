@@ -8,10 +8,24 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <style>
+                        .o_form_label{
+                            white-space: nowrap;
+                        }
+                    </style>
                     <group>
-                        <group>
-                            <field name="name" />
-                        </group>
+                        <field name="name" />
+                        <field name="sous_famille_ids" widget="many2many_tags"/>
+                    </group>
+                    <group string="Champs à afficher dans la fiche article">
+                        <field name="is_longueur"/>
+                        <field name="is_largeur_utile"/>
+                        <field name="is_surface_panneau"/>
+                        <field name="is_surface_palette"/>
+                        <field name="is_poids"/>
+                        <field name="is_poids_rouleau"/>
+                        <field name="is_ondes"/>
+                        <field name="is_resistance_thermique"/>
                     </group>
                 </sheet>
             </form>
@@ -53,6 +67,7 @@
                     <group>
                         <group>
                             <field name="name" />
+                            <field name="famille_ids" widget="many2many_tags"/>
                         </group>
                     </group>
                 </sheet>
@@ -109,15 +124,25 @@
             </div>
            <field name="detailed_type" position="after">
                 <field name="is_famille_id"/>
-                <field name="is_sous_famille_id"/>
-                <field name="is_longueur"/>
-                <field name="is_largeur_utile"/>
-                <field name="is_surface_panneau"/>
-                <field name="is_surface_palette"/>
-                <field name="is_poids"/>
-                <field name="is_poids_rouleau"/>
-                <field name="is_ondes"/>
-                <field name="is_resistance_thermique"/>
+                <field name="is_sous_famille_id"  domain="[('famille_ids', 'in', is_famille_id)]"/>
+
+                <field name="is_longueur_vsb"             invisible="1"/>
+                <field name="is_largeur_utile_vsb"        invisible="1"/>
+                <field name="is_surface_panneau_vsb"      invisible="1"/>
+                <field name="is_surface_palette_vsb"      invisible="1"/>
+                <field name="is_poids_vsb"                invisible="1"/>
+                <field name="is_poids_rouleau_vsb"        invisible="1"/>
+                <field name="is_ondes_vsb"                invisible="1"/>
+                <field name="is_resistance_thermique_vsb" invisible="1"/>
+
+                <field name="is_longueur"             attrs="{'invisible':[('is_longueur_vsb','=',False)]}"/>
+                <field name="is_largeur_utile"        attrs="{'invisible':[('is_largeur_utile_vsb','=',False)]}"/>
+                <field name="is_surface_panneau"      attrs="{'invisible':[('is_surface_panneau_vsb','=',False)]}"/>
+                <field name="is_surface_palette"      attrs="{'invisible':[('is_surface_palette_vsb','=',False)]}"/>
+                <field name="is_poids"                attrs="{'invisible':[('is_poids_vsb','=',False)]}"/>
+                <field name="is_poids_rouleau"        attrs="{'invisible':[('is_poids_rouleau_vsb','=',False)]}"/>
+                <field name="is_ondes"                attrs="{'invisible':[('is_ondes_vsb','=',False)]}"/>
+                <field name="is_resistance_thermique" attrs="{'invisible':[('is_resistance_thermique_vsb','=',False)]}"/>
             </field>
         </field>
     </record> 
