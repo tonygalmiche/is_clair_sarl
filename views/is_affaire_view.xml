@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <!--is.nature.travaux -->
+    <record id="is_nature_travaux_form_view" model="ir.ui.view">
+        <field name="name">is_nature_travaux_from_view</field>
+        <field name="model">is.nature.travaux</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="color" required="True" widget="color_picker"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_nature_travaux_tree_view">
+        <field name="name">is_nature_travaux_tree_view</field>
+        <field name="model">is.nature.travaux</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="color" required="True" widget="color_picker"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_nature_travaux_search_view" model="ir.ui.view">
+        <field name="name">is_nature_travaux_search_view</field>
+        <field name="model">is.nature.travaux</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_nature_travaux_action" model="ir.actions.act_window">
+        <field name="name">Nature des travaux</field>
+        <field name="res_model">is.nature.travaux</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!--is.type.travaux -->
+    <record id="is_type_travaux_form_view" model="ir.ui.view">
+        <field name="name">is_type_travaux_from_view</field>
+        <field name="model">is.type.travaux</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="color" required="True" widget="color_picker"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_type_travaux_tree_view">
+        <field name="name">is_type_travaux_tree_view</field>
+        <field name="model">is.type.travaux</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="color" required="True" widget="color_picker"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_type_travaux_search_view" model="ir.ui.view">
+        <field name="name">is_type_travaux_search_view</field>
+        <field name="model">is.type.travaux</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_type_travaux_action" model="ir.actions.act_window">
+        <field name="name">Type des travaux</field>
+        <field name="res_model">is.type.travaux</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!--is.specificite -->
+    <record id="is_specificite_form_view" model="ir.ui.view">
+        <field name="name">is_specificite_from_view</field>
+        <field name="model">is.specificite</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="color" required="True" widget="color_picker"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_specificite_tree_view">
+        <field name="name">is_specificite_tree_view</field>
+        <field name="model">is.specificite</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="color" required="True" widget="color_picker"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_specificite_search_view" model="ir.ui.view">
+        <field name="name">is_specificite_search_view</field>
+        <field name="model">is.specificite</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_specificite_action" model="ir.actions.act_window">
+        <field name="name">Spécificités</field>
+        <field name="res_model">is.specificite</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!--is.affaire -->
+    <record id="is_affaire_form_view" model="ir.ui.view">
+        <field name="name">is_affaire_from_view</field>
+        <field name="model">is.affaire</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <style>
+                        .o_form_label{
+                            white-space: nowrap;
+                        }
+                    </style>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="nom"/>
+                            <field name="client_id"/>
+                            <field name="chantier_id"/>
+                        </group>
+                        <group>
+                            <field name="date_creation"/>
+                            <field name="lieu"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="nature_travaux_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                        <field name="type_travaux_ids"   widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                        <field name="specificite_ids"    widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                        <field name="commentaire"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_affaire_tree_view">
+        <field name="name">is_affaire_tree_view</field>
+        <field name="model">is.affaire</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="nom"/>
+                <field name="date_creation"/>
+                <field name="lieu"/>
+                <field name="client_id"/>
+                <field name="chantier_id"/>
+                <field name="nature_travaux_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                <field name="type_travaux_ids"   widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                <field name="specificite_ids"    widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                <field name="commentaire"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_affaire_search_view" model="ir.ui.view">
+        <field name="name">is_affaire_search_view</field>
+        <field name="model">is.affaire</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="nom"/>
+                <field name="lieu"/>
+                <field name="client_id"/>
+                <field name="chantier_id"/>
+                <field name="nature_travaux_ids"/>
+                <field name="type_travaux_ids"/>
+                <field name="specificite_ids"/>
+                <field name="commentaire"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_affaire_action" model="ir.actions.act_window">
+        <field name="name">Affaires</field>
+        <field name="res_model">is.affaire</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

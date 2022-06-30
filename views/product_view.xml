@@ -1,55 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!--is.famille -->
+    <record id="is_famille_form_view" model="ir.ui.view">
+        <field name="name">is_famille_from_view</field>
+        <field name="model">is.famille</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_famille_tree_view">
+        <field name="name">is_famille_tree_view</field>
+        <field name="model">is.famille</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+    <record id="is_famille_search_view" model="ir.ui.view">
+        <field name="name">is_famille_search_view</field>
+        <field name="model">is.famille</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_famille_action" model="ir.actions.act_window">
+        <field name="name">Famille article</field>
+        <field name="res_model">is.famille</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!--is.sous.famille -->
+    <record id="is_sous_famille_form_view" model="ir.ui.view">
+        <field name="name">is_sous_famille_from_view</field>
+        <field name="model">is.sous.famille</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_sous_famille_tree_view">
+        <field name="name">is_sous_famille_tree_view</field>
+        <field name="model">is.sous.famille</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+    <record id="is_sous_famille_search_view" model="ir.ui.view">
+        <field name="name">is_sous_famille_search_view</field>
+        <field name="model">is.sous.famille</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_sous_famille_action" model="ir.actions.act_window">
+        <field name="name">Sous-famille article</field>
+        <field name="res_model">is.sous.famille</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
     <!-- product.template -->
     <record id="is_product_template_form_view" model="ir.ui.view">
-        <field name="name">is.product.template.common.form</field>
+        <field name="name">is_product_template_form_view</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
-
-
+            <xpath expr="//sheet[1]" position="inside">
+                <style>
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
+                    }
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+            </xpath>
            <div name="options" position="inside" >
                 <span class="d-inline-block">
                     <field name="is_tache"/>
                     <label for="is_tache"/>
                 </span>
             </div>
-
-
-       <!-- <div name="options" groups="base.group_user">
-                        <span class="d-inline-block">
-                            <field name="sale_ok"/>
-                            <label for="sale_ok"/>
-                        </span>
-                        <span class="d-inline-block">
-                            <field name="purchase_ok"/>
-                            <label for="purchase_ok"/>
-                        </span>
-                    </div>
-
-            <field name="standard_price" position="attributes" >
-                 <attribute name="widget"></attribute>
+           <field name="detailed_type" position="after">
+                <field name="is_famille_id"/>
+                <field name="is_sous_famille_id"/>
+                <field name="is_longueur"/>
+                <field name="is_largeur_utile"/>
+                <field name="is_surface_panneau"/>
+                <field name="is_surface_palette"/>
+                <field name="is_poids"/>
+                <field name="is_poids_rouleau"/>
+                <field name="is_ondes"/>
+                <field name="is_resistance_thermique"/>
             </field>
-
-
-            <field name="categ_id" position="before" >
-                <field name="is_currency_id"/>
+        </field>
+    </record> 
+    <record id="is_product_template_tree_view" model="ir.ui.view">
+        <field name="name">is_product_template_tree_view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+           <field name="default_code" position="after">
+                <field name="is_famille_id"            optional="show"/>
+                <field name="is_sous_famille_id"       optional="show"/>
+                <field name="is_longueur"              optional="show"/>
+                <field name="is_largeur_utile"         optional="show"/>
+                <field name="is_surface_panneau"       optional="hide"/>
+                <field name="is_surface_palette"       optional="hide"/>
+                <field name="is_poids"                 optional="hide"/>
+                <field name="is_poids_rouleau"         optional="hide"/>
+                <field name="is_ondes"                 optional="hide"/>
+                <field name="is_resistance_thermique"  optional="hide"/>
+                <field name="is_tache"                 optional="hide"/>
             </field>
-
-
-
-
-           <field name="description_purchase" position="before" >
-                <group col="4">
-                    <group>
-                        <field name="is_fournisseurs" />
-                    </group>
-                </group>
-            </field> -->
-
         </field>
     </record> 
 
-
+    <record id="is_product_template_search_view" model="ir.ui.view">
+        <field name="name">is_product_template_search_view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+           <field name="name" position="after">
+                <field name="is_famille_id"/>
+                <field name="is_sous_famille_id"/>
+                <field name="is_tache"/>
+            </field>
+            <filter name="type" position="before">
+                <filter string="Famille"      name="is_famille_id"      context="{'group_by':'is_famille_id'}"/>
+                <filter string="Sous-famille" name="is_sous_famille_id" context="{'group_by':'is_sous_famille_id'}"/>
+            </filter>
+        </field>
+    </record> 
 </odoo>

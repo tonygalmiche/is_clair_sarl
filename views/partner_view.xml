@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--Statut -->
+    <record id="is_statut_form_view" model="ir.ui.view">
+        <field name="name">is_statut_from_view</field>
+        <field name="model">is.statut</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_statut_tree_view">
+        <field name="name">is_statut_tree_view</field>
+        <field name="model">is.statut</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+    <record id="is_statut_search_view" model="ir.ui.view">
+        <field name="name">is_statut_search_view</field>
+        <field name="model">is.statut</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_statut_action" model="ir.actions.act_window">
+        <field name="name">Statut</field>
+        <field name="res_model">is.statut</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!--Profil -->
+    <record id="is_profil_form_view" model="ir.ui.view">
+        <field name="name">is_profil_from_view</field>
+        <field name="model">is.profil</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_profil_tree_view">
+        <field name="name">is_profil_tree_view</field>
+        <field name="model">is.profil</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+    <record id="is_profil_search_view" model="ir.ui.view">
+        <field name="name">is_profil_search_view</field>
+        <field name="model">is.profil</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_profil_action" model="ir.actions.act_window">
+        <field name="name">Profil</field>
+        <field name="res_model">is.profil</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!--Origine DP -->
+    <record id="is_origine_form_view" model="ir.ui.view">
+        <field name="name">is_origine_from_view</field>
+        <field name="model">is.origine</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_origine_tree_view">
+        <field name="name">is_origine_tree_view</field>
+        <field name="model">is.origine</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+    <record id="is_origine_search_view" model="ir.ui.view">
+        <field name="name">is_origine_search_view</field>
+        <field name="model">is.origine</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_origine_action" model="ir.actions.act_window">
+        <field name="name">Origine DP</field>
+        <field name="res_model">is.origine</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!-- res.partner -->
+    <record id="is_view_partner_form" model="ir.ui.view">
+        <field name="name">is_view_partner_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet[1]" position="inside">
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+            </xpath>
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="is_statut_id"/>
+                <field name="is_profil_id"/>
+                <field name="is_origine_id"/>
+            </xpath>
+            <group name="container_row_2" position="after">
+                <group>
+                    <field name="is_condition_tarifaire"/>
+                </group>
+            </group>
+        </field>
+    </record>
+    <record id="is_view_partner_tree" model="ir.ui.view">
+        <field name="name">is_view_partner_tree</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree" />
+        <field name="arch" type="xml">
+            <field name="user_id" position="before">
+                <field name="is_statut_id"           optional="show"/>
+                <field name="is_profil_id"           optional="show"/>
+                <field name="is_origine_id"          optional="show"/>
+                <field name="is_condition_tarifaire" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="is_view_res_partner_filter" model="ir.ui.view">
+        <field name="name">is_view_res_partner_filter</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter" />
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="is_statut_id"/>
+                <field name="is_profil_id"/>
+                <field name="is_origine_id"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

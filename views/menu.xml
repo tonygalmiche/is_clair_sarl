@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ventes -->
+
+
+
+    <menuitem 
+        id="is_affaire_menu" 
+        sequence="900" 
+        name="Affaires"
+        action="is_affaire_action" 
+        parent="sale.sale_order_menu" 
+    />
+
+
+
+    <menuitem 
+        id="is_statut_menu" 
+        sequence="900" 
+        name="Statut"
+        action="is_statut_action" 
+        parent="sale.menu_sale_config" 
+    />
+    <menuitem 
+        id="is_profil_menu" 
+        sequence="901" 
+        name="Profil"
+        action="is_profil_action" 
+        parent="sale.menu_sale_config" 
+    />
+    <menuitem 
+        id="is_origine_menu" 
+        sequence="902" 
+        name="Origine DP"
+        action="is_origine_action" 
+        parent="sale.menu_sale_config" 
+    />
+
+    <menuitem 
+        id="is_famille_menu" 
+        sequence="950" 
+        name="Famille article"
+        action="is_famille_action" 
+        parent="sale.menu_sale_config" 
+    />
+    <menuitem 
+        id="is_sous_famille_menu" 
+        sequence="951" 
+        name="Sous-famille article"
+        action="is_sous_famille_action" 
+        parent="sale.menu_sale_config" 
+    />
+
+
+
+
+    <menuitem 
+        id="is_nature_travaux_menu" 
+        sequence="952" 
+        name="Nature des travaux"
+        action="is_nature_travaux_action" 
+        parent="sale.menu_sale_config" 
+    />
+    <menuitem 
+        id="is_type_travaux_menu" 
+        sequence="953" 
+        name="Type des travaux"
+        action="is_type_travaux_action" 
+        parent="sale.menu_sale_config" 
+    />
+    <menuitem 
+        id="is_specificite_menu" 
+        sequence="954" 
+        name="Spécificités"
+        action="is_specificite_action" 
+        parent="sale.menu_sale_config" 
+    />
+
+
+
+    <!-- Déplacement des menus inutiles -->
+    <menuitem id="mail.menu_root_discuss"     parent="base.menu_custom" sequence="900"/>
+    <menuitem id="utm.menu_link_tracker_root" parent="base.menu_custom" sequence="901"/>
+</odoo>

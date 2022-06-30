@@ -19,8 +19,13 @@ Module Odoo 15 pour CLAIR-SARL
         "l10n_fr_fec",
     ],
     "data" : [
+        "security/ir.model.access.csv",
+        "views/is_affaire_view.xml",
+        "views/partner_view.xml",
         "views/product_view.xml",
+        "views/purchase_view.xml",
         "views/sale_view.xml",
+        "views/menu.xml",
     ],
     "installable": True,
     "application": True,
