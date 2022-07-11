@@ -2,9 +2,6 @@
 <odoo>
 
     <!-- Ventes -->
-
-
-
     <menuitem 
         id="is_affaire_menu" 
         sequence="900" 
@@ -13,70 +10,108 @@
         parent="sale.sale_order_menu" 
     />
 
-
-
+    <!-- Ventes / Configuration / Clients -->
+    <menuitem 
+        id="is_config_client_menu" 
+        sequence="900" 
+        name="Clients"
+        parent="sale.menu_sale_config" 
+    />
     <menuitem 
         id="is_statut_menu" 
-        sequence="900" 
+        sequence="10" 
         name="Statut"
         action="is_statut_action" 
-        parent="sale.menu_sale_config" 
+        parent="is_config_client_menu" 
     />
     <menuitem 
         id="is_profil_menu" 
-        sequence="901" 
+        sequence="20" 
         name="Profil"
         action="is_profil_action" 
-        parent="sale.menu_sale_config" 
+        parent="is_config_client_menu" 
     />
     <menuitem 
         id="is_origine_menu" 
-        sequence="902" 
+        sequence="30" 
         name="Origine DP"
         action="is_origine_action" 
-        parent="sale.menu_sale_config" 
+        parent="is_config_client_menu" 
     />
 
+    <!-- Ventes / Configuration / Articles -->
+   <menuitem 
+        id="is_config_article_menu" 
+        sequence="910" 
+        name="Articles"
+        parent="sale.menu_sale_config" 
+    />
     <menuitem 
         id="is_famille_menu" 
-        sequence="950" 
+        sequence="10" 
         name="Famille article"
         action="is_famille_action" 
-        parent="sale.menu_sale_config" 
+        parent="is_config_article_menu" 
     />
     <menuitem 
         id="is_sous_famille_menu" 
-        sequence="951" 
+        sequence="20" 
         name="Sous-famille article"
         action="is_sous_famille_action" 
-        parent="sale.menu_sale_config" 
+        parent="is_config_article_menu" 
     />
 
-
-
-
+    <!-- Ventes / Configuration / Affaires -->
+    <menuitem 
+        id="is_config_affaire_menu" 
+        sequence="920" 
+        name="Affaires"
+        parent="sale.menu_sale_config" 
+    />
     <menuitem 
         id="is_nature_travaux_menu" 
-        sequence="952" 
+        sequence="10" 
         name="Nature des travaux"
         action="is_nature_travaux_action" 
-        parent="sale.menu_sale_config" 
+        parent="is_config_affaire_menu" 
     />
     <menuitem 
         id="is_type_travaux_menu" 
-        sequence="953" 
+        sequence="20" 
         name="Type des travaux"
         action="is_type_travaux_action" 
-        parent="sale.menu_sale_config" 
+        parent="is_config_affaire_menu" 
     />
     <menuitem 
         id="is_specificite_menu" 
-        sequence="954" 
+        sequence="30" 
         name="Spécificités"
         action="is_specificite_action" 
-        parent="sale.menu_sale_config" 
+        parent="is_config_affaire_menu" 
     />
 
+
+    <!-- Achats / Configuration / Lignes de commandes -->
+    <menuitem 
+        id="is_config_ligne_commande_achat_menu" 
+        sequence="920" 
+        name="Lignes de commandes"
+        parent="purchase.menu_purchase_config" 
+    />
+    <menuitem 
+        id="is_finition_menu" 
+        sequence="10" 
+        name="Finitions"
+        action="is_finition_action" 
+        parent="is_config_ligne_commande_achat_menu" 
+    />
+    <menuitem 
+        id="is_traitement_menu" 
+        sequence="20" 
+        name="Traitements"
+        action="is_traitement_action" 
+        parent="is_config_ligne_commande_achat_menu" 
+    />
 
 
     <!-- Déplacement des menus inutiles -->

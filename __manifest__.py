@@ -26,6 +26,8 @@ Module Odoo 15 pour CLAIR-SARL
         "views/purchase_view.xml",
         "views/sale_view.xml",
         "views/menu.xml",
+        "report/purchase_quotation_templates.xml",
+        "report/report_templates.xml",
     ],
     "installable": True,
     "application": True,
