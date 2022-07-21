@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models
+from odoo import api, fields, models
 from random import randint
 
 
@@ -59,7 +59,6 @@ class IsAffaire(models.Model):
     name               = fields.Char("N° d'Affaire", required=True, index=True, help="Sous la forme AA-XXXX")
     nom                = fields.Char("Nom de l'affaire")
     date_creation      = fields.Date("Date de création", default=lambda *a: fields.Date.today())
-    lieu               = fields.Char("Lieu")
     client_id          = fields.Many2one('res.partner' , 'Client')
     chantier_id        = fields.Many2one('res.partner' , 'Adresse du chantier')
     nature_travaux_ids = fields.Many2many('is.nature.travaux', 'is_affaire_nature_travaux_rel', 'affaire_id', 'nature_id'     , string="Nature des travaux")
@@ -68,7 +67,41 @@ class IsAffaire(models.Model):
     commentaire        = fields.Text("Commentaire")
 
 
-#     • Nature des travaux : Liste de choix « Famille de travaux => Choix multiples
-#     • Type de travaux : Liste de choix => Choix multiples
 
+
+    def name_get(self):
+        result = []
+        for obj in self:
+            name="[%s] %s - %s %s %s %s"%(obj.name,obj.nom or '', obj.chantier_id.street or '', obj.chantier_id.street2 or '', obj.chantier_id.zip or '', obj.chantier_id.city or '')
+            result.append((obj.id, name))
+        return result
+
+
+    def _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
+        if args is None:
+            args = []
+
+        ids = []
+        if len(name) >= 1:
+
+            filtre=[
+                '|','|','|','|','|','|',
+                ('name', 'ilike', name),
+                ('nom', 'ilike', name),
+                ('chantier_id.name', 'ilike', name),
+                ('chantier_id.street', 'ilike', name),
+                ('chantier_id.street2', 'ilike', name),
+                ('chantier_id.zip', 'ilike', name),
+                ('chantier_id.city', 'ilike', name),
+            ]
+
+
+            ids = list(self._search(filtre + args, limit=limit))
+
+        search_domain = [('name', operator, name)]
+        if ids:
+            search_domain.append(('id', 'not in', ids))
+        ids += list(self._search(search_domain + args, limit=limit))
+
+        return ids
 

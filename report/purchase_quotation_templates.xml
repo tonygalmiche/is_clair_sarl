@@ -19,17 +19,31 @@
                     .o_report_layout_boxed .page > table:not(.o_main_table) tr td:last-child {
                         background-color: white;
                     }
+                    h2{
+                        font-size:14pt;
+                        font-weight: bolder;
+                    }
+                    h3{
+                        font-size:12pt;
+                        font-weight: bolder;
+                    }
+
+                    .o_boxed_footer, .o_boxed_header, .o_report_layout_boxed{
+                        font-size:11pt;
+                    }
+
+
                 </style>
                 <div class="oe_structure"/>
-                <h2>Demande de prix <span t-field="o.name"/></h2>
-
-                <div t-if="o.is_affaire_id">Affaire : <span t-field="o.is_affaire_id.name"/> - <span t-field="o.is_affaire_id.nom"/></div>
-                <div t-if="o.is_delai">Délai : <span t-field="o.is_delai"/></div>
-
+                <br />
+                <h2 t-if="o.is_affaire_id">Affaire : 
+                    <span t-field="o.is_affaire_id.display_name"/>
+                </h2>
+                <h3>Demande de prix <span t-field="o.name"/> du <span t-field="o.is_date"/></h3>
                 <table class="table table-sm">
                     <thead>
                         <tr>
-                            <th name="th_quantity" class="text-right"><strong>Qt</strong></th>
+                            <th name="th_quantity" class="text-right"><strong>Quantité</strong></th>
                             <th name="th_description"><strong>Description</strong></th>
                         </tr>
                     </thead>
@@ -55,8 +69,13 @@
                         </t>
                     </tbody>
                 </table>
-
-                <div><b><span t-field="o.user_id.name"/></b> - Tél : <span t-field="o.user_id.partner_id.phone"/> - Courriel : <span t-field="o.user_id.partner_id.email"/></div>
+                <div t-if="o.is_delai">Délai : <span t-field="o.is_delai"/></div>
+                <br />
+                <div style="margin-left:13cm">
+                    <b><span t-field="o.user_id.name"/></b><br />
+                    Tél : <span t-field="o.user_id.partner_id.phone"/><br />
+                    Courriel : <span t-field="o.user_id.partner_id.email"/>
+                </div>
 
                 <p t-field="o.notes"/>
                 <div class="oe_structure"/>

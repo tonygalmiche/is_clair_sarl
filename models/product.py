@@ -15,11 +15,11 @@ class IsFamille(models.Model):
     is_largeur_utile        = fields.Boolean("Largeur utile (mm)")
     is_surface_panneau      = fields.Boolean("Surface Panneau")
     is_surface_palette      = fields.Boolean("Surface Palette")
-    is_poids                = fields.Boolean("Poids")
+    is_poids                = fields.Boolean("Poids Unité")
     is_poids_rouleau        = fields.Boolean("Poids Rouleau")
     is_ondes                = fields.Boolean("Ondes")
     is_resistance_thermique = fields.Boolean("Résistance thermique (R)")
-
+    is_lambda               = fields.Boolean("Lambda ʎ (W/m.K)")
 
 
 class IsSousFamille(models.Model):
@@ -45,19 +45,22 @@ class product_template(models.Model):
     is_largeur_utile        = fields.Integer("Largeur utile (mm)")
     is_surface_panneau      = fields.Integer("Surface Panneau")
     is_surface_palette      = fields.Integer("Surface Palette")
-    is_poids                = fields.Float("Poids"        , digits=(14,2))
+    is_poids                = fields.Float("Poids Unité"        , digits=(14,2))
     is_poids_rouleau        = fields.Float("Poids Rouleau", digits=(14,2))
     is_ondes                = fields.Integer("Ondes")
     is_resistance_thermique = fields.Float("Résistance thermique (R)", digits=(14,2))
+    is_lambda               = fields.Float("Lambda ʎ (W/m.K)"        , digits=(14,3))
 
     is_longueur_vsb             = fields.Boolean("Longueur vsb"                , store=False, readonly=True, compute='_compute_vsb')
     is_largeur_utile_vsb        = fields.Boolean("Largeur utile (mm) vsb"      , store=False, readonly=True, compute='_compute_vsb')
     is_surface_panneau_vsb      = fields.Boolean("Surface Panneau vsb"         , store=False, readonly=True, compute='_compute_vsb')
     is_surface_palette_vsb      = fields.Boolean("Surface Palette vsb"         , store=False, readonly=True, compute='_compute_vsb')
-    is_poids_vsb                = fields.Boolean("Poids vsb"                   , store=False, readonly=True, compute='_compute_vsb')
+    is_poids_vsb                = fields.Boolean("Poids Unité vsb"             , store=False, readonly=True, compute='_compute_vsb')
     is_poids_rouleau_vsb        = fields.Boolean("Poids Rouleau vsb"           , store=False, readonly=True, compute='_compute_vsb')
     is_ondes_vsb                = fields.Boolean("Ondes vsb"                   , store=False, readonly=True, compute='_compute_vsb')
     is_resistance_thermique_vsb = fields.Boolean("Résistance thermique (R) vsb", store=False, readonly=True, compute='_compute_vsb')
+    is_lambda_vsb               = fields.Boolean("Lambda ʎ (W/m.K) vsb"        , store=False, readonly=True, compute='_compute_vsb')
+
 
 
     @api.depends('is_famille_id')
@@ -95,4 +98,8 @@ class product_template(models.Model):
             if obj.is_famille_id.is_resistance_thermique:
                 vsb=True
             obj.is_resistance_thermique_vsb = vsb
+            vsb=False
+            if obj.is_famille_id.is_lambda:
+                vsb=True
+            obj.is_lambda_vsb = vsb
 

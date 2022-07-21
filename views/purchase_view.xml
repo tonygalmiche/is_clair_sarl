@@ -21,8 +21,38 @@
                 <field name="is_affaire_id"/>
             </field>
             <field name="date_order" position="before">
+                <field name="is_date"/>
                 <field name="is_delai"/>
+                <field name="is_date_livraison"/>
+                <field name="is_lieu_livraison"/>
             </field>
+
+            <field name="date_order" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </field>
+
+            <label for="date_planned" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </label>
+
+            <div name="date_planned_div" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </div>
+
+            <div name="reminder" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </div>
+
+            <label for="date_approve" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </label>
+            <div name="date_approve" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </div>
+
+
+
+
 
 
             <notebook position="before">
@@ -59,6 +89,39 @@
 
         </field>
     </record>
+
+    <record id="is_purchase_order_kpis_tree" model="ir.ui.view">
+        <field name="name">is_purchase_order_kpis_tree</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_affaire_id"/>
+                <field name="is_date"  optional="show"/>
+                <field name="is_delai" optional="show"/>
+            </field>
+            <field name="date_order" position="replace"/>
+            <field name="user_id" position="replace"/>
+        </field>
+    </record>
+    <record id="is_purchase_order_view_tree" model="ir.ui.view">
+        <field name="name">is_purchase_order_view_tree</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_affaire_id"/>
+                <field name="is_date"           optional="show"/>
+                <field name="is_delai"          optional="show"/>
+                <field name="is_date_livraison" optional="show"/>
+                <field name="is_lieu_livraison" optional="show"/>
+            </field>
+            <field name="date_planned" position="replace"/>
+            <field name="user_id" position="replace"/>
+        </field>
+    </record>
+
+
 
 
      <!-- <sheet>

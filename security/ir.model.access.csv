@@ -27,3 +27,5 @@ access_is_finition,access_is_finition,model_is_finition,base.group_user,1,0,0,0
 access_is_traitement,access_is_traitement,model_is_traitement,base.group_user,1,0,0,0
 access_is_finition_manager,access_is_finition_manager,model_is_finition,sales_team.group_sale_manager,1,1,1,1
 access_is_traitement_manager,access_is_traitement_manager,model_is_traitement,sales_team.group_sale_manager,1,1,1,1
+
+is_clair_sarl.access_is_import_clair,access_is_import_clair,is_clair_sarl.model_is_import_clair,base.group_user,1,1,1,1

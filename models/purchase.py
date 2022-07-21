@@ -6,8 +6,14 @@ from odoo.tools.misc import formatLang, get_lang
 class purchase_order(models.Model):
     _inherit = "purchase.order"
 
-    is_affaire_id          = fields.Many2one('is.affaire', 'Affaire')
-    is_delai               = fields.Date('Délai')
+    is_affaire_id     = fields.Many2one('is.affaire', 'Affaire')
+    is_date           = fields.Date('Date')
+    is_delai          = fields.Date('Délai')
+    is_date_livraison = fields.Date('Date de livraison')
+    is_lieu_livraison = fields.Selection([
+        ('notre_adresse', 'A notre adresse'),
+        ('chantier'     , 'Livraison sur chantier référence'),
+    ], 'Lieu de livraison')
     is_condition_tarifaire = fields.Text('Conditions tarifaire', related='partner_id.is_condition_tarifaire')
 
 

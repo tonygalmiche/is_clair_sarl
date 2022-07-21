@@ -26,6 +26,7 @@
                         <field name="is_poids_rouleau"/>
                         <field name="is_ondes"/>
                         <field name="is_resistance_thermique"/>
+                        <field name="is_lambda"/>
                     </group>
                 </sheet>
             </form>
@@ -38,6 +39,16 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
+                <field name="sous_famille_ids" widget="many2many_tags"/>
+                <field name="is_longueur"/>
+                <field name="is_largeur_utile"/>
+                <field name="is_surface_panneau"/>
+                <field name="is_surface_palette"/>
+                <field name="is_poids"/>
+                <field name="is_poids_rouleau"/>
+                <field name="is_ondes"/>
+                <field name="is_resistance_thermique"/>
+                <field name="is_lambda"/>
             </tree>
         </field>
     </record>
@@ -134,6 +145,7 @@
                 <field name="is_poids_rouleau_vsb"        invisible="1"/>
                 <field name="is_ondes_vsb"                invisible="1"/>
                 <field name="is_resistance_thermique_vsb" invisible="1"/>
+                <field name="is_lambda_vsb"               invisible="1"/>
 
                 <field name="is_longueur"             attrs="{'invisible':[('is_longueur_vsb','=',False)]}"/>
                 <field name="is_largeur_utile"        attrs="{'invisible':[('is_largeur_utile_vsb','=',False)]}"/>
@@ -143,6 +155,7 @@
                 <field name="is_poids_rouleau"        attrs="{'invisible':[('is_poids_rouleau_vsb','=',False)]}"/>
                 <field name="is_ondes"                attrs="{'invisible':[('is_ondes_vsb','=',False)]}"/>
                 <field name="is_resistance_thermique" attrs="{'invisible':[('is_resistance_thermique_vsb','=',False)]}"/>
+                <field name="is_lambda"               attrs="{'invisible':[('is_lambda_vsb','=',False)]}"/>
             </field>
         </field>
     </record> 
@@ -183,4 +196,35 @@
             </filter>
         </field>
     </record> 
+
+    <!-- Vue tree par défaut -->
+    <record id="purchase.product_normal_action_puchased" model="ir.actions.act_window">
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+    </record>
+    <record id="sale.product_template_action" model="ir.actions.act_window">
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+        <field name="view_id" ref=""/>
+    </record>
+    <record id="product.product_template_action" model="ir.actions.act_window">
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+    </record>
+    <record id="account.product_product_action_sellable" model="ir.actions.act_window">
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+    </record>
+    <record id="product.product_template_action_all" model="ir.actions.act_window">
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+    </record>
+    <record id="account.product_product_action_purchasable" model="ir.actions.act_window">
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+    </record>
+
+
+
+
 </odoo>

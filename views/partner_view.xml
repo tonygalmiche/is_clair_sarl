@@ -179,4 +179,15 @@
         </field>
     </record>
 
+
+    <!-- Vue tree par défaut -->
+    <record id="account.res_partner_action_supplier" model="ir.actions.act_window">
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+    </record>
+    <record id="account.res_partner_action_customer" model="ir.actions.act_window">
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+    </record>
+
 </odoo>
