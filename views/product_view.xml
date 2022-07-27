@@ -134,6 +134,7 @@
                 </span>
             </div>
            <field name="detailed_type" position="after">
+                <field name="is_fournisseur_id" attrs="{'invisible':[('is_fournisseur_id','=',False)]}"/>
                 <field name="is_famille_id"/>
                 <field name="is_sous_famille_id"  domain="[('famille_ids', 'in', is_famille_id)]"/>
 
@@ -165,6 +166,7 @@
         <field name="inherit_id" ref="product.product_template_tree_view"/>
         <field name="arch" type="xml">
            <field name="default_code" position="after">
+                <field name="is_fournisseur_id"        optional="show"/>
                 <field name="is_famille_id"            optional="show"/>
                 <field name="is_sous_famille_id"       optional="show"/>
                 <field name="is_longueur"              optional="show"/>
@@ -180,17 +182,20 @@
         </field>
     </record> 
 
+
     <record id="is_product_template_search_view" model="ir.ui.view">
         <field name="name">is_product_template_search_view</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_search_view"/>
         <field name="arch" type="xml">
            <field name="name" position="after">
+                <field name="is_fournisseur_id"/>
                 <field name="is_famille_id"/>
                 <field name="is_sous_famille_id"/>
                 <field name="is_tache"/>
             </field>
             <filter name="type" position="before">
+                <filter string="Fournisseur"  name="is_fournisseur_id"  context="{'group_by':'is_fournisseur_id'}"/>
                 <filter string="Famille"      name="is_famille_id"      context="{'group_by':'is_famille_id'}"/>
                 <filter string="Sous-famille" name="is_sous_famille_id" context="{'group_by':'is_sous_famille_id'}"/>
             </filter>

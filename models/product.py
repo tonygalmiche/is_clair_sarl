@@ -61,6 +61,17 @@ class product_template(models.Model):
     is_resistance_thermique_vsb = fields.Boolean("Résistance thermique (R) vsb", store=False, readonly=True, compute='_compute_vsb')
     is_lambda_vsb               = fields.Boolean("Lambda ʎ (W/m.K) vsb"        , store=False, readonly=True, compute='_compute_vsb')
 
+    is_fournisseur_id = fields.Many2one('res.partner', 'Fournisseur par défaut', store=True, readonly=True, compute='_compute_is_fournisseur_id')
+
+
+    @api.depends('seller_ids')
+    def _compute_is_fournisseur_id(self):
+        for obj in self:
+            is_fournisseur_id=False
+            for line in obj.seller_ids:
+                is_fournisseur_id = line.name.id
+                break
+            obj.is_fournisseur_id =is_fournisseur_id
 
 
     @api.depends('is_famille_id')
