@@ -52,6 +52,7 @@
                 <field name="is_resistance_thermique"/>
                 <field name="is_lambda"/>
                 <field name="is_lg_mini_forfait"/>
+                <field name="is_forfait_coupe_id"/>
             </tree>
         </field>
     </record>
