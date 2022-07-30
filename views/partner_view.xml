@@ -157,6 +157,9 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_tree" />
         <field name="arch" type="xml">
+            <field name="phone" position="after">
+                <field name="mobile" optional="show"/>
+            </field>
             <field name="user_id" position="before">
                 <field name="is_statut_id"           optional="show"/>
                 <field name="is_profil_id"           optional="show"/>

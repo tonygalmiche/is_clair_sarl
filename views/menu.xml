@@ -91,7 +91,21 @@
     />
 
 
-    <!-- Achats / Configuration / Lignes de commandes -->
+    <!-- Achats / Configuration -->
+    <menuitem 
+        id="is_famille_purchase_menu" 
+        sequence="900" 
+        name="Famille article"
+        action="is_famille_action" 
+        parent="purchase.menu_product_in_config_purchase" 
+    />
+    <menuitem 
+        id="is_sous_famille_purchase_menu" 
+        sequence="910" 
+        name="Sous-famille article"
+        action="is_sous_famille_action" 
+        parent="purchase.menu_product_in_config_purchase" 
+    />
     <menuitem 
         id="is_config_ligne_commande_achat_menu" 
         sequence="920" 

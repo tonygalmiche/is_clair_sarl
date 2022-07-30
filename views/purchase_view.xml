@@ -66,11 +66,11 @@
                 <field name="is_finition_id"   optional="show"/>
                 <field name="is_traitement_id" optional="show"/>
             </xpath>
-            <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
+            <!-- <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
                 <field name="is_finition_id"/>
                 <field name="is_traitement_id"/>
             </xpath>
-
+ -->
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree/field[@name='product_qty']" position="before">
                 <field name="is_colisage" optional="hide" widget="html"/>
                 <field name="is_liste_colis_action_vsb" invisible="1"/>
@@ -82,14 +82,25 @@
                 />
             </xpath>
 
+            <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='date_planned']" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </xpath>
 
-            <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='invoices_incoming_shiptments']" position="after">
+            <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='date_planned']" position="after">
+                <field name="is_finition_id"/>
+                <field name="is_traitement_id"/>
+            </xpath>
+
+
+            <!-- <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='invoices_incoming_shiptments']" position="after">
                 <page string="Colisage">
                     <group>
                         <field name="is_colisage" widget="html"/>
                     </group>
                 </page>
             </xpath>
+ -->
+
 
 
             <!-- <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='invoices_incoming_shiptments']" position="after">
