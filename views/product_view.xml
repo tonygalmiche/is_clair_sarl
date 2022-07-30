@@ -27,6 +27,8 @@
                         <field name="is_ondes"/>
                         <field name="is_resistance_thermique"/>
                         <field name="is_lambda"/>
+                        <field name="is_lg_mini_forfait"/>
+                        <field name="is_forfait_coupe_id"/>
                     </group>
                 </sheet>
             </form>
@@ -49,6 +51,7 @@
                 <field name="is_ondes"/>
                 <field name="is_resistance_thermique"/>
                 <field name="is_lambda"/>
+                <field name="is_lg_mini_forfait"/>
             </tree>
         </field>
     </record>
@@ -147,6 +150,8 @@
                 <field name="is_ondes_vsb"                invisible="1"/>
                 <field name="is_resistance_thermique_vsb" invisible="1"/>
                 <field name="is_lambda_vsb"               invisible="1"/>
+                <field name="is_lg_mini_forfait_vsb"      invisible="1"/>
+                <field name="is_forfait_coupe_id_vsb"     invisible="1"/>
 
                 <field name="is_longueur"             attrs="{'invisible':[('is_longueur_vsb','=',False)]}"/>
                 <field name="is_largeur_utile"        attrs="{'invisible':[('is_largeur_utile_vsb','=',False)]}"/>
@@ -157,6 +162,8 @@
                 <field name="is_ondes"                attrs="{'invisible':[('is_ondes_vsb','=',False)]}"/>
                 <field name="is_resistance_thermique" attrs="{'invisible':[('is_resistance_thermique_vsb','=',False)]}"/>
                 <field name="is_lambda"               attrs="{'invisible':[('is_lambda_vsb','=',False)]}"/>
+                <field name="is_lg_mini_forfait"      attrs="{'invisible':[('is_lg_mini_forfait_vsb','=',False)]}"/>
+                <field name="is_forfait_coupe_id"     attrs="{'invisible':[('is_forfait_coupe_id_vsb','=',False)]}"/>
             </field>
         </field>
     </record> 

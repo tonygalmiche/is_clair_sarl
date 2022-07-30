@@ -49,12 +49,6 @@
             <div name="date_approve" position="attributes">
                  <attribute name="invisible">1</attribute>
             </div>
-
-
-
-
-
-
             <notebook position="before">
                 <div style="background:orange;color:white;font-weight:bold;padding-left:5pt" attrs="{'invisible':[('is_condition_tarifaire','=',False)]}">
                     <field 
@@ -76,17 +70,47 @@
                 <field name="is_finition_id"/>
                 <field name="is_traitement_id"/>
             </xpath>
+
+            <xpath expr="//page[@name='products']/field[@name='order_line']/tree/field[@name='product_qty']" position="before">
+                <field name="is_colisage" optional="hide" widget="html"/>
+                <field name="is_liste_colis_action_vsb" invisible="1"/>
+                <button 
+                    name="liste_colis_action" 
+                    type="object" icon="fa-list-alt" 
+                    title="Liste des colis"
+                    attrs="{'invisible':[('is_liste_colis_action_vsb','=',False)]}"
+                />
+            </xpath>
+
+
             <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='invoices_incoming_shiptments']" position="after">
+                <page string="Colisage">
+                    <group>
+                        <field name="is_colisage" widget="html"/>
+                    </group>
+                </page>
+            </xpath>
+
+
+            <!-- <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='invoices_incoming_shiptments']" position="after">
                 <page string="Calculateur Clair SARL">
                     <group>
                         <field name="is_largeur"/>
                         <field name="is_hauteur"/>
                     </group>
                 </page>
-            </xpath>
-
-
-
+               <page string="Colisage">
+                    <group>
+                        <field name="is_colis_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="line_id" invisible="1"/>
+                                <field name="name"/>
+                                <field name="surface"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath> -->
         </field>
     </record>
 
@@ -120,35 +144,6 @@
             <field name="user_id" position="replace"/>
         </field>
     </record>
-
-
-
-
-     <!-- <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button type="object" name="action_view_invoice" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible':['|', ('invoice_count', '=', 0), ('state', 'in', ('draft','sent','to approve'))]}">
-                            <field name="invoice_count" widget="statinfo" string="Vendor Bills"/>
-                            <field name="invoice_ids" invisible="1"/>
-                        </button>
-                    </div>
-                    <div class="oe_title">
-                        <span class="o_form_label" attrs="{'invisible': [('state','not in',('draft','sent'))]}">Request for Quotation </span>
-                        <span class="o_form_label" attrs="{'invisible': [('state','in',('draft','sent'))]}">Purchase Order </span>
-                        <h1>
-                            <field name="priority" widget="priority" class="mr-3"/>
-                            <field name="name" readonly="1"/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="partner_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'supplier', 'show_vat': True}" placeholder="Name, TIN, Email, or Reference"/>
-                            <field name="partner_ref"/>
-                            <field name="currency_id" groups="base.group_multi_currency" force_save="1"/>
-                            <field name="id" invisible="1"/>
-                        </group>
-                        <group>
-                            <field name="date_order" attrs="{'invisible': [('state','in',('purchase','done'))]}"/>
- -->
 
 
     <!--is.finition -->
@@ -233,6 +228,84 @@
         <field name="res_model">is.traitement</field>
         <field name="view_mode">tree,form</field>
     </record>
+
+
+    <!--is.purchase.order.line.colis -->
+    <record id="is_purchase_order_line_colis_form_view" model="ir.ui.view">
+        <field name="name">is_purchase_order_line_colis_from_view</field>
+        <field name="model">is.purchase.order.line.colis</field>
+        <field name="arch" type="xml">
+            <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="line_id" invisible="1"/>
+                            <field name="name"/>
+                            <field name="surface"       invisible="1"/>
+                            <field name="forfait_coupe" invisible="1"/>
+
+
+                        </group>
+                        <group>
+                            <field name="largeur_utile"/>
+                            <field name="poids"/>
+                            <field name="forfait_coupe_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="line_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="colis_id" invisible="1"/>
+                                <field name="nb"            sum="Total"/>
+                                <field name="longueur"      sum="Total"/>
+                                <field name="note"/>
+                                <field name="surface"       sum="Total"/>
+                                <field name="poids"         sum="Total"/>
+                                <field name="forfait_coupe" sum="Total"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_purchase_order_line_colis_tree_view">
+        <field name="name">is_purchase_order_line_colis_tree_view</field>
+        <field name="model">is.purchase.order.line.colis</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="line_id" invisible="1"/>
+                <field name="name"/>
+                <field name="surface"       sum="Total"/>
+                <field name="poids"         sum="Total"/>
+                <field name="forfait_coupe" sum="Total"/>
+                <field name="forfait_coupe_id"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_purchase_order_line_colis_search_view" model="ir.ui.view">
+        <field name="name">is_purchase_order_line_colis_search_view</field>
+        <field name="model">is.purchase.order.line.colis</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_purchase_order_line_colis_action" model="ir.actions.act_window">
+        <field name="name">Colis</field>
+        <field name="res_model">is.purchase.order.line.colis</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
 
 </odoo>
 

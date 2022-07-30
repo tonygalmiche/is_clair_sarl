@@ -31,19 +31,19 @@
                     .o_boxed_footer, .o_boxed_header, .o_report_layout_boxed{
                         font-size:11pt;
                     }
-
-
                 </style>
                 <div class="oe_structure"/>
                 <br />
                 <h2 t-if="o.is_affaire_id">Affaire : 
                     <span t-field="o.is_affaire_id.display_name"/>
                 </h2>
+                <div style="height:3mm"/>
                 <h3>Demande de prix <span t-field="o.name"/> du <span t-field="o.is_date"/></h3>
+                <div style="height:3mm"/>
                 <table class="table table-sm">
                     <thead>
                         <tr>
-                            <th name="th_quantity" class="text-right"><strong>Quantité</strong></th>
+                            <th name="th_quantity" class="text-center"><strong>Quantité</strong></th>
                             <th name="th_description"><strong>Description</strong></th>
                         </tr>
                     </thead>

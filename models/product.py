@@ -20,6 +20,8 @@ class IsFamille(models.Model):
     is_ondes                = fields.Boolean("Ondes")
     is_resistance_thermique = fields.Boolean("Résistance thermique (R)")
     is_lambda               = fields.Boolean("Lambda ʎ (W/m.K)")
+    is_lg_mini_forfait      = fields.Boolean("Longueur mini forfait coupe")
+    is_forfait_coupe_id     = fields.Boolean("Forfait coupe")
 
 
 class IsSousFamille(models.Model):
@@ -50,16 +52,20 @@ class product_template(models.Model):
     is_ondes                = fields.Integer("Ondes")
     is_resistance_thermique = fields.Float("Résistance thermique (R)", digits=(14,2))
     is_lambda               = fields.Float("Lambda ʎ (W/m.K)"        , digits=(14,3))
+    is_lg_mini_forfait      = fields.Integer("Longueur mini forfait coupe")
+    is_forfait_coupe_id     = fields.Many2one('product.product', 'Forfait coupe')
 
-    is_longueur_vsb             = fields.Boolean("Longueur vsb"                , store=False, readonly=True, compute='_compute_vsb')
-    is_largeur_utile_vsb        = fields.Boolean("Largeur utile (mm) vsb"      , store=False, readonly=True, compute='_compute_vsb')
-    is_surface_panneau_vsb      = fields.Boolean("Surface Panneau vsb"         , store=False, readonly=True, compute='_compute_vsb')
-    is_surface_palette_vsb      = fields.Boolean("Surface Palette vsb"         , store=False, readonly=True, compute='_compute_vsb')
-    is_poids_vsb                = fields.Boolean("Poids Unité vsb"             , store=False, readonly=True, compute='_compute_vsb')
-    is_poids_rouleau_vsb        = fields.Boolean("Poids Rouleau vsb"           , store=False, readonly=True, compute='_compute_vsb')
-    is_ondes_vsb                = fields.Boolean("Ondes vsb"                   , store=False, readonly=True, compute='_compute_vsb')
-    is_resistance_thermique_vsb = fields.Boolean("Résistance thermique (R) vsb", store=False, readonly=True, compute='_compute_vsb')
-    is_lambda_vsb               = fields.Boolean("Lambda ʎ (W/m.K) vsb"        , store=False, readonly=True, compute='_compute_vsb')
+    is_longueur_vsb             = fields.Boolean("Longueur vsb"                   , store=False, readonly=True, compute='_compute_vsb')
+    is_largeur_utile_vsb        = fields.Boolean("Largeur utile (mm) vsb"         , store=False, readonly=True, compute='_compute_vsb')
+    is_surface_panneau_vsb      = fields.Boolean("Surface Panneau vsb"            , store=False, readonly=True, compute='_compute_vsb')
+    is_surface_palette_vsb      = fields.Boolean("Surface Palette vsb"            , store=False, readonly=True, compute='_compute_vsb')
+    is_poids_vsb                = fields.Boolean("Poids Unité vsb"                , store=False, readonly=True, compute='_compute_vsb')
+    is_poids_rouleau_vsb        = fields.Boolean("Poids Rouleau vsb"              , store=False, readonly=True, compute='_compute_vsb')
+    is_ondes_vsb                = fields.Boolean("Ondes vsb"                      , store=False, readonly=True, compute='_compute_vsb')
+    is_resistance_thermique_vsb = fields.Boolean("Résistance thermique (R) vsb"   , store=False, readonly=True, compute='_compute_vsb')
+    is_lambda_vsb               = fields.Boolean("Lambda ʎ (W/m.K) vsb"           , store=False, readonly=True, compute='_compute_vsb')
+    is_lg_mini_forfait_vsb      = fields.Boolean("Longueur mini forfait coupe vsb", store=False, readonly=True, compute='_compute_vsb')
+    is_forfait_coupe_id_vsb     = fields.Boolean("Forfait coupe vsb"              , store=False, readonly=True, compute='_compute_vsb')
 
     is_fournisseur_id = fields.Many2one('res.partner', 'Fournisseur par défaut', store=True, readonly=True, compute='_compute_is_fournisseur_id')
 
@@ -113,4 +119,9 @@ class product_template(models.Model):
             if obj.is_famille_id.is_lambda:
                 vsb=True
             obj.is_lambda_vsb = vsb
-
+            if obj.is_famille_id.is_lg_mini_forfait:
+                vsb=True
+            obj.is_lg_mini_forfait_vsb = vsb
+            if obj.is_famille_id.is_forfait_coupe_id:
+                vsb=True
+            obj.is_forfait_coupe_id_vsb = vsb

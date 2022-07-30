@@ -2,6 +2,11 @@
 <odoo>
     <template id="is_external_layout_boxed" name="is_external_layout_boxed" inherit_id="web.external_layout_boxed">
         <xpath expr="//div[hasclass('o_boxed_header')]" position="replace">
+            <style>
+                .o_boxed_header {
+                    border-bottom: 0;
+                }
+            </style>
             <div class="o_boxed_header">
                 <div class="row mb8">
                     <div class="col-6">
