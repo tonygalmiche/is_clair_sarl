@@ -14,6 +14,7 @@ class purchase_order(models.Model):
     is_lieu_livraison = fields.Selection([
         ('notre_adresse', 'A notre adresse'),
         ('chantier'     , 'Livraison sur chantier référence'),
+        ('enlevement'   , 'Enlèvement'),
     ], 'Lieu de livraison')
     is_condition_tarifaire = fields.Text('Conditions tarifaire', related='partner_id.is_condition_tarifaire')
 
