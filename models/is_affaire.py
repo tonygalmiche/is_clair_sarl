@@ -56,7 +56,7 @@ class IsAffaire(models.Model):
     _description = "Affaire"
     _order='name desc'
 
-    name               = fields.Char("N° d'Affaire", required=True, index=True, help="Sous la forme AA-XXXX")
+    name               = fields.Char("N° d'Affaire", index=True, help="Sous la forme AA-XXXX")
     nom                = fields.Char("Nom de l'affaire")
     date_creation      = fields.Date("Date de création", default=lambda *a: fields.Date.today())
     client_id          = fields.Many2one('res.partner' , 'Client')
@@ -72,7 +72,16 @@ class IsAffaire(models.Model):
     def name_get(self):
         result = []
         for obj in self:
-            name="[%s] %s - %s %s %s %s"%(obj.name,obj.nom or '', obj.chantier_id.street or '', obj.chantier_id.street2 or '', obj.chantier_id.zip or '', obj.chantier_id.city or '')
+
+            name=""
+            if obj.name and obj.nom:
+                name = "[%s] %s"%(obj.name,obj.nom)
+            if obj.name and not obj.nom:
+                name = "%s"%(obj.name)
+            if obj.nom and not obj.name:
+                name = "%s"%(obj.nom)
+            if obj.chantier_id:
+                name+=" - %s %s %s %s"%(obj.chantier_id.street or '', obj.chantier_id.street2 or '', obj.chantier_id.zip or '', obj.chantier_id.city or '')
             result.append((obj.id, name))
         return result
 

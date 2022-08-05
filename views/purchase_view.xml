@@ -16,17 +16,21 @@
                     }
                 </style>
             </xpath>
-
             <field name="partner_id" position="after">
                 <field name="is_affaire_id"/>
             </field>
             <field name="date_order" position="before">
                 <field name="is_date"/>
-                <field name="is_delai"/>
+                <label for="is_delai"/>
+                <div class="d-flex">
+                    <field name="is_delai_mois_id" placeholder="Mois / Trimestre"/>
+                    <span class="o_form_label mx-3"> </span>
+                    <field name="is_delai_annee"   placeholder="Année"/>
+                </div>
+                <field name="is_delai" invisible="1"/>
                 <field name="is_date_livraison"/>
                 <field name="is_lieu_livraison"/>
             </field>
-
             <field name="date_order" position="attributes">
                  <attribute name="invisible">1</attribute>
             </field>
@@ -57,71 +61,36 @@
                     />
                 </div>
             </notebook>
-
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree" position="attributes">
                 <attribute name="editable"></attribute>
             </xpath>
-
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree/field[@name='name']" position="before">
                 <field name="is_finition_id"   optional="show"/>
                 <field name="is_traitement_id" optional="show"/>
             </xpath>
-            <!-- <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
-                <field name="is_finition_id"/>
-                <field name="is_traitement_id"/>
-            </xpath>
- -->
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree/field[@name='product_qty']" position="before">
                 <field name="is_colisage" optional="hide" widget="html"/>
                 <field name="is_liste_colis_action_vsb" invisible="1"/>
                 <button 
                     name="liste_colis_action" 
-                    type="object" icon="fa-list-alt" 
+                    type="object" icon="fa-list-ul" 
                     title="Liste des colis"
                     attrs="{'invisible':[('is_liste_colis_action_vsb','=',False)]}"
                 />
+                <button 
+                    name="liste_lignes_colis_action" 
+                    type="object" icon="fa-list" 
+                    title="Liste des lignes des colis"
+                    attrs="{'invisible':[('is_liste_colis_action_vsb','=',False)]}"
+                />
             </xpath>
-
             <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='date_planned']" position="attributes">
                  <attribute name="invisible">1</attribute>
             </xpath>
-
             <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='date_planned']" position="after">
                 <field name="is_finition_id"/>
                 <field name="is_traitement_id"/>
             </xpath>
-
-
-            <!-- <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='invoices_incoming_shiptments']" position="after">
-                <page string="Colisage">
-                    <group>
-                        <field name="is_colisage" widget="html"/>
-                    </group>
-                </page>
-            </xpath>
- -->
-
-
-
-            <!-- <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='invoices_incoming_shiptments']" position="after">
-                <page string="Calculateur Clair SARL">
-                    <group>
-                        <field name="is_largeur"/>
-                        <field name="is_hauteur"/>
-                    </group>
-                </page>
-               <page string="Colisage">
-                    <group>
-                        <field name="is_colis_ids" nolabel="1">
-                            <tree editable="bottom">
-                                <field name="line_id" invisible="1"/>
-                                <field name="name"/>
-                                <field name="surface"/>
-                            </tree>
-                        </field>
-                    </group>
-                </page>
-            </xpath> -->
         </field>
     </record>
 
@@ -241,6 +210,48 @@
     </record>
 
 
+    <!--is.mois.trimestre -->
+    <record id="is_mois_trimestre_form_view" model="ir.ui.view">
+        <field name="name">is_mois_trimestre_from_view</field>
+        <field name="model">is.mois.trimestre</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_mois_trimestre_tree_view">
+        <field name="name">is_mois_trimestre_tree_view</field>
+        <field name="model">is.mois.trimestre</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+    <record id="is_mois_trimestre_search_view" model="ir.ui.view">
+        <field name="name">is_mois_trimestre_search_view</field>
+        <field name="model">is.mois.trimestre</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_mois_trimestre_action" model="ir.actions.act_window">
+        <field name="name">Mois / Trimestre</field>
+        <field name="res_model">is.mois.trimestre</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
     <!--is.purchase.order.line.colis -->
     <record id="is_purchase_order_line_colis_form_view" model="ir.ui.view">
         <field name="name">is_purchase_order_line_colis_from_view</field>
@@ -266,6 +277,7 @@
                         <group>
                             <field name="largeur_utile"/>
                             <field name="poids"/>
+                            <field name="poids_colis"/>
                             <field name="forfait_coupe_id"/>
                         </group>
                     </group>
@@ -295,7 +307,8 @@
                 <field name="line_id" invisible="1"/>
                 <field name="name"/>
                 <field name="surface"       sum="Total"/>
-                <field name="poids"         sum="Total"/>
+                <field name="poids"/>
+                <field name="poids_colis"   sum="Total"/>
                 <field name="forfait_coupe" sum="Total"/>
                 <field name="forfait_coupe_id"/>
             </tree>
@@ -314,6 +327,102 @@
         <field name="name">Colis</field>
         <field name="res_model">is.purchase.order.line.colis</field>
         <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+
+    <!--is.purchase.order.line.colis.line -->
+    <record id="is_purchase_order_line_colis_line_form_view" model="ir.ui.view">
+        <field name="name">is_purchase_order_line_colis_line_from_view</field>
+        <field name="model">is.purchase.order.line.colis.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="colis_id"/>
+                            <field name="nb"/>
+                            <field name="longueur"/>
+                            <field name="note"/>
+                            <field name="surface"/>
+                            <field name="poids"/>
+                            <field name="forfait_coupe"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_purchase_order_line_colis_line_tree_view">
+        <field name="name">is_purchase_order_line_colis_line_tree_view</field>
+        <field name="model">is.purchase.order.line.colis.line</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree editable="top" create="0">
+                <field name="order_line_id"/>
+                <field name="colis_ids" widget="many2many_tags"/>
+                <field name="colis_id" domain="[('id', 'in', colis_ids)]"/> 
+                <field name="nb"            sum="Total"/>
+                <field name="longueur"      sum="Total"/>
+                <field name="note"/>
+                <field name="surface"       sum="Total"/>
+                <field name="poids"         sum="Total"/>
+                <field name="forfait_coupe" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="is_purchase_order_line_colis_line_kanban_view" model="ir.ui.view">
+        <field name="name">is_purchase_order_line_colis_line_kanban_view</field>
+        <field name="model">is.purchase.order.line.colis.line</field>
+        <field name="arch" type="xml">
+            <kanban sample="1">
+                <field name="id"/>
+                <field name="colis_id"/>
+                <field name="nb"/>
+                <field name="longueur"/>
+                <field name="surface"/>
+                <field name="poids"/>
+                <field name="surface"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                             <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top mb-0">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="id"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div><field name="nb"/> / <field name="longueur"/> / <field name="surface"/></div>
+                                <div>Poids ligne : <field name="poids"/></div>
+                                <div><b>Poids colis : <field name="poids_colis"/></b></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="is_purchase_order_line_colis_line_search_view" model="ir.ui.view">
+        <field name="name">is_purchase_order_line_colis_line_search_view</field>
+        <field name="model">is.purchase.order.line.colis.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="colis_id" />
+                <group string="Group By">
+                    <filter name="group_colis_id" string="Colis" context="{'group_by':'colis_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="is_purchase_order_line_colis_line_action" model="ir.actions.act_window">
+        <field name="name">Finitions</field>
+        <field name="res_model">is.purchase.order.line.colis.line</field>
+        <field name="view_mode">tree,form,kanban</field>
     </record>
 
 

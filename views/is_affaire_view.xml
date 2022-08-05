@@ -173,6 +173,7 @@
         <field name="type">tree</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="display_name" string="Nom complet" optional="hide"/>
                 <field name="name"/>
                 <field name="nom"/>
                 <field name="date_creation"/>

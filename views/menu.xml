@@ -91,6 +91,15 @@
     />
 
 
+    <!-- Achats / Commandes -->
+    <menuitem 
+        id="is_purchase_affaire_menu" 
+        sequence="900" 
+        name="Affaires"
+        action="is_affaire_action" 
+        parent="purchase.menu_procurement_management" 
+    />
+
     <!-- Achats / Configuration -->
     <menuitem 
         id="is_famille_purchase_menu" 
@@ -107,8 +116,21 @@
         parent="purchase.menu_product_in_config_purchase" 
     />
     <menuitem 
-        id="is_config_ligne_commande_achat_menu" 
+        id="is_config_demande_de_prix_menu" 
         sequence="920" 
+        name="Demande de prix"
+        parent="purchase.menu_purchase_config" 
+    />
+    <menuitem 
+        id="is_mois_trimestre_menu" 
+        sequence="10" 
+        name="Mois / Trimestre"
+        action="is_mois_trimestre_action" 
+        parent="is_config_demande_de_prix_menu" 
+    />
+    <menuitem 
+        id="is_config_ligne_commande_achat_menu" 
+        sequence="930" 
         name="Lignes de commandes"
         parent="purchase.menu_purchase_config" 
     />

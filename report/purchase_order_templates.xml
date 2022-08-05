@@ -34,10 +34,10 @@
                         font-size:11pt;
                     }
                     .colisage th{
-                        font-size:9pt;
+                        font-size:11pt;
                     }
                     .colisage td{
-                        font-size:9pt;
+                        font-size:11pt;
                         padding: 0;
                         padding-left:0.3em;
                         padding-right:0.3em;
@@ -93,8 +93,8 @@
                                         <span t-field="line.product_qty"/>
                                         <span t-field="line.product_uom.name" groups="uom.group_uom"/>
                                     </td>
-                                    <td class="text-right">
-                                        <span t-field="line.price_unit"/>
+                                    <td class="text-right" style="white-space: nowrap;">
+                                        <span t-field="line.price_unit"/> €
                                     </td>
                                     <td class="text-right">
                                         <span t-field="line.price_subtotal"

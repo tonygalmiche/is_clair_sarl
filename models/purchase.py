@@ -4,12 +4,17 @@ from pdb import line_prefix
 from odoo import models,fields,api
 from odoo.tools.misc import formatLang, get_lang
 
+
 class purchase_order(models.Model):
     _inherit = "purchase.order"
 
     is_affaire_id     = fields.Many2one('is.affaire', 'Affaire')
     is_date           = fields.Date('Date')
-    is_delai          = fields.Date('Délai')
+    
+    is_delai_mois_id = fields.Many2one('is.mois.trimestre', 'Délai (Mois / Trimestre)')
+    is_delai_annee   = fields.Char('Délai (Année)')
+    is_delai         = fields.Char("Délai prévisionnel", store=True, readonly=True, compute='_compute_is_delai', help="Délai prévisionnel de l'affaire")
+
     is_date_livraison = fields.Date('Date de livraison')
     is_lieu_livraison = fields.Selection([
         ('notre_adresse', 'A notre adresse'),
@@ -17,6 +22,14 @@ class purchase_order(models.Model):
         ('enlevement'   , 'Enlèvement'),
     ], 'Lieu de livraison')
     is_condition_tarifaire = fields.Text('Conditions tarifaire', related='partner_id.is_condition_tarifaire')
+
+
+    @api.depends('is_delai_mois_id','is_delai_annee')
+    def _compute_is_delai(self):
+        for obj in self:
+            t=[(obj.is_delai_mois_id.name or ''), (obj.is_delai_annee or '')]
+            x = " ".join(t)
+            obj.is_delai=x
 
 
 class purchase_order_line(models.Model):
@@ -112,6 +125,39 @@ class purchase_order_line(models.Model):
             }
 
 
+    def liste_lignes_colis_action(self):
+        for obj in self:
+            filtre=[
+                ("line_id"  ,"=", obj.id),
+            ]
+            colis = self.env['is.purchase.order.line.colis'].search(filtre)
+            ids=[]
+            for c in colis:
+                for line in c.line_ids:
+                    ids.append(line.id)
+            ctx={
+                'group_by': 'colis_id',
+            }
+            return {
+                "name": "Ligne "+str(obj.id),
+                "view_mode": "kanban,tree,form",
+                "res_model": "is.purchase.order.line.colis.line",
+                "domain": [
+                    ("id","in",ids),
+                ],
+                "type": "ir.actions.act_window",
+                "context": ctx,
+            }
+
+
+class IsMoisTrimestre(models.Model):
+    _name='is.mois.trimestre'
+    _description = "IsMoisTrimestre"
+    _order='name'
+
+    name = fields.Char('Mois / Trimestre', required=True, index=True)
+
+
 class IsFinition(models.Model):
     _name='is.finition'
     _description = "Finition"
@@ -137,11 +183,20 @@ class IsPurchaseOrderLineColis(models.Model):
     product_id       = fields.Many2one('product.product', 'Article', related='line_id.product_id')
     largeur_utile    = fields.Integer("Largeur utile (mm)", related='product_id.is_largeur_utile')
     poids            = fields.Float("Poids (Kg/㎡)"        , related='product_id.is_poids')
+    poids_colis      = fields.Float("Poids colis", digits=(14,2), store=True, readonly=True, compute='_compute_poids_colis')
     forfait_coupe_id = fields.Many2one('product.product', 'Longueur mini forfait coupe', related='product_id.is_forfait_coupe_id')
     name             = fields.Char('Colis', required=True, index=True)
     surface          = fields.Float("Surface (㎡)", digits=(14,2), store=True, readonly=True, compute='_compute_surface')
     forfait_coupe    = fields.Integer("Forfait coupe"            , store=True, readonly=True, compute='_compute_surface')
     line_ids         = fields.One2many('is.purchase.order.line.colis.line', 'colis_id', 'Lignes')
+
+    @api.depends('line_ids')
+    def _compute_poids_colis(self):
+        for obj in self:
+            poids=0
+            for line in obj.line_ids:
+                poids+=line.poids
+            obj.poids_colis=poids
 
 
     @api.depends('line_ids')
@@ -195,8 +250,12 @@ class IsPurchaseOrderLineColis(models.Model):
 class IsPurchaseOrderLineColisLine(models.Model):
     _name='is.purchase.order.line.colis.line'
     _description = "Lignes des colis des lignes de commandes fournisseurs"
+    _order='colis_id,id'
 
     colis_id      = fields.Many2one('is.purchase.order.line.colis', 'Colis', required=True, ondelete='cascade')
+    poids_colis   = fields.Float("Poids colis", related='colis_id.poids_colis')
+    order_line_id = fields.Many2one('purchase.order.line', related='colis_id.line_id')
+    colis_ids     = fields.Many2many('is.purchase.order.line.colis', 'is_purchase_order_line_colis_ids', 'line_id', 'colis_id', store=False, readonly=True, compute='_compute_colis_ids', string="Colis de la ligne")
     nb            = fields.Integer('Nb'      , required=True)
     longueur      = fields.Integer("Longueur", required=True)
     note          = fields.Char("Note")
@@ -217,3 +276,14 @@ class IsPurchaseOrderLineColisLine(models.Model):
             obj.forfait_coupe = forfait_coupe
 
 
+    @api.depends('colis_id')
+    def _compute_colis_ids(self):
+        for obj in self:
+            filtre=[
+                ("line_id"  ,"=", obj.order_line_id.id),
+            ]
+            colis = self.env['is.purchase.order.line.colis'].search(filtre)
+            ids=[]
+            for c in colis:
+                ids.append(c.id)
+            obj.colis_ids= [(6, 0, ids)]
