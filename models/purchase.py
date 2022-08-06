@@ -5,6 +5,22 @@ from odoo import models,fields,api
 from odoo.tools.misc import formatLang, get_lang
 
 
+def str2float(x):
+    try:
+        resultat = float(x)
+    except:
+        return 0
+    return resultat
+
+
+def str2eval(x):
+    try:
+        resultat = str2float(eval(x))
+    except:
+        return 0
+    return resultat
+
+
 class purchase_order(models.Model):
     _inherit = "purchase.order"
 
@@ -22,6 +38,8 @@ class purchase_order(models.Model):
         ('enlevement'   , 'Enlèvement'),
     ], 'Lieu de livraison')
     is_condition_tarifaire = fields.Text('Conditions tarifaire', related='partner_id.is_condition_tarifaire')
+    is_repere_ids          = fields.One2many('is.purchase.order.repere', 'order_id', 'Repère de plan')
+    is_mois_ids            = fields.One2many('is.purchase.order.mois'  , 'order_id', 'Mois de réalisation des tâches')
 
 
     @api.depends('is_delai_mois_id','is_delai_annee')
@@ -30,6 +48,125 @@ class purchase_order(models.Model):
             t=[(obj.is_delai_mois_id.name or ''), (obj.is_delai_annee or '')]
             x = " ".join(t)
             obj.is_delai=x
+
+
+    def write(self, vals):
+        res = super(purchase_order, self).write(vals)
+        self.update_reperes()
+        return res
+
+
+    def update_reperes(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            #** Ajout des lignes des reperes **********************************
+            ids=[]
+            for r in obj.is_repere_ids:
+                ids.append(r)
+            for line in obj.order_line:
+                ids2=[]
+                for r2 in line.is_repere_ids:
+                    ids2.append(r2.repere_id)
+                for r in ids:
+                    if r not in ids2:
+                        print('add',line,r)
+                        vals={
+                            "line_id"  : line.id,
+                            "repere_id": r.id,
+                        }
+                        res = self.env['is.purchase.order.line.repere'].create(vals)
+
+
+            #** Ajout des lignes des mois *************************************
+            ids=[]
+            for r in obj.is_mois_ids:
+                ids.append(r)
+            for line in obj.order_line:
+                ids2=[]
+                for r2 in line.is_mois_ids:
+                    ids2.append(r2.mois_id)
+                for r in ids:
+                    if r not in ids2:
+                        print('add',line,r)
+                        vals={
+                            "line_id": line.id,
+                            "mois_id": r.id,
+                        }
+                        res = self.env['is.purchase.order.line.mois'].create(vals)
+
+
+            #** Calcul des totaux *********************************************
+            for r in obj.is_repere_ids:
+                SQL="""
+                    SELECT montant
+                    FROM is_purchase_order_line_repere
+                    WHERE repere_id=%s
+                """
+                cr.execute(SQL,[r.id])
+                for row in cr.fetchall():
+                    r.montant = row[0]
+
+
+class IsPurchaseOrderMois(models.Model):
+    _name='is.purchase.order.mois'
+    _description = "Mois pour le suivi des taches"
+    _order='mois'
+    _rec_name = 'mois'
+
+    order_id = fields.Many2one('purchase.order', 'Commande', required=True, ondelete='cascade')
+    mois     = fields.Date("Mois", required=True)
+    montant  = fields.Float("Montant", digits=(14,2), readonly=True)
+
+
+class IsPurchaseOrderRepere(models.Model):
+    _name='is.purchase.order.repere'
+    _description = "Repère de plan des commandes"
+    _order='repere'
+    _rec_name = 'repere'
+
+    order_id = fields.Many2one('purchase.order', 'Commande', required=True, ondelete='cascade')
+    repere   = fields.Char("Repère de plan", required=True)
+    montant  = fields.Float("Montant", digits=(14,2), readonly=True)
+
+
+class IsPurchaseOrderLineRepere(models.Model):
+    _name='is.purchase.order.line.repere'
+    _description = "Repère de plan des lignes de commandes"
+    _order='repere_id'
+    _rec_name = 'repere_id'
+
+    line_id   = fields.Many2one('purchase.order.line', 'Ligne de commande', required=True, ondelete='cascade')
+    repere_id = fields.Many2one('is.purchase.order.repere', 'Repère de plan', required=True)
+    formule   = fields.Char("Formule")
+    quantite  = fields.Float("Quantité", digits=(14,2), store=True, readonly=True, compute='_compute_quantite')
+    montant   = fields.Float("Montant" , digits=(14,2), store=True, readonly=True, compute='_compute_quantite')
+
+    @api.depends('formule')
+    def _compute_quantite(self):
+        for obj in self:
+            v=str2eval(obj.formule)
+            obj.quantite = v
+            obj.montant  = v * obj.line_id.price_unit
+
+
+class IsPurchaseOrderLineMois(models.Model):
+    _name='is.purchase.order.line.mois'
+    _description = "Mois des lignes de commandes"
+    _order='mois_id'
+    _rec_name = 'mois_id'
+
+    line_id   = fields.Many2one('purchase.order.line', 'Ligne de commande', required=True, ondelete='cascade')
+    mois_id   = fields.Many2one('is.purchase.order.mois', 'Mois', required=True)
+    formule   = fields.Char("Formule")
+    quantite  = fields.Float("Quantité", digits=(14,2), store=True, readonly=True, compute='_compute_quantite')
+    montant   = fields.Float("Montant" , digits=(14,2), store=True, readonly=True, compute='_compute_quantite')
+
+    @api.depends('formule')
+    def _compute_quantite(self):
+        for obj in self:
+            v=str2eval(obj.formule)
+            obj.quantite = v
+            obj.montant  = v * obj.line_id.price_unit
 
 
 class purchase_order_line(models.Model):
@@ -41,8 +178,9 @@ class purchase_order_line(models.Model):
     is_hauteur       = fields.Float('Hauteur')
     is_colis_ids     = fields.One2many('is.purchase.order.line.colis', 'line_id', 'Colis')
     is_liste_colis_action_vsb = fields.Boolean("Liste colis vsb", store=False, readonly=True, compute='_compute_is_liste_colis_action_vsb')
-    is_colisage = fields.Text("Colisage", store=False, readonly=True, compute='_compute_is_colisage')
-
+    is_colisage               = fields.Text("Colisage", store=False, readonly=True, compute='_compute_is_colisage')
+    is_repere_ids             = fields.One2many('is.purchase.order.line.repere', 'line_id', 'Repère de plan')
+    is_mois_ids               = fields.One2many('is.purchase.order.line.mois'  , 'line_id', 'Mois')
 
     @api.depends('is_colis_ids')
     def _compute_is_colisage(self):

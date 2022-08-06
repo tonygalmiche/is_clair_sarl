@@ -91,8 +91,56 @@
                 <field name="is_finition_id"/>
                 <field name="is_traitement_id"/>
             </xpath>
+            <xpath expr="//page[@name='products']" position="after">
+                <page string="Repères de plan">
+                    <group>
+                        <group>
+                            <field name="is_repere_ids" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="repere"/>
+                                    <field name="montant" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group>
+                            <field name="is_mois_ids" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="mois"/>
+                                    <field name="montant" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='notes']" position="after">
+                <page string="Repères de plan">
+                    <group>
+                        <field name="is_repere_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="repere_id" readonly="1"/>
+                                <field name="formule"/>
+                                <field name="quantite"  readonly="1" sum="Total"/>
+                                <field name="montant"                sum="Total"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group>
+                        <field name="is_mois_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="mois_id" readonly="1"/>
+                                <field name="formule"/>
+                                <field name="quantite"  readonly="1" sum="Total"/>
+                                <field name="montant"                sum="Total"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
         </field>
     </record>
+
+
 
     <record id="is_purchase_order_kpis_tree" model="ir.ui.view">
         <field name="name">is_purchase_order_kpis_tree</field>
