@@ -95,12 +95,24 @@ class purchase_order(models.Model):
                         res = self.env['is.purchase.order.line.mois'].create(vals)
 
 
-            #** Calcul des totaux *********************************************
+            #** Calcul des totaux des reperes *********************************
             for r in obj.is_repere_ids:
                 SQL="""
                     SELECT montant
                     FROM is_purchase_order_line_repere
                     WHERE repere_id=%s
+                """
+                cr.execute(SQL,[r.id])
+                for row in cr.fetchall():
+                    r.montant = row[0]
+
+
+            #** Calcul des totaux des mois ************************************
+            for r in obj.is_mois_ids:
+                SQL="""
+                    SELECT montant
+                    FROM is_purchase_order_line_mois
+                    WHERE mois_id=%s
                 """
                 cr.execute(SQL,[r.id])
                 for row in cr.fetchall():
