@@ -22,6 +22,8 @@ class IsFamille(models.Model):
     is_lambda               = fields.Boolean("Lambda ʎ (W/m.K)")
     is_lg_mini_forfait      = fields.Boolean("Longueur mini forfait coupe")
     is_forfait_coupe_id     = fields.Boolean("Forfait coupe")
+    colisage                = fields.Boolean("Accès au colisage dans les commandes")
+
 
 
 class IsSousFamille(models.Model):
@@ -45,8 +47,8 @@ class product_template(models.Model):
 
     is_longueur             = fields.Integer("Longueur")
     is_largeur_utile        = fields.Integer("Largeur utile (mm)")
-    is_surface_panneau      = fields.Integer("Surface Panneau")
-    is_surface_palette      = fields.Integer("Surface Palette")
+    is_surface_panneau      = fields.Float("Surface Panneau", digits=(14,2))
+    is_surface_palette      = fields.Float("Surface Palette", digits=(14,2))
     is_poids                = fields.Float("Poids Unité"        , digits=(14,2))
     is_poids_rouleau        = fields.Float("Poids Rouleau", digits=(14,2))
     is_ondes                = fields.Integer("Ondes")

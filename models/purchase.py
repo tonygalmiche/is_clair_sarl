@@ -231,7 +231,7 @@ class purchase_order_line(models.Model):
     def _compute_is_liste_colis_action_vsb(self):
         for obj in self:
             vsb=False
-            if obj.product_id.is_forfait_coupe_id:
+            if obj.product_id.is_famille_id.colisage:
                 vsb=True
             obj.is_liste_colis_action_vsb=vsb
 

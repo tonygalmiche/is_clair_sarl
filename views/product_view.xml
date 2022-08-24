@@ -30,6 +30,9 @@
                         <field name="is_lg_mini_forfait"/>
                         <field name="is_forfait_coupe_id"/>
                     </group>
+                    <group string="Autre">
+                        <field name="colisage"/>
+                    </group>
                 </sheet>
             </form>
         </field>
@@ -42,17 +45,18 @@
             <tree>
                 <field name="name" />
                 <field name="sous_famille_ids" widget="many2many_tags"/>
-                <field name="is_longueur"/>
-                <field name="is_largeur_utile"/>
-                <field name="is_surface_panneau"/>
-                <field name="is_surface_palette"/>
-                <field name="is_poids"/>
-                <field name="is_poids_rouleau"/>
-                <field name="is_ondes"/>
-                <field name="is_resistance_thermique"/>
-                <field name="is_lambda"/>
-                <field name="is_lg_mini_forfait"/>
-                <field name="is_forfait_coupe_id"/>
+                <field name="is_longueur" optional="show"/>
+                <field name="is_largeur_utile" optional="show"/>
+                <field name="is_surface_panneau" optional="show"/>
+                <field name="is_surface_palette" optional="show"/>
+                <field name="is_poids" optional="show"/>
+                <field name="is_poids_rouleau" optional="show"/>
+                <field name="is_ondes" optional="show"/>
+                <field name="is_resistance_thermique" optional="show"/>
+                <field name="is_lambda" optional="show"/>
+                <field name="is_lg_mini_forfait" optional="show"/>
+                <field name="is_forfait_coupe_id" optional="show"/>
+                <field name="colisage" optional="show"/>
             </tree>
         </field>
     </record>
