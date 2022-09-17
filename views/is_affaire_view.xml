@@ -146,6 +146,28 @@
                             white-space: nowrap;
                         }
                     </style>
+
+
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" name="liste_achat_facture_action" type="object" icon="fa-bars">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="achat_facture"/>
+                                </span>
+                                <span class="o_stat_text">Achats</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" name="liste_vente_facture_action" type="object" icon="fa-bars">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="vente_facture"/>
+                                </span>
+                                <span class="o_stat_text">Ventes</span>
+                            </div>
+                        </button>
+                    </div>
+
+
                     <group>
                         <group>
                             <field name="name"/>
@@ -183,6 +205,8 @@
                 <field name="type_travaux_ids"   widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                 <field name="specificite_ids"    widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                 <field name="commentaire"/>
+                <field name="achat_facture" sum="Total"/>
+                <field name="vente_facture" sum="Total"/>
             </tree>
         </field>
     </record>

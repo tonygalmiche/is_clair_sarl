@@ -245,5 +245,24 @@
 
 
 
+    <record model="ir.ui.view" id="is_product_search_tree_view">
+        <field name="name">is_product_search_tree_view</field>
+        <field name="model">product.product</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="default_code" />
+                <field name="name" />
+                <field name="is_fournisseur_id" />
+                <field name="is_famille_id" />
+                <field name="is_sous_famille_id" />
+                <field name="is_longueur" />
+                <field name="is_largeur_utile" />
+            </tree>
+        </field>
+    </record>
+
+
+
 
 </odoo>

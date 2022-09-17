@@ -65,8 +65,76 @@ class IsAffaire(models.Model):
     type_travaux_ids   = fields.Many2many('is.type.travaux'  , 'is_affaire_type_travaux_rel'  , 'affaire_id', 'type_id'       , string="Type des travaux")
     specificite_ids    = fields.Many2many('is.specificite'   , 'is_affaire_specificite_rel'   , 'affaire_id', 'specificite_id', string="Spécificités")
     commentaire        = fields.Text("Commentaire")
+    achat_facture      = fields.Float("Achats facturés" , digits=(14,2), store=False, readonly=True, compute='_compute_achat_facture')
+    vente_facture      = fields.Float("Ventes facturées", digits=(14,2), store=False, readonly=True, compute='_compute_vente_facture')
 
 
+    @api.depends('name')
+    def _compute_achat_facture(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            SQL="""
+                SELECT sum(price_subtotal)
+                FROM account_move_line
+                WHERE is_affaire_id=%s and exclude_from_invoice_tab='f' and journal_id=2
+            """
+            cr.execute(SQL,[obj.id])
+            val=0
+            for row in cr.fetchall():
+                val = row[0]
+            obj.achat_facture = val
+
+
+    @api.depends('name')
+    def _compute_vente_facture(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            SQL="""
+                SELECT sum(price_subtotal)
+                FROM account_move_line
+                WHERE is_affaire_id=%s and exclude_from_invoice_tab='f' and journal_id=1
+            """
+            cr.execute(SQL,[obj.id])
+            val=0
+            for row in cr.fetchall():
+                val = row[0]
+            obj.vente_facture = val
+
+
+    def liste_achat_facture_action(self):
+        for obj in self:
+            tree_id = self.env.ref('is_clair_sarl.is_account_move_line_tree_view').id
+            form_id = self.env.ref('is_clair_sarl.is_account_move_line_form_view').id
+            return {
+                "name": "Lignes de factures ",
+                "view_mode": "tree,form",
+                "res_model": "account.move.line",
+                "domain": [
+                    ("is_affaire_id","=",obj.id),
+                    ("exclude_from_invoice_tab","=",False),
+                    ("journal_id","=",2),
+                ],
+                "type": "ir.actions.act_window",
+                "views"    : [[tree_id, "tree"],[form_id, "form"]],
+            }
+
+
+    def liste_vente_facture_action(self):
+        for obj in self:
+            tree_id = self.env.ref('is_clair_sarl.is_account_move_line_tree_view').id
+            form_id = self.env.ref('is_clair_sarl.is_account_move_line_form_view').id
+            return {
+                "name": "Lignes de factures ",
+                "view_mode": "tree,form",
+                "res_model": "account.move.line",
+                "domain": [
+                    ("is_affaire_id","=",obj.id),
+                    ("exclude_from_invoice_tab","=",False),
+                    ("journal_id","=",1),
+                ],
+                "type": "ir.actions.act_window",
+                "views"    : [[tree_id, "tree"],[form_id, "form"]],
+            }
 
 
     def name_get(self):
@@ -92,7 +160,6 @@ class IsAffaire(models.Model):
 
         ids = []
         if len(name) >= 1:
-
             filtre=[
                 '|','|','|','|','|','|',
                 ('name', 'ilike', name),
@@ -103,8 +170,10 @@ class IsAffaire(models.Model):
                 ('chantier_id.zip', 'ilike', name),
                 ('chantier_id.city', 'ilike', name),
             ]
-
-
+            if name=="[":
+                filtre=[('name', '!=', False)]
+            if name=="#":
+                filtre=[('name', '=', False)]
             ids = list(self._search(filtre + args, limit=limit))
 
         search_domain = [('name', operator, name)]

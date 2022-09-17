@@ -14,6 +14,9 @@
                     .o_form_label{
                         white-space: nowrap;
                     }
+                    .modal-lg, .modal-xl {
+                        max-width: 1400px;
+                    }
                 </style>
             </xpath>
             <field name="partner_id" position="after">
@@ -64,6 +67,11 @@
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree" position="attributes">
                 <attribute name="editable"></attribute>
             </xpath>
+
+
+
+
+
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree/field[@name='name']" position="before">
                 <field name="is_finition_id"   optional="show"/>
                 <field name="is_traitement_id" optional="show"/>
@@ -84,6 +92,13 @@
                     attrs="{'invisible':[('is_liste_colis_action_vsb','=',False)]}"
                 />
             </xpath>
+
+            <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='product_id']" position="attributes">
+                <attribute name="context">{'tree_view_ref': 'is_clair_sarl.is_product_search_tree_view'}</attribute>
+            </xpath>
+
+
+
             <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='date_planned']" position="attributes">
                  <attribute name="invisible">1</attribute>
             </xpath>
@@ -174,6 +189,25 @@
             <field name="user_id" position="replace"/>
         </field>
     </record>
+
+
+
+
+
+
+    <record id="is_view_purchase_order_filter" model="ir.ui.view">
+        <field name="name">is_view_purchase_order_filter</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_affaire_id"/>
+            </field>
+        </field>
+    </record>
+
+
+
 
 
     <!--is.finition -->

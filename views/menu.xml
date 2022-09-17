@@ -150,6 +150,18 @@
     />
 
 
+
+    <!-- Facturation -->
+    <menuitem 
+        id="is_account_move_line_menu" 
+        sequence="900" 
+        name="Lignes des factures"
+        action="is_account_move_line_action" 
+        parent="account.menu_finance_payables" 
+    />
+
+
+
     <!-- Déplacement des menus inutiles -->
     <menuitem id="mail.menu_root_discuss"     parent="base.menu_custom" sequence="900"/>
     <menuitem id="utm.menu_link_tracker_root" parent="base.menu_custom" sequence="901"/>

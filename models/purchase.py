@@ -300,6 +300,18 @@ class purchase_order_line(models.Model):
             }
 
 
+    def _prepare_account_move_line(self, move=False):
+        res = super(purchase_order_line, self)._prepare_account_move_line(move)
+        res.update({
+            'is_affaire_id': self.order_id.is_affaire_id.id,
+        })
+        print(res)
+        return res
+
+
+
+
+
 class IsMoisTrimestre(models.Model):
     _name='is.mois.trimestre'
     _description = "IsMoisTrimestre"
