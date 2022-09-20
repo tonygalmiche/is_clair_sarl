@@ -73,15 +73,16 @@ class IsAffaire(models.Model):
     def _compute_achat_facture(self):
         cr,uid,context,su = self.env.args
         for obj in self:
-            SQL="""
-                SELECT sum(price_subtotal)
-                FROM account_move_line
-                WHERE is_affaire_id=%s and exclude_from_invoice_tab='f' and journal_id=2
-            """
-            cr.execute(SQL,[obj.id])
             val=0
-            for row in cr.fetchall():
-                val = row[0]
+            if isinstance(obj.id, int):
+                SQL="""
+                    SELECT sum(price_subtotal)
+                    FROM account_move_line
+                    WHERE is_affaire_id=%s and exclude_from_invoice_tab='f' and journal_id=2
+                """
+                cr.execute(SQL,[obj.id])
+                for row in cr.fetchall():
+                    val = row[0]
             obj.achat_facture = val
 
 
@@ -89,15 +90,16 @@ class IsAffaire(models.Model):
     def _compute_vente_facture(self):
         cr,uid,context,su = self.env.args
         for obj in self:
-            SQL="""
-                SELECT sum(price_subtotal)
-                FROM account_move_line
-                WHERE is_affaire_id=%s and exclude_from_invoice_tab='f' and journal_id=1
-            """
-            cr.execute(SQL,[obj.id])
             val=0
-            for row in cr.fetchall():
-                val = row[0]
+            if isinstance(obj.id, int):
+                SQL="""
+                    SELECT sum(price_subtotal)
+                    FROM account_move_line
+                    WHERE is_affaire_id=%s and exclude_from_invoice_tab='f' and journal_id=1
+                """
+                cr.execute(SQL,[obj.id])
+                for row in cr.fetchall():
+                    val = row[0]
             obj.vente_facture = val
 
 
