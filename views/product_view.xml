@@ -29,6 +29,8 @@
                         <field name="is_lambda"/>
                         <field name="is_lg_mini_forfait"/>
                         <field name="is_forfait_coupe_id"/>
+                        <field name="is_ordre_tri"/>
+                        <field name="is_sous_article_ids"/>
                     </group>
                     <group string="Autre">
                         <field name="colisage"/>
@@ -45,18 +47,20 @@
             <tree>
                 <field name="name" />
                 <field name="sous_famille_ids" widget="many2many_tags"/>
-                <field name="is_longueur" optional="show"/>
-                <field name="is_largeur_utile" optional="show"/>
-                <field name="is_surface_panneau" optional="show"/>
-                <field name="is_surface_palette" optional="show"/>
-                <field name="is_poids" optional="show"/>
-                <field name="is_poids_rouleau" optional="show"/>
-                <field name="is_ondes" optional="show"/>
+                <field name="is_longueur"             optional="show"/>
+                <field name="is_largeur_utile"        optional="show"/>
+                <field name="is_surface_panneau"      optional="show"/>
+                <field name="is_surface_palette"      optional="show"/>
+                <field name="is_poids"                optional="show"/>
+                <field name="is_poids_rouleau"        optional="show"/>
+                <field name="is_ondes"                optional="show"/>
                 <field name="is_resistance_thermique" optional="show"/>
-                <field name="is_lambda" optional="show"/>
-                <field name="is_lg_mini_forfait" optional="show"/>
-                <field name="is_forfait_coupe_id" optional="show"/>
-                <field name="colisage" optional="show"/>
+                <field name="is_lambda"               optional="show"/>
+                <field name="is_lg_mini_forfait"      optional="show"/>
+                <field name="is_forfait_coupe_id"     optional="show"/>
+                <field name="is_ordre_tri"            optional="show"/>
+                <field name="is_sous_article_ids"     optional="show"/>
+                <field name="colisage"                optional="show"/>
             </tree>
         </field>
     </record>
@@ -159,6 +163,8 @@
                 <field name="is_lambda_vsb"               invisible="1"/>
                 <field name="is_lg_mini_forfait_vsb"      invisible="1"/>
                 <field name="is_forfait_coupe_id_vsb"     invisible="1"/>
+                <field name="is_ordre_tri_vsb"            invisible="1"/>
+                <field name="is_sous_article_ids_vsb"     invisible="1"/>
 
                 <field name="is_longueur"             attrs="{'invisible':[('is_longueur_vsb','=',False)]}"/>
                 <field name="is_largeur_utile"        attrs="{'invisible':[('is_largeur_utile_vsb','=',False)]}"/>
@@ -171,7 +177,18 @@
                 <field name="is_lambda"               attrs="{'invisible':[('is_lambda_vsb','=',False)]}"/>
                 <field name="is_lg_mini_forfait"      attrs="{'invisible':[('is_lg_mini_forfait_vsb','=',False)]}"/>
                 <field name="is_forfait_coupe_id"     attrs="{'invisible':[('is_forfait_coupe_id_vsb','=',False)]}"/>
+                <field name="is_ordre_tri"            attrs="{'invisible':[('is_ordre_tri_vsb','=',False)]}"/>
+                <field name="is_sous_article_ids"     attrs="{'invisible':[('is_sous_article_ids_vsb','=',False)]}">
+                    <tree editable="bottom">
+                        <field name="product_id"/>
+                        <field name="quantite"/>
+                    </tree>
+                </field>
             </field>
+
+
+
+
         </field>
     </record> 
     <record id="is_product_template_tree_view" model="ir.ui.view">
@@ -191,6 +208,10 @@
                 <field name="is_poids_rouleau"         optional="hide"/>
                 <field name="is_ondes"                 optional="hide"/>
                 <field name="is_resistance_thermique"  optional="hide"/>
+                <field name="is_lambda"                optional="hide"/>
+                <field name="is_lg_mini_forfait"       optional="hide"/>
+                <field name="is_forfait_coupe_id"      optional="hide"/>
+                <field name="is_ordre_tri"             optional="hide"/>
                 <field name="is_tache"                 optional="hide"/>
             </field>
         </field>

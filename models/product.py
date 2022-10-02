@@ -22,6 +22,8 @@ class IsFamille(models.Model):
     is_lambda               = fields.Boolean("Lambda ʎ (W/m.K)")
     is_lg_mini_forfait      = fields.Boolean("Longueur mini forfait coupe")
     is_forfait_coupe_id     = fields.Boolean("Forfait coupe")
+    is_ordre_tri            = fields.Boolean("Ordre de tri")
+    is_sous_article_ids     = fields.Boolean("Sous-articles")
     colisage                = fields.Boolean("Accès au colisage dans les commandes")
 
 
@@ -35,6 +37,15 @@ class IsSousFamille(models.Model):
 
     famille_ids = fields.Many2many('is.famille', 'is_famille_sous_famille_rel', 'sous_famille_id' , 'famille_id', string="Familles")
 
+
+class IsSousArticle(models.Model):
+    _name='is.sous.article'
+    _description = "Sous-articles"
+    _order='product_tmpl_id, product_id'
+
+    product_tmpl_id = fields.Many2one('product.template', 'Article parent', required=True, ondelete='cascade')
+    product_id      = fields.Many2one('product.product' , 'Sous-Article', required=True)
+    quantite        = fields.Float("Quantité", default=1)
 
 
 class product_template(models.Model):
@@ -56,6 +67,8 @@ class product_template(models.Model):
     is_lambda               = fields.Float("Lambda ʎ (W/m.K)"        , digits=(14,3))
     is_lg_mini_forfait      = fields.Integer("Longueur mini forfait coupe")
     is_forfait_coupe_id     = fields.Many2one('product.product', 'Forfait coupe')
+    is_ordre_tri            = fields.Integer("Ordre de tri")
+    is_sous_article_ids     = fields.One2many('is.sous.article', 'product_tmpl_id', 'Sous-articles')
 
     is_longueur_vsb             = fields.Boolean("Longueur vsb"                   , store=False, readonly=True, compute='_compute_vsb')
     is_largeur_utile_vsb        = fields.Boolean("Largeur utile (mm) vsb"         , store=False, readonly=True, compute='_compute_vsb')
@@ -68,8 +81,14 @@ class product_template(models.Model):
     is_lambda_vsb               = fields.Boolean("Lambda ʎ (W/m.K) vsb"           , store=False, readonly=True, compute='_compute_vsb')
     is_lg_mini_forfait_vsb      = fields.Boolean("Longueur mini forfait coupe vsb", store=False, readonly=True, compute='_compute_vsb')
     is_forfait_coupe_id_vsb     = fields.Boolean("Forfait coupe vsb"              , store=False, readonly=True, compute='_compute_vsb')
+    is_ordre_tri_vsb            = fields.Boolean("Ordre de tri vsb"               , store=False, readonly=True, compute='_compute_vsb')
+    is_sous_article_ids_vsb     = fields.Boolean("Sous-articles vsb"              , store=False, readonly=True, compute='_compute_vsb')
 
     is_fournisseur_id = fields.Many2one('res.partner', 'Fournisseur par défaut', store=True, readonly=True, compute='_compute_is_fournisseur_id')
+
+
+
+
 
 
     @api.depends('seller_ids')
@@ -120,10 +139,20 @@ class product_template(models.Model):
             vsb=False
             if obj.is_famille_id.is_lambda:
                 vsb=True
+            vsb=False
             obj.is_lambda_vsb = vsb
             if obj.is_famille_id.is_lg_mini_forfait:
                 vsb=True
+            vsb=False
             obj.is_lg_mini_forfait_vsb = vsb
             if obj.is_famille_id.is_forfait_coupe_id:
                 vsb=True
             obj.is_forfait_coupe_id_vsb = vsb
+            vsb=False
+            if obj.is_famille_id.is_ordre_tri:
+                vsb=True
+            obj.is_ordre_tri_vsb = vsb
+            vsb=False
+            if obj.is_famille_id.is_sous_article_ids:
+                vsb=True
+            obj.is_sous_article_ids_vsb = vsb

@@ -21,6 +21,7 @@
             </xpath>
             <field name="partner_id" position="after">
                 <field name="is_affaire_id"/>
+                <field name="is_contact_chantier_id"/>
             </field>
             <field name="date_order" position="before">
                 <field name="is_date"/>
@@ -34,6 +35,13 @@
                 <field name="is_date_livraison"/>
                 <field name="is_lieu_livraison"/>
             </field>
+
+            <field name="origin" position="after">
+                <field name="is_sale_order_id"/>
+            </field>
+
+
+
             <field name="date_order" position="attributes">
                  <attribute name="invisible">1</attribute>
             </field>
@@ -56,6 +64,15 @@
             <div name="date_approve" position="attributes">
                  <attribute name="invisible">1</attribute>
             </div>
+            <field name="partner_ref" position="after">
+                <button
+                    name="importer_tache_action"
+                    type="object"
+                    string="Importer les tâches"
+                    confirm="Voulez-vous vraiment remplacer toutes les lignes de cette commande ?"
+                    states="draft"
+                />
+            </field>
             <notebook position="before">
                 <div style="background:orange;color:white;font-weight:bold;padding-left:5pt" attrs="{'invisible':[('is_condition_tarifaire','=',False)]}">
                     <field 
@@ -64,6 +81,12 @@
                     />
                 </div>
             </notebook>
+
+            <xpath expr="//page[@name='products']/field[@name='order_line']/tree" position="attributes">
+                <attribute name="limit">500</attribute>
+            </xpath>
+
+
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree" position="attributes">
                 <attribute name="editable"></attribute>
             </xpath>
@@ -73,8 +96,10 @@
 
 
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree/field[@name='name']" position="before">
-                <field name="is_finition_id"   optional="show"/>
-                <field name="is_traitement_id" optional="show"/>
+                <field name="is_famille_id"      optional="hide"/>
+                <field name="is_sous_famille_id" optional="hide"/>
+                <field name="is_finition_id"     optional="show"/>
+                <field name="is_traitement_id"   optional="show"/>
             </xpath>
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree/field[@name='product_qty']" position="before">
                 <field name="is_colisage" optional="hide" widget="html"/>
@@ -112,6 +137,7 @@
                         <group>
                             <field name="is_repere_ids" nolabel="1">
                                 <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
                                     <field name="repere"/>
                                     <field name="montant" sum="Total"/>
                                 </tree>
@@ -133,6 +159,7 @@
                     <group>
                         <field name="is_repere_ids" nolabel="1">
                             <tree editable="bottom">
+                                <field name="sequence" readonly="1"/>
                                 <field name="repere_id" readonly="1"/>
                                 <field name="formule"/>
                                 <field name="quantite"  readonly="1" sum="Total"/>
@@ -164,10 +191,11 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_affaire_id"/>
-                <field name="is_date"  optional="show"/>
-                <field name="is_delai" optional="show"/>
-                <field name="is_date_livraison" optional="show"/>
-                <field name="is_lieu_livraison" optional="show"/>
+                <field name="is_contact_chantier_id"  optional="hide"/>
+                <field name="is_date"                 optional="show"/>
+                <field name="is_delai"                optional="show"/>
+                <field name="is_date_livraison"       optional="show"/>
+                <field name="is_lieu_livraison"       optional="show"/>
             </field>
             <field name="date_order" position="replace"/>
             <field name="user_id" position="replace"/>
@@ -180,10 +208,11 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_affaire_id"/>
-                <field name="is_date"           optional="show"/>
-                <field name="is_delai"          optional="show"/>
-                <field name="is_date_livraison" optional="show"/>
-                <field name="is_lieu_livraison" optional="show"/>
+                <field name="is_contact_chantier_id"  optional="hide"/>
+                <field name="is_date"                 optional="show"/>
+                <field name="is_delai"                optional="show"/>
+                <field name="is_date_livraison"       optional="show"/>
+                <field name="is_lieu_livraison"       optional="show"/>
             </field>
             <field name="date_planned" position="replace"/>
             <field name="user_id" position="replace"/>
@@ -202,6 +231,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_affaire_id"/>
+                <field name="is_contact_chantier_id"/>
             </field>
         </field>
     </record>

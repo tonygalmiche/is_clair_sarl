@@ -56,17 +56,18 @@ class IsAffaire(models.Model):
     _description = "Affaire"
     _order='name desc'
 
-    name               = fields.Char("N° d'Affaire", index=True, help="Sous la forme AA-XXXX")
-    nom                = fields.Char("Nom de l'affaire")
-    date_creation      = fields.Date("Date de création", default=lambda *a: fields.Date.today())
-    client_id          = fields.Many2one('res.partner' , 'Client')
-    chantier_id        = fields.Many2one('res.partner' , 'Adresse du chantier')
-    nature_travaux_ids = fields.Many2many('is.nature.travaux', 'is_affaire_nature_travaux_rel', 'affaire_id', 'nature_id'     , string="Nature des travaux")
-    type_travaux_ids   = fields.Many2many('is.type.travaux'  , 'is_affaire_type_travaux_rel'  , 'affaire_id', 'type_id'       , string="Type des travaux")
-    specificite_ids    = fields.Many2many('is.specificite'   , 'is_affaire_specificite_rel'   , 'affaire_id', 'specificite_id', string="Spécificités")
-    commentaire        = fields.Text("Commentaire")
-    achat_facture      = fields.Float("Achats facturés" , digits=(14,2), store=False, readonly=True, compute='_compute_achat_facture')
-    vente_facture      = fields.Float("Ventes facturées", digits=(14,2), store=False, readonly=True, compute='_compute_vente_facture')
+    name                = fields.Char("N° d'Affaire", index=True, help="Sous la forme AA-XXXX")
+    nom                 = fields.Char("Nom de l'affaire")
+    date_creation       = fields.Date("Date de création", default=lambda *a: fields.Date.today())
+    client_id           = fields.Many2one('res.partner' , 'Client')
+    chantier_id         = fields.Many2one('res.partner' , 'Adresse du chantier')
+    nature_travaux_ids  = fields.Many2many('is.nature.travaux', 'is_affaire_nature_travaux_rel', 'affaire_id', 'nature_id'     , string="Nature des travaux")
+    type_travaux_ids    = fields.Many2many('is.type.travaux'  , 'is_affaire_type_travaux_rel'  , 'affaire_id', 'type_id'       , string="Type des travaux")
+    specificite_ids     = fields.Many2many('is.specificite'   , 'is_affaire_specificite_rel'   , 'affaire_id', 'specificite_id', string="Spécificités")
+    commentaire         = fields.Text("Commentaire")
+    achat_facture       = fields.Float("Achats facturés" , digits=(14,2), store=False, readonly=True, compute='_compute_achat_facture')
+    vente_facture       = fields.Float("Ventes facturées", digits=(14,2), store=False, readonly=True, compute='_compute_vente_facture')
+    contact_chantier_id = fields.Many2one('res.users' , 'Contact chantier')
 
 
     @api.depends('name')

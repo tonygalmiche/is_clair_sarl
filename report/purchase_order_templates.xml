@@ -261,11 +261,33 @@
                 </div>
 
                 <br />
-                <div style="margin-left:13cm">
+
+                <div class="row mt32 mb32">
+                    <div class="col-7">
+                        <t t-if="o.is_contact_chantier_id">
+                            <strong>Contact chantier:</strong>
+                            <p class="m-0" t-field="o.is_contact_chantier_id.name"/>
+                            <p class="m-0" t-field="o.is_contact_chantier_id.mobile"/>
+                        </t>
+                    </div>
+                    <div class="col-5">
+                        <b><span t-field="o.user_id.name"/></b><br />
+                        Tél : <span t-field="o.user_id.partner_id.phone"/><br />
+                        Courriel : <span t-field="o.user_id.partner_id.email"/>
+                    </div>
+
+                </div>
+
+
+
+
+                <!-- <div style="margin-left:13cm">
                     <b><span t-field="o.user_id.name"/></b><br />
                     Tél : <span t-field="o.user_id.partner_id.phone"/><br />
                     Courriel : <span t-field="o.user_id.partner_id.email"/>
                 </div>
+ -->
+                <t t-if="o.fiscal_position_id.note"><b><div t-field="o.fiscal_position_id.note"/></b></t>
 
 
                 <p t-field="o.notes"/>

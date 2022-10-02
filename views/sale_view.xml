@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <!-- purchase.order  -->
+    <record model="ir.ui.view" id="is_taches_associees_tree_view">
+        <field name="name">is_taches_associees_tree_view</field>
+        <field name="model">purchase.order</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <button name="view_order_action" type="object" icon="fa-search-plus"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+
     <!-- sale.order  -->
     <record id="view_sale_order_form_inherit" model="ir.ui.view">
         <field name="name">sale.order.form.inherit</field>
@@ -13,23 +28,67 @@
                     }
                 </style>
             </xpath>
-            <field name="partner_id" position="after">
-                <field name="is_import_excel_ids" widget="many2many_binary"/>
-                <button 
-                    name="import_fichier_xlsx" 
-                    string="Importer Devis .xlsx" type="object" 
-                />
+            <field name="partner_shipping_id" position="after">
+                <field name="is_affaire_id"/>
             </field>
-            <!-- <field name="order_line" position="attributes">
-                <attribute name="limit">500</attribute>
-            </field> -->
-
+            <xpath expr="//page[@name='order_lines']" position="after">
+                <page string="Import devis xlsx">
+                    <group string="Fichier à importer">
+                        <field name="is_import_excel_ids" widget="many2many_binary" nolabel="1"/>
+                    </group>
+                    <group>
+                        <button 
+                            name="import_fichier_xlsx" 
+                            string="Importer le devis" type="object" 
+                        />
+                    </group>
+                    <group string="Tâches associées">
+                        <field 
+                            name="is_taches_associees_ids"
+                            context="{'tree_view_ref': 'is_clair_sarl.is_taches_associees_tree_view'}"
+                            nolabel="1"
+                        />
+                    </group>
+                </page>
+            </xpath>
             <xpath expr="//field[@name='order_line']/tree" position="attributes">
                 <attribute name="limit">500</attribute>
             </xpath>
-
-
-
         </field>
     </record>
+    <record id="is_view_quotation_tree" model="ir.ui.view">
+        <field name="name">is_view_quotation_tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_affaire_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+    <record id="is_view_order_tree" model="ir.ui.view">
+        <field name="name">is_view_order_tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_affaire_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+    <record id="is_view_sales_order_filter" model="ir.ui.view">
+        <field name="name">is_view_sales_order_filter</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_affaire_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+
+
+
+
 </odoo>

@@ -24,15 +24,14 @@ def str2eval(x):
 class purchase_order(models.Model):
     _inherit = "purchase.order"
 
-    is_affaire_id     = fields.Many2one('is.affaire', 'Affaire')
-    is_date           = fields.Date('Date')
-    
-    is_delai_mois_id = fields.Many2one('is.mois.trimestre', 'Délai (Mois / Trimestre)')
-    is_delai_annee   = fields.Char('Délai (Année)')
-    is_delai         = fields.Char("Délai prévisionnel", store=True, readonly=True, compute='_compute_is_delai', help="Délai prévisionnel de l'affaire")
-
-    is_date_livraison = fields.Date('Date de livraison')
-    is_lieu_livraison = fields.Selection([
+    is_affaire_id          = fields.Many2one('is.affaire', 'Affaire')
+    is_contact_chantier_id = fields.Many2one('res.users' , 'Contact chantier')
+    is_date                = fields.Date('Date')
+    is_delai_mois_id       = fields.Many2one('is.mois.trimestre', 'Délai (Mois / Trimestre)')
+    is_delai_annee         = fields.Char('Délai (Année)')
+    is_delai               = fields.Char("Délai prévisionnel", store=True, readonly=True, compute='_compute_is_delai', help="Délai prévisionnel de l'affaire")
+    is_date_livraison      = fields.Date('Date de livraison')
+    is_lieu_livraison      = fields.Selection([
         ('notre_adresse', 'A notre adresse'),
         ('chantier'     , 'Livraison sur chantier référence'),
         ('enlevement'   , 'Enlèvement'),
@@ -40,6 +39,14 @@ class purchase_order(models.Model):
     is_condition_tarifaire = fields.Text('Conditions tarifaire', related='partner_id.is_condition_tarifaire')
     is_repere_ids          = fields.One2many('is.purchase.order.repere', 'order_id', 'Repère de plan')
     is_mois_ids            = fields.One2many('is.purchase.order.mois'  , 'order_id', 'Mois de réalisation des tâches')
+    is_sale_order_id       = fields.Many2one('sale.order', 'Commande client associée')
+
+
+    @api.onchange('is_affaire_id')
+    def onchange_is_affaire_id(self):
+        for obj in self:
+            if obj.is_affaire_id.contact_chantier_id:
+                obj.is_contact_chantier_id = obj.is_affaire_id.contact_chantier_id.id
 
 
     @api.depends('is_delai_mois_id','is_delai_annee')
@@ -67,12 +74,13 @@ class purchase_order(models.Model):
                 ids2=[]
                 for r2 in line.is_repere_ids:
                     ids2.append(r2.repere_id)
+                    r2.sequence=r2.repere_id.sequence
                 for r in ids:
                     if r not in ids2:
-                        print('add',line,r)
                         vals={
                             "line_id"  : line.id,
                             "repere_id": r.id,
+                            "sequence" : r.sequence,
                         }
                         res = self.env['is.purchase.order.line.repere'].create(vals)
 
@@ -87,7 +95,6 @@ class purchase_order(models.Model):
                     ids2.append(r2.mois_id)
                 for r in ids:
                     if r not in ids2:
-                        print('add',line,r)
                         vals={
                             "line_id": line.id,
                             "mois_id": r.id,
@@ -119,6 +126,58 @@ class purchase_order(models.Model):
                     r.montant = row[0]
 
 
+    def importer_tache_action(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            obj.order_line.unlink()
+            SQL="""
+                SELECT pp.id, pt.name, isf.name
+                FROM product_product pp join product_template pt on pp.product_tmpl_id=pt.id
+                                        join is_famille       if on pt.is_famille_id=if.id
+                                        left join is_sous_famille isf on pt.is_sous_famille_id=isf.id
+                WHERE if.name='Tâche' and pt.active='t'
+                ORDER BY if.name,isf.name,pt.is_ordre_tri,pt.name
+            """
+            cr.execute(SQL)
+            sequence=1
+            mem=""
+            for row in cr.fetchall():
+                if row[2]!=mem:
+                    mem=row[2]
+                    vals={
+                        "order_id"    : obj.id,
+                        "sequence"    : sequence,
+                        "name"        : mem,
+                        "product_qty" : 0,
+                        "display_type": "line_section",
+                    }
+                    res = self.env['purchase.order.line'].create(vals)
+                vals={
+                    "order_id"       : obj.id,
+                    "product_id"     : row[0],
+                    "sequence"       : sequence,
+                    "name"           : row[1],
+                    "product_uom_qty": 1,
+                }
+                res = self.env['purchase.order.line'].create(vals)
+                sequence+=1
+
+
+    def view_order_action(self):
+        for obj in self:
+            return {
+                "name": "Commande %s"%(obj.name),
+                "view_mode": "form",
+                "res_model": "purchase.order",
+                "res_id"   : obj.id,
+                "type": "ir.actions.act_window",
+            }
+
+
+
+
+
+
 class IsPurchaseOrderMois(models.Model):
     _name='is.purchase.order.mois'
     _description = "Mois pour le suivi des taches"
@@ -137,6 +196,7 @@ class IsPurchaseOrderRepere(models.Model):
     _rec_name = 'repere'
 
     order_id = fields.Many2one('purchase.order', 'Commande', required=True, ondelete='cascade')
+    sequence = fields.Integer("Sequence")
     repere   = fields.Char("Repère de plan", required=True)
     montant  = fields.Float("Montant", digits=(14,2), readonly=True)
 
@@ -144,11 +204,12 @@ class IsPurchaseOrderRepere(models.Model):
 class IsPurchaseOrderLineRepere(models.Model):
     _name='is.purchase.order.line.repere'
     _description = "Repère de plan des lignes de commandes"
-    _order='repere_id'
+    _order='sequence,id'
     _rec_name = 'repere_id'
 
     line_id   = fields.Many2one('purchase.order.line', 'Ligne de commande', required=True, ondelete='cascade')
     repere_id = fields.Many2one('is.purchase.order.repere', 'Repère de plan', required=True)
+    sequence  = fields.Integer("Sequence")
     formule   = fields.Char("Formule")
     quantite  = fields.Float("Quantité", digits=(14,2), store=True, readonly=True, compute='_compute_quantite')
     montant   = fields.Float("Montant" , digits=(14,2), store=True, readonly=True, compute='_compute_quantite')
@@ -184,11 +245,14 @@ class IsPurchaseOrderLineMois(models.Model):
 class purchase_order_line(models.Model):
     _inherit = "purchase.order.line"
 
-    is_finition_id   = fields.Many2one('is.finition'  , 'Finition')
-    is_traitement_id = fields.Many2one('is.traitement', 'Traitement')
-    is_largeur       = fields.Float('Largeur')
-    is_hauteur       = fields.Float('Hauteur')
-    is_colis_ids     = fields.One2many('is.purchase.order.line.colis', 'line_id', 'Colis')
+
+    is_famille_id      = fields.Many2one('is.famille', 'Famille'          , related='product_id.is_famille_id')
+    is_sous_famille_id = fields.Many2one('is.sous.famille', 'Sous-famille', related='product_id.is_sous_famille_id')
+    is_finition_id     = fields.Many2one('is.finition'  , 'Finition')
+    is_traitement_id   = fields.Many2one('is.traitement', 'Traitement')
+    is_largeur         = fields.Float('Largeur')
+    is_hauteur         = fields.Float('Hauteur')
+    is_colis_ids       = fields.One2many('is.purchase.order.line.colis', 'line_id', 'Colis')
     is_liste_colis_action_vsb = fields.Boolean("Liste colis vsb", store=False, readonly=True, compute='_compute_is_liste_colis_action_vsb')
     is_colisage               = fields.Text("Colisage", store=False, readonly=True, compute='_compute_is_colisage')
     is_repere_ids             = fields.One2many('is.purchase.order.line.repere', 'line_id', 'Repère de plan')
@@ -236,11 +300,23 @@ class purchase_order_line(models.Model):
             obj.is_liste_colis_action_vsb=vsb
 
 
-    @api.onchange('is_largeur','is_hauteur')
-    def onchange_calculateur(self):
+    # @api.onchange('is_largeur','is_hauteur')
+    # def onchange_calculateur(self):
+    #     for obj in self:
+    #         if  obj.is_largeur and obj.is_hauteur:
+    #             obj.product_qty = obj.is_largeur*obj.is_hauteur
+
+
+    @api.onchange('is_repere_ids')
+    def onchange_repere_ids(self):
         for obj in self:
-            if  obj.is_largeur and obj.is_hauteur:
-                obj.product_qty = obj.is_largeur*obj.is_hauteur
+            if  obj.is_repere_ids:
+                    quantite=0
+                    for r in obj.is_repere_ids:
+                        quantite+=r.quantite
+                    obj.product_qty=quantite
+
+
 
 
     @api.onchange('product_id','is_finition_id','is_traitement_id')
@@ -305,7 +381,6 @@ class purchase_order_line(models.Model):
         res.update({
             'is_affaire_id': self.order_id.is_affaire_id.id,
         })
-        print(res)
         return res
 
 

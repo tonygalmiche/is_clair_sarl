@@ -177,6 +177,7 @@
                         </group>
                         <group>
                             <field name="date_creation"/>
+                            <field name="contact_chantier_id"/>
                         </group>
                     </group>
                     <group>
@@ -195,18 +196,19 @@
         <field name="type">tree</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="display_name" string="Nom complet" optional="hide"/>
-                <field name="name"/>
-                <field name="nom"/>
-                <field name="date_creation"/>
-                <field name="client_id"/>
-                <field name="chantier_id"/>
-                <field name="nature_travaux_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
-                <field name="type_travaux_ids"   widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
-                <field name="specificite_ids"    widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
-                <field name="commentaire"/>
-                <field name="achat_facture" sum="Total"/>
-                <field name="vente_facture" sum="Total"/>
+                <field name="display_name"        optional="hide" string="Nom complet" />
+                <field name="name"                optional="show"/>
+                <field name="nom"                 optional="show"/>
+                <field name="date_creation"       optional="show"/>
+                <field name="contact_chantier_id" optional="hide"/>
+                <field name="client_id"           optional="show"/>
+                <field name="chantier_id"         optional="show"/>
+                <field name="nature_travaux_ids"  optional="show" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                <field name="type_travaux_ids"    optional="show" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                <field name="specificite_ids"     optional="show" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                <field name="commentaire"         optional="show"/>
+                <field name="achat_facture"       optional="show" sum="Total"/>
+                <field name="vente_facture"       optional="show" sum="Total"/>
             </tree>
         </field>
     </record>
@@ -223,6 +225,7 @@
                 <field name="type_travaux_ids"/>
                 <field name="specificite_ids"/>
                 <field name="commentaire"/>
+                <field name="contact_chantier_id"/>
             </search>
         </field>
     </record>
