@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from copy import copy
-from importlib.resources import path
-from itertools import product
+#from copy import copy
+#from importlib.resources import path
+#from itertools import product
 from odoo import models,fields,api
 from odoo.http import request
 from odoo.exceptions import Warning
@@ -24,6 +24,7 @@ class sale_order(models.Model):
     def import_fichier_xlsx(self):
         for obj in self:
             obj.order_line.unlink()
+            sequence=0
             for attachment in obj.is_import_excel_ids:
                 xlsxfile=base64.b64decode(attachment.datas)
 
@@ -52,7 +53,7 @@ class sale_order(models.Model):
                     if ref=="SECTION":
                         vals={
                             "order_id"       : obj.id,
-                            "sequence"       : lig,
+                            "sequence"       : sequence,
                             "name"           : name,
                             "product_uom_qty": 0,
                             "display_type"   : "line_section",
@@ -77,7 +78,7 @@ class sale_order(models.Model):
                     if ref=="NOTE":
                         vals={
                             "order_id"       : obj.id,
-                            "sequence"       : lig,
+                            "sequence"       : sequence,
                             "name"           : name,
                             "product_uom_qty": 0,
                             "display_type"   : "line_note",
@@ -104,7 +105,7 @@ class sale_order(models.Model):
                                 vals={
                                     "order_id": obj.id,
                                     "product_id": product.id,
-                                    "sequence"    : lig,
+                                    "sequence"    : sequence,
                                     "name"        : name,
                                     "product_uom_qty": qty,
                                     "price_unit"     : price,
@@ -113,7 +114,7 @@ class sale_order(models.Model):
                                     v={
                                         "order_id"    : purchase_order.id,
                                         "product_id"  : product.id,
-                                        "sequence"    : lig,
+                                        "sequence"    : sequence,
                                         "name"        : name,
                                         "product_qty" : qty,
                                     }
@@ -128,5 +129,6 @@ class sale_order(models.Model):
                     if vals:
                         res = self.env['sale.order.line'].create(vals)
                     lig+=1
+                    sequence+=1
 
 
