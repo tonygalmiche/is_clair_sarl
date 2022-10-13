@@ -204,12 +204,12 @@ class sale_order(models.Model):
                     lig+=1
                     sequence+=1
 
-                if alertes:
-                    alertes = "\n".join(alertes)
-                else:
-                    alertes=False
+            if alertes:
+                alertes = "\n".join(alertes)
+            else:
+                alertes=False
 
-                obj.is_import_alerte = alertes
+            obj.is_import_alerte = alertes
 
 
 
