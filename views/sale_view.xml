@@ -42,6 +42,31 @@
                             string="Importer le devis" type="object" 
                         />
                     </group>
+                    <group string="Alertes importation" attrs="{'invisible':[('is_import_alerte','=',False)]}" >
+                        <div style="background:orange;font-weight:bold;padding-left:5pt">
+                            <field name="is_import_alerte" nolabel="1"/>
+                        </div>
+                    </group>
+                    <group string="Sections">
+                        <field name="is_section_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <button 
+                                    name="lignes_section_action" 
+                                    type="object" icon="fa-list" 
+                                    title="Lignes de la section"
+                                />
+                                <field name="section"/>
+                                <button 
+                                    name="option_section_action" 
+                                    type="object" icon="fa-refresh" 
+                                    title="Option/Section"
+                                />
+                                <field name="option"  readonly="1"/>
+
+                            </tree>
+                        </field>
+                    </group>
                     <group string="Tâches associées">
                         <field 
                             name="is_taches_associees_ids"
