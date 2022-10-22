@@ -25,8 +25,41 @@
             <xpath expr="//page[@id='aml_tab']/field[@name='line_ids']/tree/field[@name='name']" position="after">
                 <field name="is_affaire_id" optional="hide"/>
             </xpath>
+
+
+            <label for="invoice_payment_term_id" position="replace"/>
+            <xpath expr="//field[@name='invoice_date_due']/.." position="replace">
+                <field name="invoice_payment_term_id"/>
+                <field name="invoice_date_due"/>
+            </xpath>
+
+
+
         </field>
     </record> 
+    <record id="is_view_out_invoice_tree" model="ir.ui.view">
+        <field name="name">is_view_out_invoice_tree</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_out_invoice_tree" />
+        <field name="arch" type="xml">
+            <field name="invoice_date_due" position="before">
+                <field name="invoice_payment_term_id" optional="show"/>
+                <field name="invoice_date_due"        optional="show"/>
+            </field>
+        </field>
+    </record>
+    <record id="is_view_in_invoice_tree" model="ir.ui.view">
+        <field name="name">is_view_in_invoice_tree</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_in_invoice_tree" />
+        <field name="arch" type="xml">
+            <field name="invoice_date_due" position="before">
+                <field name="invoice_payment_term_id" optional="show"/>
+                <field name="invoice_date_due"        optional="show"/>
+            </field>
+        </field>
+    </record>
+
 
 
     <!-- account.move.line -->
