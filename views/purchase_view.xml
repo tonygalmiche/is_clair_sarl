@@ -90,7 +90,7 @@
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree" position="attributes">
                 <attribute name="editable"></attribute>
             </xpath>
-
+ 
 
 
 

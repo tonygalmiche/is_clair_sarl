@@ -55,3 +55,5 @@ access_is_sous_article_manager,access_is_sous_article_manager,model_is_sous_arti
 
 access_is_sale_order_section,access_is_sale_order_section,model_is_sale_order_section,base.group_user,1,0,0,0
 access_is_sale_order_section_manager,access_is_sale_order_section_manager,model_is_sale_order_section,sales_team.group_sale_manager,1,1,1,1
+
+access_is_affaire_analyse,access_is_affaire_analyse,model_is_affaire_analyse,base.group_user,1,0,0,0

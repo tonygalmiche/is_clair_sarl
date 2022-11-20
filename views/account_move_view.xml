@@ -19,8 +19,15 @@
                     }
                 </style>
             </xpath>
+
+            <field name="payment_reference" position="after">
+                <field name="is_order_id"   attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
+                <field name="is_affaire_id" attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
+            </field>
+
             <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='analytic_tag_ids']" position="after">
                 <field name="is_affaire_id" optional="hide"/>
+                <field name="is_sale_line_id" optional="hide"/>
             </xpath>
             <xpath expr="//page[@id='aml_tab']/field[@name='line_ids']/tree/field[@name='name']" position="after">
                 <field name="is_affaire_id" optional="hide"/>
@@ -32,9 +39,6 @@
                 <field name="invoice_payment_term_id"/>
                 <field name="invoice_date_due"/>
             </xpath>
-
-
-
         </field>
     </record> 
     <record id="is_view_out_invoice_tree" model="ir.ui.view">
@@ -83,6 +87,8 @@
                             <field name="product_uom_id" readonly="1"/>
                             <field name="price_unit" readonly="1"/>
                             <field name="price_subtotal" readonly="1"/>
+
+                            <field name="is_sale_line_id" readonly="1"/>
                         </group>
                     </group>
                 </sheet>

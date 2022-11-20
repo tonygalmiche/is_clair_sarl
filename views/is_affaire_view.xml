@@ -134,20 +134,117 @@
     </record>
 
 
+
+    <!--is.affaire.analyse -->
+    <record id="is_affaire_analyse_form_view" model="ir.ui.view">
+        <field name="name">is_affaire_analyse_from_view</field>
+        <field name="model">is.affaire.analyse</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="affaire_id"/>
+                            <field name="fournisseur_id"/>
+                            <field name="famille_id"/>
+                            <field name="montant_cde"/>
+                            <field name="montant_fac"/>
+                            <field name="ecart"/>
+                            <field name="ecart_pourcent"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_affaire_analyse_tree_view">
+        <field name="name">is_affaire_analyse_tree_view</field>
+        <field name="model">is.affaire.analyse</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree default_order="montant_cde desc">
+                <field name="fournisseur_id"/>
+                <field name="famille_id"/>
+                <field name="montant_cde" sum="Total"/>
+                <field name="montant_fac" sum="Total"/>
+                <field name="ecart"       sum="Total"/>
+                <field name="ecart_pourcent"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_affaire_analyse_search_view" model="ir.ui.view">
+        <field name="name">is_affaire_analyse_search_view</field>
+        <field name="model">is.affaire.analyse</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="fournisseur_id" />
+                <field name="famille_id"/>
+            </search>
+        </field>
+    </record>
+
+
+    <record id="is_affaire_analyse_action_pivot" model="ir.ui.view">
+         <field name="name">is_affaire_analyse_action_pivot</field>
+        <field name="model">is.affaire.analyse</field>
+         <field name="arch" type="xml">
+             <pivot string="pivot" sample="1">
+                 <field name="fournisseur_id" type="row"/>
+                 <field name="montant_cde" type="measure"/>
+                 <field name="montant_fac" type="measure"/>
+                 <field name="ecart" type="measure"/>
+             </pivot>
+         </field>
+    </record>
+
+    <record id="is_affaire_analyse_action_graph" model="ir.ui.view">
+         <field name="name">is_affaire_analyse_action_graph</field>
+        <field name="model">is.affaire.analyse</field>
+         <field name="arch" type="xml">
+             <graph string="graph" type="line" sample="1">
+                 <field name="fournisseur_id"/>
+                 <field name="montant_cde" type="measure"/>
+                 <field name="montant_fac" type="measure"/>
+             </graph>
+         </field>
+    </record>
+
+    <record id="is_affaire_analyse_action" model="ir.actions.act_window">
+        <field name="name">Analyse par fournisseur</field>
+        <field name="res_model">is.affaire.analyse</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+    </record>
+
+
+
+
+
+
+
     <!--is.affaire -->
     <record id="is_affaire_form_view" model="ir.ui.view">
         <field name="name">is_affaire_from_view</field>
         <field name="model">is.affaire</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button
+                        name="analyse_par_fournisseur_action"
+                        type="object"
+                        string="Analyse par fournisseur"
+                    />
+                    <button
+                        name="analyse_par_famille_action"
+                        type="object"
+                        string="Analyse par famille"
+                    />
+                </header>
                 <sheet>
                     <style>
                         .o_form_label{
                             white-space: nowrap;
                         }
                     </style>
-
-
                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" name="liste_achat_facture_action" type="object" icon="fa-bars">
                             <div class="o_stat_info">

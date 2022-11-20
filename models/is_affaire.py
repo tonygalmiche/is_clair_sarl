@@ -51,6 +51,19 @@ class IsSpecificite(models.Model):
     ]
 
 
+class IsAffaireAnalyse(models.Model):
+    _name='is.affaire.analyse'
+    _description = "Analyse de commandes par affaire"
+
+    affaire_id     = fields.Many2one('is.affaire', 'Affaire', required=True, ondelete='cascade')
+    fournisseur_id = fields.Many2one('res.partner' , 'Fournisseur')
+    famille_id     = fields.Many2one('is.famille', 'Famille')
+    montant_cde    = fields.Float("Montant Commandé", digits=(14,2))
+    montant_fac    = fields.Float("Montant Facturé" , digits=(14,2))
+    ecart          = fields.Float("Ecart"           , digits=(14,2))
+    ecart_pourcent = fields.Float("% Ecart"         , digits=(14,2))
+
+
 class IsAffaire(models.Model):
     _name='is.affaire'
     _description = "Affaire"
@@ -68,6 +81,7 @@ class IsAffaire(models.Model):
     achat_facture       = fields.Float("Achats facturés" , digits=(14,2), store=False, readonly=True, compute='_compute_achat_facture')
     vente_facture       = fields.Float("Ventes facturées", digits=(14,2), store=False, readonly=True, compute='_compute_vente_facture')
     contact_chantier_id = fields.Many2one('res.users' , 'Contact chantier')
+    analyse_ids         = fields.One2many('is.affaire.analyse'  , 'affaire_id', 'Analyse de commandes')
 
 
     @api.depends('name')
@@ -77,9 +91,9 @@ class IsAffaire(models.Model):
             val=0
             if isinstance(obj.id, int):
                 SQL="""
-                    SELECT sum(price_subtotal)
-                    FROM account_move_line
-                    WHERE is_affaire_id=%s and exclude_from_invoice_tab='f' and journal_id=2
+                    SELECT sum(aml.price_subtotal)
+                    FROM account_move_line aml join account_move am on aml.move_id=am.id
+                    WHERE aml.is_affaire_id=%s and aml.exclude_from_invoice_tab='f' and aml.journal_id=2 and am.state='posted'
                 """
                 cr.execute(SQL,[obj.id])
                 for row in cr.fetchall():
@@ -94,14 +108,117 @@ class IsAffaire(models.Model):
             val=0
             if isinstance(obj.id, int):
                 SQL="""
-                    SELECT sum(price_subtotal)
-                    FROM account_move_line
-                    WHERE is_affaire_id=%s and exclude_from_invoice_tab='f' and journal_id=1
+                    SELECT sum(aml.price_subtotal)
+                    FROM account_move_line aml join account_move am on aml.move_id=am.id
+                    WHERE aml.is_affaire_id=%s and aml.exclude_from_invoice_tab='f' and aml.journal_id=1 and am.state='posted'
                 """
                 cr.execute(SQL,[obj.id])
                 for row in cr.fetchall():
                     val = row[0]
             obj.vente_facture = val
+
+
+    def analyse_par_fournisseur_action(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            obj.analyse_ids.sudo().unlink()
+            SQL="""
+                SELECT coalesce(rp.parent_id,po.partner_id),sum(amount_untaxed)
+                FROM purchase_order po join res_partner rp on po.partner_id=rp.id
+                WHERE is_affaire_id=%s and state='purchase'
+                GROUP BY coalesce(rp.parent_id,po.partner_id)
+            """
+            cr.execute(SQL,[obj.id])
+            for row in cr.fetchall():
+                montant_cde = row[1] or 0
+                SQL="""
+                    SELECT sum(aml.price_subtotal)
+                    FROM account_move_line aml join account_move am on aml.move_id=am.id
+                                               join res_partner rp on am.partner_id=rp.id
+                    WHERE 
+                        aml.is_affaire_id=%s and 
+                        aml.exclude_from_invoice_tab='f' and 
+                        aml.journal_id=2 and 
+                        (am.partner_id=%s or rp.parent_id=%s) and
+                        am.state='posted'
+                """
+                cr.execute(SQL,[obj.id, row[0], row[0]])
+                montant_fac=ecart=ecart_pourcent=0
+                for row2 in cr.fetchall():
+                    montant_fac = row2[0] or 0
+                ecart=montant_cde-montant_fac
+                if montant_fac>0:
+                    ecart_pourcent = 100*ecart/montant_fac
+                vals={
+                    "affaire_id"    : obj.id,
+                    "fournisseur_id": row[0],
+                    "montant_cde"   : montant_cde,
+                    "montant_fac"   : montant_fac,
+                    "ecart"         : ecart,
+                    "ecart_pourcent": ecart_pourcent,
+                }
+                res = self.env['is.affaire.analyse'].sudo().create(vals)
+            return obj.is_affaire_analyse_action()
+
+
+    def analyse_par_famille_action(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            obj.analyse_ids.sudo().unlink()
+            SQL="""
+                SELECT pt.is_famille_id,sum(pol.price_subtotal)
+                FROM purchase_order po join purchase_order_line pol on po.id=pol.order_id
+                                       join product_product pp on pol.product_id=pp.id
+                                       join product_template pt on pp.product_tmpl_id=pt.id
+                WHERE po.is_affaire_id=%s and po.state='purchase'
+                GROUP BY pt.is_famille_id
+            """
+            cr.execute(SQL,[obj.id])
+            for row in cr.fetchall():
+                montant_cde = row[1] or 0
+                SQL="""
+                    SELECT sum(aml.price_subtotal)
+                    FROM account_move_line aml join account_move am on aml.move_id=am.id
+                                               join product_product pp on aml.product_id=pp.id
+                                               join product_template pt on pp.product_tmpl_id=pt.id
+                    WHERE 
+                        aml.is_affaire_id=%s and 
+                        aml.exclude_from_invoice_tab='f' and 
+                        aml.journal_id=2 and 
+                        am.state='posted' and
+                        pt.is_famille_id=%s
+                """
+                cr.execute(SQL,[obj.id, row[0]])
+                montant_fac=ecart=ecart_pourcent=0
+                for row2 in cr.fetchall():
+                    montant_fac = row2[0] or 0
+                ecart=montant_cde-montant_fac
+                if montant_fac>0:
+                    ecart_pourcent = 100*ecart/montant_fac
+                vals={
+                    "affaire_id"    : obj.id,
+                    "famille_id"    : row[0],
+                    "montant_cde"   : montant_cde,
+                    "montant_fac"   : montant_fac,
+                    "ecart"         : ecart,
+                    "ecart_pourcent": ecart_pourcent,
+                }
+                res = self.env['is.affaire.analyse'].sudo().create(vals)
+            return obj.is_affaire_analyse_action()
+
+
+    def is_affaire_analyse_action(self):
+        for obj in self:
+            return {
+                "name": "Analyse par fournisseur %s"%(obj.name),
+                "view_mode": "tree,form,pivot,graph",
+                "res_model": "is.affaire.analyse",
+                "res_id"   : obj.id,
+                "type": "ir.actions.act_window",
+                "domain": [
+                    ("affaire_id","=",obj.id),
+                ],
+            }
 
 
     def liste_achat_facture_action(self):
@@ -116,6 +233,7 @@ class IsAffaire(models.Model):
                     ("is_affaire_id","=",obj.id),
                     ("exclude_from_invoice_tab","=",False),
                     ("journal_id","=",2),
+                    ("move_id.state","=","posted"),
                 ],
                 "type": "ir.actions.act_window",
                 "views"    : [[tree_id, "tree"],[form_id, "form"]],

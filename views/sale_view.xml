@@ -26,11 +26,60 @@
                     .o_form_view .o_form_sheet_bg > .o_form_sheet{
                         max-width: 1800px;
                     }
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                    .modal-lg, .modal-xl {
+                        max-width: 1400px;
+                    }
                 </style>
             </xpath>
+
+
+            <xpath expr="//button[@name='287'][1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='287'][1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_quotation_send'][1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_quotation_send'][2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_quotation_send'][3]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_quotation_send'][4]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
             <field name="partner_shipping_id" position="after">
                 <field name="is_affaire_id"/>
             </field>
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree" position="attributes">
+                <attribute name="editable"></attribute>
+            </xpath>
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/form/group/group/field[@name='tax_id']" position="after">
+                <field name="price_subtotal" readonly="1"/>
+            </xpath>
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/form/group/group/field[@name='analytic_tag_ids']" position="before">
+                <field name="is_section_id" readonly="1"/>
+                <field name="is_facturable_pourcent"/>
+                <field name="is_facturable"/>
+                <field name="is_deja_facture"/>
+                <field name="is_a_facturer"/>
+            </xpath>
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree/field[@name='product_id']" position="before">
+                <field name="is_section_id" readonly="1" optional="hide"/>
+            </xpath>
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
+                <field name="is_facturable_pourcent" readonly="1" optional="hide"/>
+                <field name="is_facturable"   optional="hide" sum="Total"/>
+                <field name="is_deja_facture" optional="hide" sum="Total"/>
+                <field name="is_a_facturer"   optional="hide" sum="Total"/>
+            </xpath>
             <xpath expr="//page[@name='order_lines']" position="after">
                 <page string="Import devis xlsx">
                     <group string="Fichier à importer">
@@ -74,6 +123,34 @@
                             nolabel="1"
                         />
                     </group>
+                </page>
+                <page string="Facturation">
+
+                    <group string="Factures">
+                        <button
+                            name="generer_facture_action"
+                            type="object"
+                            string="Générer nouvelle facture"
+                        />
+                    </group>
+                    <group>
+                        <field name="is_invoice_ids" nolabel="1">
+                            <tree>
+
+                                <button title="Facture" name="acceder_facture_action" type="object" icon="fa-search-plus"/>
+
+
+                                <field name="name"/>
+                                <field name="invoice_date"/>
+                                <!-- <field name="date_due"/> -->
+                                <!-- <field name="amount_untaxed_invoice_signed" sum="Total" string="Montant HT"/> -->
+                                <field name="state" string="État"/>
+                            </tree>
+                        </field>
+                    </group>
+
+
+
                 </page>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree" position="attributes">
