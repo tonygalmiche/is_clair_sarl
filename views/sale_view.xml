@@ -127,30 +127,27 @@
                 <page string="Facturation">
 
                     <group string="Factures">
+                        <field name="is_a_facturer"/>
                         <button
                             name="generer_facture_action"
                             type="object"
                             string="Générer nouvelle facture"
+                            attrs="{'invisible':[('is_a_facturer','=',0)]}" 
                         />
                     </group>
                     <group>
                         <field name="is_invoice_ids" nolabel="1">
                             <tree>
-
                                 <button title="Facture" name="acceder_facture_action" type="object" icon="fa-search-plus"/>
-
-
                                 <field name="name"/>
                                 <field name="invoice_date"/>
-                                <!-- <field name="date_due"/> -->
-                                <!-- <field name="amount_untaxed_invoice_signed" sum="Total" string="Montant HT"/> -->
-                                <field name="state" string="État"/>
+                                <field name="invoice_date_due"/>
+                                <field name="amount_untaxed_signed" sum="Total" string="Montant HT"/>
+                                <field name="payment_state" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')" attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}" optional="show"/>
+                                <field name="state" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'" optional="show"/>
                             </tree>
                         </field>
                     </group>
-
-
-
                 </page>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree" position="attributes">
@@ -175,6 +172,12 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_affaire_id" optional="show"/>
+            </field>
+            <field name="amount_total" position="after">
+                <field name="is_a_facturer" sum="Total" widget="monetary" decoration-bf="1" optional="show"/>
+            </field>
+            <field name="invoice_status" position="attributes">
+                <attribute name="invisible">1</attribute>
             </field>
         </field>
     </record>

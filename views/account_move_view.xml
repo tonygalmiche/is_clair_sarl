@@ -25,9 +25,16 @@
                 <field name="is_affaire_id" attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
             </field>
 
+            <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="before">
+                <field name="is_sale_line_id"        optional="hide"/>
+                <field name="is_qt_commande"         optional="hide"/>
+                <field name="is_facturable_pourcent" optional="hide"/>
+                <field name="is_a_facturer"          optional="hide" sum="Total"/>
+            </xpath>
+
+
             <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='analytic_tag_ids']" position="after">
                 <field name="is_affaire_id" optional="hide"/>
-                <field name="is_sale_line_id" optional="hide"/>
             </xpath>
             <xpath expr="//page[@id='aml_tab']/field[@name='line_ids']/tree/field[@name='name']" position="after">
                 <field name="is_affaire_id" optional="hide"/>

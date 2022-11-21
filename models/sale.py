@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models,fields,api
 from odoo.http import request
-from odoo.exceptions import Warning
+from odoo.exceptions import UserError, ValidationError
 import datetime
 import base64
 import os
@@ -17,21 +17,29 @@ class sale_order_line(models.Model):
 
     @api.depends('is_facturable_pourcent','price_unit','product_uom_qty')
     def _compute_facturable(self):
+        cr,uid,context,su = self.env.args
         for obj in self:
-            is_facturable = obj.price_subtotal*obj.is_facturable_pourcent/100
-            is_deja_facture = 100
-            is_a_facturer = is_facturable - is_deja_facture
 
+            is_deja_facture=0
+            if not isinstance(obj.id, models.NewId):
+                SQL="""
+                    SELECT sum(aml.is_a_facturer)
+                    FROM account_move_line aml join account_move am on aml.move_id=am.id
+                    WHERE aml.is_sale_line_id=%s and am.state!='cancel'
+                """
+                cr.execute(SQL,[obj.id])
+                for row in cr.fetchall():
+                    is_deja_facture = row[0] or 0
+            is_facturable = obj.price_subtotal*obj.is_facturable_pourcent/100
+            is_a_facturer = is_facturable - is_deja_facture
             obj.is_facturable   = is_facturable
             obj.is_deja_facture = is_deja_facture
             obj.is_a_facturer   = is_a_facturer
 
 
-
-
     order_id               = fields.Many2one('sale.order', string='Order Reference', required=False, ondelete='cascade', index=True, copy=False)
     is_section_id          = fields.Many2one('is.sale.order.section', 'Section', index=True)
-    is_facturable_pourcent = fields.Float("% facturable", digits=(14,2))
+    is_facturable_pourcent = fields.Float("% facturable", digits=(14,2), copy=False)
     is_facturable          = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     is_a_facturer          = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
@@ -76,12 +84,21 @@ class is_sale_order_section(models.Model):
 class sale_order(models.Model):
     _inherit = "sale.order"
 
+    @api.depends('order_line')
+    def _compute_facturable(self):
+        for obj in self:
+            is_a_facturer=0
+            for line in obj.order_line:
+                is_a_facturer+=line.is_a_facturer
+            obj.is_a_facturer=is_a_facturer
+
     is_import_excel_ids     = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Devis .xlsx à importer')
     is_import_alerte        = fields.Text('Alertes importation')
     is_taches_associees_ids = fields.One2many('purchase.order', 'is_sale_order_id', 'Tâches associées')
     is_affaire_id           = fields.Many2one('is.affaire', 'Affaire')
     is_section_ids          = fields.One2many('is.sale.order.section', 'order_id', 'Sections')
     is_invoice_ids          = fields.One2many('account.move', 'is_order_id', 'Factures', readonly=True) #, domain=[('state','=','posted')])
+    is_a_facturer           = fields.Float("A Facturer", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
 
 
     def import_fichier_xlsx(self):
@@ -217,10 +234,22 @@ class sale_order(models.Model):
 
 
     def generer_facture_action(self):
+        cr,uid,context,su = self.env.args
         for obj in self:
+            if obj.is_a_facturer==0:
+                raise ValidationError("Il n'y a rien à facturer")
+
+            products = self.env['product.product'].search([("default_code","=",'FACTURE')])
+            print(products,len(products))
+            if not len(products):
+                raise ValidationError("Article 'FACTURE' non trouvé")
+            product=products[0]
+
             #** Création des lignes *******************************************
             invoice_line_ids=[]
+            sequence=0
             for line in obj.order_line:
+                print(line.sequence, line)
                 if line.display_type=="line_section":
                     vals={
                         'sequence'    : line.sequence,
@@ -228,6 +257,12 @@ class sale_order(models.Model):
                         'name'        : line.name,
                     }
                 else:
+                    #quantity=0
+                    #if line.price_subtotal>0:
+                    #    quantity=line.product_uom_qty*line.is_a_facturer/line.price_subtotal
+
+                    quantity=line.product_uom_qty*line.is_facturable_pourcent/100
+
                     taxes = line.product_id.taxes_id
                     taxes = obj.fiscal_position_id.map_tax(taxes)
                     tax_ids=[]
@@ -237,12 +272,38 @@ class sale_order(models.Model):
                         'sequence'  : line.sequence,
                         'product_id': line.product_id.id,
                         'name'      : line.name,
-                        'quantity'  : line.product_uom_qty,
-                        'price_unit': line.price_unit,
-                        'is_sale_line_id': line.id,
-                        'tax_ids'        : tax_ids,
+                        'quantity'  : quantity,
+                        'is_facturable_pourcent': line.is_facturable_pourcent,
+                        'price_unit'            : line.price_unit,
+                        'is_sale_line_id'       : line.id,
+                        'tax_ids'               : tax_ids,
+                        "is_a_facturer"         : line.is_a_facturer,
                     }
                 invoice_line_ids.append(vals)
+                sequence=line.sequence
+
+            #** Ajout des factures ********************************************
+            invoices = self.env['account.move'].search([("is_order_id","=",obj.id)])
+            for invoice in invoices:
+
+                taxes = product.taxes_id
+                taxes = obj.fiscal_position_id.map_tax(taxes)
+                tax_ids=[]
+                for tax in taxes:
+                    tax_ids.append(tax.id)
+
+                sequence+=10
+                print(sequence,invoice)
+                vals={
+                    'sequence'  : sequence,
+                    'product_id': product.id,
+                    'name'      : invoice.name,
+                    'quantity'  : -1,
+                    'price_unit': invoice.amount_untaxed_signed,
+                    'tax_ids'   : tax_ids,
+                }
+                invoice_line_ids.append(vals)
+
 
             #** Création entête facture ***************************************
             vals={
@@ -254,7 +315,7 @@ class sale_order(models.Model):
                 'invoice_line_ids'  : invoice_line_ids,
             }
             move=self.env['account.move'].create(vals)
-
+            move.action_post()
 
     #         #** Ajout des factures réalisées ***********************************
     #         filtre=[
