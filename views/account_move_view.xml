@@ -76,6 +76,9 @@
                 <field name="invoice_payment_term_id" optional="show"/>
                 <field name="invoice_date_due"        optional="show"/>
             </field>
+            <field name="state" position="before">
+                <field name="is_banque_id"            optional="show"/>
+            </field>
         </field>
     </record>
 
