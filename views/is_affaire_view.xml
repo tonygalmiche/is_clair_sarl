@@ -165,10 +165,13 @@
             <tree default_order="montant_cde desc">
                 <field name="fournisseur_id"/>
                 <field name="famille_id"/>
+                <field name="budget"      sum="Total"/>
                 <field name="montant_cde" sum="Total"/>
                 <field name="montant_fac" sum="Total"/>
                 <field name="ecart"       sum="Total"/>
                 <field name="ecart_pourcent"/>
+                <field name="ecart_budget_cde" sum="Total"/>
+                <field name="ecart_budget_fac" sum="Total"/>
             </tree>
         </field>
     </record>
@@ -263,8 +266,6 @@
                             </div>
                         </button>
                     </div>
-
-
                     <group>
                         <group>
                             <field name="name"/>
@@ -282,8 +283,33 @@
                         <field name="type_travaux_ids"   widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                         <field name="specificite_ids"    widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                         <field name="commentaire"/>
+                        <field name="active"/>
                     </group>
+                    <field name="budget_famille_ids" nolabel="1">
+                        <tree editable="bottom">
+                            <field name="famille_id"/>
+                            <field name="budget" sum="Total"/>
+                        </tree>
+                    </field>
+                    <button
+                        name="ajout_famille_action"
+                        type="object"
+                        string="Ajout de toutes les familles"
+                        attrs="{'invisible': [('budget_famille_ids', '!=', [])]}"
+                    />
+                    <button
+                        name="import_budget_famille_action"
+                        type="object"
+                        string="Importation des budgets des commandes client"
+                    />
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+
+
             </form>
         </field>
     </record>
@@ -329,7 +355,7 @@
     <record id="is_affaire_action" model="ir.actions.act_window">
         <field name="name">Affaires</field>
         <field name="res_model">is.affaire</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,activity</field>
     </record>
 
 </odoo>

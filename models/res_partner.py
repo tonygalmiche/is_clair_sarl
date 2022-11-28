@@ -34,3 +34,4 @@ class ResPartner(models.Model):
     is_profil_id           = fields.Many2one('is.profil' , 'Profil')
     is_origine_id          = fields.Many2one('is.origine', 'Origine DP')
     is_condition_tarifaire = fields.Text('Conditions tarifaire', help="Informations sur les conditions tarifaires affichées sur la commande")
+    is_banque_id           = fields.Many2one('account.journal', 'Banque par défaut', domain=[('type','=','bank')])

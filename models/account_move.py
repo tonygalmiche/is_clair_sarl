@@ -7,6 +7,9 @@ class AccountMove(models.Model):
 
     is_order_id   = fields.Many2one('sale.order', 'Commande')
     is_affaire_id = fields.Many2one('is.affaire', 'Affaire', related='is_order_id.is_affaire_id')
+    is_banque_id  = fields.Many2one('account.journal', 'Banque par défaut', related='partner_id.is_banque_id')
+
+
 
     def acceder_facture_action(self):
         for obj in self:

@@ -13,8 +13,6 @@ _logger = logging.getLogger(__name__)
 class sale_order_line(models.Model):
     _inherit = "sale.order.line"
 
-
-
     @api.depends('is_facturable_pourcent','price_unit','product_uom_qty')
     def _compute_facturable(self):
         cr,uid,context,su = self.env.args
@@ -43,6 +41,7 @@ class sale_order_line(models.Model):
     is_facturable          = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     is_a_facturer          = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    is_prix_achat          = fields.Float("Prix d'achat", digits=(14,4))
 
 
 class is_sale_order_section(models.Model):
@@ -51,11 +50,38 @@ class is_sale_order_section(models.Model):
     _rec_name = 'section'
     _order='sequence'
 
-    order_id = fields.Many2one('sale.order', 'Commande', required=True, ondelete='cascade')
-    sequence = fields.Integer("Sequence")
-    section  = fields.Char("Section", required=True)
-    option   = fields.Boolean("Option", default=False)
-    line_ids = fields.One2many('sale.order.line', 'is_section_id', 'Lignes')
+    order_id   = fields.Many2one('sale.order', 'Commande', required=True, ondelete='cascade')
+    sequence   = fields.Integer("Sequence")
+    section    = fields.Char("Section", required=True)
+    facturable_pourcent = fields.Float("% facturable", digits=(14,2))
+    option     = fields.Boolean("Option", default=False)
+    line_ids   = fields.One2many('sale.order.line', 'is_section_id', 'Lignes')
+
+
+
+    def write(self, vals):
+        res = super(is_sale_order_section, self).write(vals)
+        if "facturable_pourcent" in vals:
+            for obj in self:
+                for line in obj.order_id.order_line:
+                    if line.is_section_id==obj:
+                        line.is_facturable_pourcent = vals["facturable_pourcent"]
+
+
+        print(vals)
+
+        if "sequence" in vals:
+            for obj in self:
+                x=10
+                for line in obj.order_id.order_line:
+                    if line.is_section_id==obj:
+                        line.sequence = vals["sequence"]*10000+x
+                    x+=10
+
+
+
+        return res
+
 
 
     def option_section_action(self):
@@ -70,14 +96,17 @@ class is_sale_order_section(models.Model):
 
     def lignes_section_action(self):
         for obj in self:
+            tree_id = self.env.ref('is_clair_sarl.is_view_order_line_tree').id
             return {
                 "name": "Section "+str(obj.section),
-                "view_mode": "tree,form",
+                "view_mode": "tree",
                 "res_model": "sale.order.line",
                 "domain": [
                     ("is_section_id","=",obj.id),
+                    ("product_id","!=",False),
                 ],
                 "type": "ir.actions.act_window",
+                "views"    : [[tree_id, "tree"]],
             }
 
 
@@ -197,14 +226,24 @@ class sale_order(models.Model):
                                 price = float(cells[lig][4].value or 0)
                             except ValueError:
                                 price = 0
+                            try:
+                                discount = float(cells[lig][8].value or 0)
+                            except ValueError:
+                                discount = 0
+                            try:
+                                is_prix_achat = float(cells[lig][9].value or 0)
+                            except ValueError:
+                                is_prix_achat = 0
                             vals={
-                                "order_id": not option and obj.id,
-                                "product_id": product.id,
-                                "sequence"    : sequence,
-                                "name"        : name,
+                                "order_id"       : not option and obj.id,
+                                "product_id"     : product.id,
+                                "sequence"       : sequence,
+                                "name"           : name,
                                 "product_uom_qty": qty,
                                 "price_unit"     : price,
-                                "product_uom" : product.uom_id.id,
+                                "discount"       : discount,
+                                "is_prix_achat"  : is_prix_achat,
+                                "product_uom"    : product.uom_id.id,
                                 "is_section_id"  : section_id,
                             }
                             if purchase_order:

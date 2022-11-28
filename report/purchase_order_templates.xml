@@ -55,6 +55,7 @@
                 <div style="height:3mm"/>
                 <h3>Commande <span t-field="o.name"/> du <span t-field="o.is_date"/></h3>
                 <div style="height:3mm"/>
+                <div  t-if="o.partner_ref">Référence fournisseur : <b><span t-field="o.partner_ref"/></b></div>
                 <div  t-if="o.is_lieu_livraison">Lieu de livraison : <b><span t-field="o.is_lieu_livraison"/></b></div>
                 <div  t-if="o.is_date_livraison">Date de livraison : <b><span t-field="o.is_date_livraison"/></b></div>
                 <div style="height:3mm"/>

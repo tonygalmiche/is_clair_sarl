@@ -55,17 +55,30 @@ class IsAffaireAnalyse(models.Model):
     _name='is.affaire.analyse'
     _description = "Analyse de commandes par affaire"
 
+    affaire_id       = fields.Many2one('is.affaire', 'Affaire', required=True, ondelete='cascade')
+    fournisseur_id   = fields.Many2one('res.partner' , 'Fournisseur')
+    famille_id       = fields.Many2one('is.famille', 'Famille')
+    budget           = fields.Float("Budget"          , digits=(14,2))
+    montant_cde      = fields.Float("Montant Commandé", digits=(14,2))
+    montant_fac      = fields.Float("Montant Facturé" , digits=(14,2))
+    ecart            = fields.Float("Ecart Cde/Fac"   , digits=(14,2))
+    ecart_pourcent   = fields.Float("% Ecart"         , digits=(14,2))
+    ecart_budget_cde = fields.Float("Ecart Budget/Cde", digits=(14,2))
+    ecart_budget_fac = fields.Float("Ecart Budget/Fac", digits=(14,2))
+
+
+class IsAffaireBudgetFamille(models.Model):
+    _name='is.affaire.budget.famille'
+    _description = "Budget affaire par famille"
+
     affaire_id     = fields.Many2one('is.affaire', 'Affaire', required=True, ondelete='cascade')
-    fournisseur_id = fields.Many2one('res.partner' , 'Fournisseur')
-    famille_id     = fields.Many2one('is.famille', 'Famille')
-    montant_cde    = fields.Float("Montant Commandé", digits=(14,2))
-    montant_fac    = fields.Float("Montant Facturé" , digits=(14,2))
-    ecart          = fields.Float("Ecart"           , digits=(14,2))
-    ecart_pourcent = fields.Float("% Ecart"         , digits=(14,2))
+    famille_id     = fields.Many2one('is.famille', 'Famille', required=True)
+    budget         = fields.Float("Budget", digits=(14,2))
 
 
 class IsAffaire(models.Model):
     _name='is.affaire'
+    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
     _description = "Affaire"
     _order='name desc'
 
@@ -81,7 +94,9 @@ class IsAffaire(models.Model):
     achat_facture       = fields.Float("Achats facturés" , digits=(14,2), store=False, readonly=True, compute='_compute_achat_facture')
     vente_facture       = fields.Float("Ventes facturées", digits=(14,2), store=False, readonly=True, compute='_compute_vente_facture')
     contact_chantier_id = fields.Many2one('res.users' , 'Contact chantier')
-    analyse_ids         = fields.One2many('is.affaire.analyse'  , 'affaire_id', 'Analyse de commandes')
+    analyse_ids         = fields.One2many('is.affaire.analyse'       , 'affaire_id', 'Analyse de commandes')
+    budget_famille_ids  = fields.One2many('is.affaire.budget.famille', 'affaire_id', 'Budget par famille')
+    active              = fields.Boolean("Active", default=True)
 
 
     @api.depends('name')
@@ -116,6 +131,18 @@ class IsAffaire(models.Model):
                 for row in cr.fetchall():
                     val = row[0]
             obj.vente_facture = val
+
+
+
+    def ajout_famille_action(self):
+        for obj in self:
+            familles = self.env['is.famille'].search([])
+            for famille in familles:
+                vals={
+                    "affaire_id": obj.id,
+                    "famille_id": famille.id,
+                }
+                res = self.env['is.affaire.budget.famille'].create(vals)
 
 
     def analyse_par_fournisseur_action(self):
@@ -165,17 +192,34 @@ class IsAffaire(models.Model):
         cr,uid,context,su = self.env.args
         for obj in self:
             obj.analyse_ids.sudo().unlink()
-            SQL="""
-                SELECT pt.is_famille_id,sum(pol.price_subtotal)
-                FROM purchase_order po join purchase_order_line pol on po.id=pol.order_id
-                                       join product_product pp on pol.product_id=pp.id
-                                       join product_template pt on pp.product_tmpl_id=pt.id
-                WHERE po.is_affaire_id=%s and po.state='purchase'
-                GROUP BY pt.is_famille_id
-            """
-            cr.execute(SQL,[obj.id])
-            for row in cr.fetchall():
-                montant_cde = row[1] or 0
+            familles = self.env['is.famille'].search([])
+            for famille in familles:
+                #** Budget ****************************************************
+                budget=0
+                filtre=[('affaire_id', '=', obj.id),('famille_id', '=', famille.id)]
+                lines = self.env['is.affaire.budget.famille'].search(filtre)
+                budget=0
+                for line in lines:
+                    budget=line.budget
+                #**************************************************************
+
+                #** Montant Cde ***********************************************
+                montant_cde=0
+                SQL="""
+                    SELECT pt.is_famille_id,sum(pol.price_subtotal)
+                    FROM purchase_order po join purchase_order_line pol on po.id=pol.order_id
+                                        join product_product pp on pol.product_id=pp.id
+                                        join product_template pt on pp.product_tmpl_id=pt.id
+                    WHERE po.is_affaire_id=%s and pt.is_famille_id=%s and  po.state='purchase'
+                    GROUP BY pt.is_famille_id
+                """
+                cr.execute(SQL,[obj.id, famille.id])
+                for row in cr.fetchall():
+                    montant_cde = row[1] or 0
+                ecart_budget_cde = budget-montant_cde
+                #**************************************************************
+
+                #** Montant Cde ***********************************************
                 SQL="""
                     SELECT sum(aml.price_subtotal)
                     FROM account_move_line aml join account_move am on aml.move_id=am.id
@@ -188,23 +232,61 @@ class IsAffaire(models.Model):
                         am.state='posted' and
                         pt.is_famille_id=%s
                 """
-                cr.execute(SQL,[obj.id, row[0]])
+                cr.execute(SQL,[obj.id, famille.id])
                 montant_fac=ecart=ecart_pourcent=0
                 for row2 in cr.fetchall():
                     montant_fac = row2[0] or 0
                 ecart=montant_cde-montant_fac
                 if montant_fac>0:
                     ecart_pourcent = 100*ecart/montant_fac
-                vals={
-                    "affaire_id"    : obj.id,
-                    "famille_id"    : row[0],
-                    "montant_cde"   : montant_cde,
-                    "montant_fac"   : montant_fac,
-                    "ecart"         : ecart,
-                    "ecart_pourcent": ecart_pourcent,
-                }
-                res = self.env['is.affaire.analyse'].sudo().create(vals)
+                ecart_budget_fac = budget-montant_fac
+                #**************************************************************
+
+                if budget!=0 or montant_cde!=0 or montant_fac!=0:
+                    vals={
+                        "affaire_id": obj.id,
+                        "famille_id": famille.id,
+                        "budget"    : budget,
+                        "montant_cde"     : montant_cde,
+                        "montant_fac"   : montant_fac,
+                        "ecart"         : ecart,
+                        "ecart_pourcent": ecart_pourcent,
+                        "ecart_budget_cde": ecart_budget_cde,
+                        "ecart_budget_fac": ecart_budget_fac,
+                    }
+                    res = self.env['is.affaire.analyse'].sudo().create(vals)
             return obj.is_affaire_analyse_action()
+
+
+    def import_budget_famille_action(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            # print(obj)
+            # filtre=[('is_affaire_id', '=', obj.id)]
+            # orders = self.env['sale.order'].search(filtre)
+            # print(orders)
+            # for order in orders:
+            #     print(order.name)
+
+
+            for line in obj.budget_famille_ids:
+                SQL="""
+                    SELECT sum(sol.product_uom_qty*sol.is_prix_achat)
+                    FROM sale_order so join sale_order_line sol on so.id=sol.order_id
+                                    join product_product pp on sol.product_id=pp.id
+                                    join product_template pt on pp.product_tmpl_id=pt.id
+                    WHERE 
+                        so.is_affaire_id=%s and 
+                        pt.is_famille_id=%s 
+                """
+                cr.execute(SQL,[obj.id, line.famille_id.id])
+                budget=0
+                for row in cr.fetchall():
+                    print(row)
+                    budget = row[0] or 0
+                line.budget=budget
+
+
 
 
     def is_affaire_analyse_action(self):

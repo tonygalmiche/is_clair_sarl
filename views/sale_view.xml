@@ -74,6 +74,9 @@
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree/field[@name='product_id']" position="before">
                 <field name="is_section_id" readonly="1" optional="hide"/>
             </xpath>
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree/field[@name='price_unit']" position="after">
+                <field name="is_prix_achat" optional="hide"/>
+            </xpath>
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
                 <field name="is_facturable_pourcent" readonly="1" optional="hide"/>
                 <field name="is_facturable"   optional="hide" sum="Total"/>
@@ -106,6 +109,7 @@
                                     title="Lignes de la section"
                                 />
                                 <field name="section"/>
+                                <field name="facturable_pourcent"/>
                                 <button 
                                     name="option_section_action" 
                                     type="object" icon="fa-refresh" 
@@ -151,7 +155,7 @@
                 </page>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree" position="attributes">
-                <attribute name="limit">500</attribute>
+                <attribute name="limit">1000</attribute>
             </xpath>
         </field>
     </record>
@@ -181,6 +185,9 @@
             </field>
         </field>
     </record>
+
+
+
     <record id="is_view_sales_order_filter" model="ir.ui.view">
         <field name="name">is_view_sales_order_filter</field>
         <field name="model">sale.order</field>
@@ -191,6 +198,36 @@
             </field>
         </field>
     </record>
+
+
+    <record id="is_view_order_line_tree" model="ir.ui.view">
+        <field name="name">is_view_order_line_tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="order_id" optional="hide"/>
+                <field name="order_partner_id" optional="hide"/>
+                <field name="name" readonly="1"/>
+                <field name="product_uom_qty" readonly="1"/>
+                <!-- <field name="qty_invoiced"/> -->
+                <!-- <field name="qty_to_invoice"/> -->
+
+                <field name="is_facturable_pourcent"/>
+                <field name="is_facturable"/>
+                <field name="is_deja_facture"/>
+                <field name="is_a_facturer"/>
+
+
+
+                <field name="product_uom_category_id" invisible="1"/>
+                <field name="product_uom" string="Unité"  optional="hide" readonly="1"/>
+                <field name="price_subtotal" sum="Total" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+<!-- Field 'product_uom_category_id' used in domain of field 'product_uom' ([('category_id', '=', product_uom_category_id)]) must be present in view but is missing. -->
 
 
 
