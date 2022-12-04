@@ -159,6 +159,13 @@
         action="is_account_move_line_action" 
         parent="account.menu_finance_payables" 
     />
+    <menuitem
+        id="is_export_compta_menu"
+        name="Export Compta"
+        parent="account.menu_finance_payables"
+        sequence="910"
+        action="is_export_compta_action"
+    />
 
 
 

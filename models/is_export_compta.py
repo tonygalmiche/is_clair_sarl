@@ -1,0 +1,155 @@
+# -*- coding: utf-8 -*-
+from odoo import api, fields, models, _
+import codecs
+import unicodedata
+import base64
+
+
+class IsExportComptaLigne(models.Model):
+    _name = 'is.export.compta.ligne'
+    _description = "Export Compta Lignes"
+    _order='ligne,id'
+
+    export_compta_id = fields.Many2one('is.export.compta', 'Export Compta', required=True, ondelete='cascade')
+    ligne            = fields.Integer("Ligne")
+    journal_code     = fields.Char("JournalCode")
+    journal_lib      = fields.Char("JournalLib")
+    partner_id       = fields.Many2one('res.partner', 'Partenaire')
+    ecriture_num     = fields.Char("EcritureNum")
+    ecriture_date    = fields.Date("EcritureDate")
+    compte_num       = fields.Char("CompteNum")
+    compte_lib       = fields.Char("CompteLib")
+    comp_aux_num     = fields.Char("CompAuxNum")
+    comp_aux_lib     = fields.Char("CompAuxLib")
+    piece_ref        = fields.Char("PieceRef")
+    piece_date       = fields.Date("PieceDate")
+    ecriture_lib     = fields.Char("EcritureLib")
+    debit            = fields.Float("Debit" , digits=(14,2))
+    credit           = fields.Float("Credit", digits=(14,2))
+    invoice_id       = fields.Many2one('account.move', 'Facture')
+    payment_id       = fields.Many2one('account.payment', 'Paiement')
+
+
+class IsExportCompta(models.Model):
+    _name = 'is.export.compta'
+    _description = "Export Compta"
+    _order = 'name desc'
+
+    name       = fields.Char("N°Folio", readonly=True)
+    date_fin   = fields.Date("Date de fin"  , required=True)
+    ligne_ids  = fields.One2many('is.export.compta.ligne', 'export_compta_id', 'Lignes')
+    file_ids   = fields.Many2many('ir.attachment', 'is_export_compta_attachment_rel', 'doc_id', 'file_id', u'Fichiers')
+    company_id = fields.Many2one('res.company', 'Société',required=True,default=lambda self: self.env.user.company_id.id)
+
+
+    @api.model
+    def create(self, vals):
+        vals['name'] = self.env['ir.sequence'].next_by_code('is.export.compta')
+        res = super(IsExportCompta, self).create(vals)
+        return res
+
+
+    def generer_lignes_action(self):
+        cr, user, context, su = self.env.args
+        for obj in self:
+            invoices = self.env['account.move'].search([('is_export_compta_id','=',obj.id)])
+            for invoice in invoices:
+                invoice.is_export_compta_id=False
+            obj.ligne_ids.unlink()
+            sql="""
+                SELECT  
+                    aj.code journal_code,
+                    am.name ecriture_num,
+                    am.date ecriture_date,
+                    aa.code compte_num,
+                    aa.name,
+                    am.date piece_date,
+                    aml.name ecriture_lib,
+                    aml.debit,
+                    aml.credit,
+                    rp.name partner_name,
+                    rp.ref comp_aux_num,
+                    am.id invoice_id,
+                    aj.code,
+                    am.partner_id
+                FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
+                                           inner join account_account aa             on aml.account_id=aa.id
+                                           left outer join res_partner rp            on aml.partner_id=rp.id
+                                           inner join account_journal aj             on aml.journal_id=aj.id
+
+                WHERE 
+                     am.is_export_compta_id is null and
+                     aml.date<=%s and aj.code in ('VE','AC')
+                ORDER BY aml.date
+            """
+            cr.execute(sql,[obj.date_fin])
+            ct=0
+            for row in cr.dictfetchall():
+                invoice_id = row["invoice_id"]
+                invoices = self.env['account.move'].search([('id','=',invoice_id)])
+                compte_num = row["compte_num"]
+                comp_aux_num = ''
+                if compte_num[:3] in ['401','411']:
+                    comp_aux_num = row["comp_aux_num"]
+                for invoice in invoices:
+                    invoice.is_export_compta_id = obj.id
+                    if compte_num[:3]=='411':
+                        compte_num = invoice.partner_id.property_account_receivable_id.code
+                    if compte_num[:3]=='401':
+                        compte_num = invoice.partner_id.property_account_payable_id.code
+                ct=ct+1
+                vals={
+                    'export_compta_id': obj.id,
+                    'ligne'           : ct,
+                    'journal_code'           : row["journal_code"],
+                    'ecriture_num'           : row["ecriture_num"],
+                    'ecriture_date'          : row["ecriture_date"],
+                    'compte_num'             : compte_num,
+                    'comp_aux_num'           : comp_aux_num,
+                    'piece_ref'              : row["ecriture_num"],
+                    'piece_date'             : row["piece_date"],
+                    'ecriture_lib'           : row["ecriture_lib"] or row["partner_name"],
+                    'debit'                  : row["debit"],
+                    'credit'                 : row["credit"],
+                    'invoice_id'             : invoice_id,
+                    'partner_id'             : row["partner_id"],
+                }
+                self.env['is.export.compta.ligne'].create(vals)
+
+
+    def generer_fichier_action(self):
+        cr=self._cr
+        for obj in self:
+            name='export-compta.txt.xls'
+            model='is.export.compta'
+            attachments = self.env['ir.attachment'].search([('res_model','=',model),('res_id','=',obj.id),('name','=',name)])
+            attachments.unlink()
+            dest     = '/tmp/'+name
+            f = codecs.open(dest,'wb',encoding='utf-8')
+            f.write("ligne\tjournal_code\tecriture_num\tecriture_date\tcompte_num\tcomp_aux_num\tpiece_ref\tpiece_date\tecriture_lib\tdebit\tcredit\r\n")
+            for row in obj.ligne_ids:
+                f.write(str(row.ligne)+'\t')
+                f.write(row.journal_code+'\t')
+                f.write(row.ecriture_num+'\t')
+                f.write(row.ecriture_date.strftime('%Y%m%d')+'\t')
+                f.write((row.compte_num or '')+'\t')
+                f.write((row.comp_aux_num or '')+'\t')
+                f.write(row.piece_ref+'\t')
+                f.write(row.piece_date.strftime('%Y%m%d')+'\t')
+                f.write(row.ecriture_lib+'\t')
+                f.write(str(row.debit).replace('.','.')+'\t')
+                f.write(str(row.credit).replace('.','.')+'\t')
+                f.write('\r\n')
+            f.close()
+            r = open(dest,'rb').read()
+            r=base64.b64encode(r)
+            vals = {
+                'name':        name,
+                'type':        'binary',
+                'res_model':   model,
+                'res_id':      obj.id,
+                'datas':       r,
+            }
+            attachment = self.env['ir.attachment'].create(vals)
+            obj.file_ids=[(6,0,[attachment.id])]
+
