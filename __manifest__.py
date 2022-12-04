@@ -27,6 +27,7 @@ Module Odoo 15 pour CLAIR-SARL
         "views/purchase_view.xml",
         "views/sale_view.xml",
         "views/account_move_view.xml",
+        "views/account_payment_view.xml",
         "views/is_export_compta_views.xml",
         "views/menu.xml",
         "report/purchase_quotation_templates.xml",
@@ -34,6 +35,17 @@ Module Odoo 15 pour CLAIR-SARL
         "report/sale_report_templates.xml",
         "report/report_templates.xml",
     ],
+
+ 
+
+    'assets': {
+        'web.assets_qweb': [
+            'is_clair_sarl/static/src/xml/**/*',
+        ],
+    },
+
+
+
     "installable": True,
     "application": True,
     "license": "LGPL-3",
