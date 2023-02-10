@@ -12,22 +12,16 @@ class IsExportComptaLigne(models.Model):
 
     export_compta_id = fields.Many2one('is.export.compta', 'Export Compta', required=True, ondelete='cascade')
     ligne            = fields.Integer("Ligne")
-    journal_code     = fields.Char("JournalCode")
-    journal_lib      = fields.Char("JournalLib")
-    partner_id       = fields.Many2one('res.partner', 'Partenaire')
-    ecriture_num     = fields.Char("EcritureNum")
-    ecriture_date    = fields.Date("EcritureDate")
-    compte_num       = fields.Char("CompteNum")
-    compte_lib       = fields.Char("CompteLib")
-    comp_aux_num     = fields.Char("CompAuxNum")
-    comp_aux_lib     = fields.Char("CompAuxLib")
-    piece_ref        = fields.Char("PieceRef")
-    piece_date       = fields.Date("PieceDate")
-    ecriture_lib     = fields.Char("EcritureLib")
+    code_journal     = fields.Char("Journal")
+    date             = fields.Date("Date")
+    num_piece        = fields.Char("N°Pièce")
+    num_facture      = fields.Char("N°Facture")
+    num_compte       = fields.Char("N°Compte")
+    libelle          = fields.Char("Libellé")
     debit            = fields.Float("Debit" , digits=(14,2))
     credit           = fields.Float("Credit", digits=(14,2))
+    partner_id       = fields.Many2one('res.partner', 'Partenaire')
     invoice_id       = fields.Many2one('account.move', 'Facture')
-    payment_id       = fields.Many2one('account.payment', 'Paiement')
 
 
 class IsExportCompta(models.Model):
@@ -58,20 +52,17 @@ class IsExportCompta(models.Model):
             obj.ligne_ids.unlink()
             sql="""
                 SELECT  
-                    aj.code journal_code,
-                    am.name ecriture_num,
-                    am.date ecriture_date,
-                    aa.code compte_num,
-                    aa.name,
-                    am.date piece_date,
-                    aml.name ecriture_lib,
+                    aj.code code_journal,
+                    am.date date,
+                    am.ref num_piece,
+                    am.name num_facture,
+                    aa.code num_compte,
+                    aml.name libelle,
                     aml.debit,
                     aml.credit,
-                    rp.name partner_name,
-                    rp.ref comp_aux_num,
-                    am.id invoice_id,
-                    aj.code,
-                    am.partner_id
+                    rp.is_compte_auxiliaire,
+                    am.partner_id,
+                    am.id invoice_id
                 FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
                                            inner join account_account aa             on aml.account_id=aa.id
                                            left outer join res_partner rp            on aml.partner_id=rp.id
@@ -79,40 +70,37 @@ class IsExportCompta(models.Model):
 
                 WHERE 
                      am.is_export_compta_id is null and
-                     aml.date<=%s and aj.code in ('VE','AC')
-                ORDER BY aml.date
+                     aml.date<=%s and aj.code in ('VE','AC') and
+                     am.state='posted'
+                ORDER BY am.date, am.name, aml.sequence
             """
             cr.execute(sql,[obj.date_fin])
             ct=0
             for row in cr.dictfetchall():
+                partner = self.env['res.partner'].browse(row["partner_id"])
+                libelle = partner.name
+
                 invoice_id = row["invoice_id"]
-                invoices = self.env['account.move'].search([('id','=',invoice_id)])
-                compte_num = row["compte_num"]
-                comp_aux_num = ''
-                if compte_num[:3] in ['401','411']:
-                    comp_aux_num = row["comp_aux_num"]
-                for invoice in invoices:
-                    invoice.is_export_compta_id = obj.id
-                    if compte_num[:3]=='411':
-                        compte_num = invoice.partner_id.property_account_receivable_id.code
-                    if compte_num[:3]=='401':
-                        compte_num = invoice.partner_id.property_account_payable_id.code
+                invoice = self.env['account.move'].browse(invoice_id)
+                invoice.is_export_compta_id = obj.id
+                num_compte = row["num_compte"]
+                if num_compte[:3] in ['401','411']:
+                    if row["is_compte_auxiliaire"]:
+                        num_compte = row["is_compte_auxiliaire"]
                 ct=ct+1
                 vals={
                     'export_compta_id': obj.id,
                     'ligne'           : ct,
-                    'journal_code'           : row["journal_code"],
-                    'ecriture_num'           : row["ecriture_num"],
-                    'ecriture_date'          : row["ecriture_date"],
-                    'compte_num'             : compte_num,
-                    'comp_aux_num'           : comp_aux_num,
-                    'piece_ref'              : row["ecriture_num"],
-                    'piece_date'             : row["piece_date"],
-                    'ecriture_lib'           : row["ecriture_lib"] or row["partner_name"],
-                    'debit'                  : row["debit"],
-                    'credit'                 : row["credit"],
-                    'invoice_id'             : invoice_id,
-                    'partner_id'             : row["partner_id"],
+                    'code_journal'    : row["code_journal"],
+                    'date'            : row["date"],
+                    'num_piece'       : invoice.ref,
+                    'num_facture'     : invoice.name,
+                    'num_compte'      : num_compte,
+                    'libelle'         : libelle,
+                    'debit'           : row["debit"],
+                    'credit'          : row["credit"],
+                    'partner_id'      : row["partner_id"],
+                    'invoice_id'      : row["invoice_id"],
                 }
                 self.env['is.export.compta.ligne'].create(vals)
 
@@ -126,20 +114,28 @@ class IsExportCompta(models.Model):
             attachments.unlink()
             dest     = '/tmp/'+name
             f = codecs.open(dest,'wb',encoding='utf-8')
-            f.write("ligne\tjournal_code\tecriture_num\tecriture_date\tcompte_num\tcomp_aux_num\tpiece_ref\tpiece_date\tecriture_lib\tdebit\tcredit\r\n")
+            f.write("code_journal;date;num_piece;num_facture;num_compte;libelle;debit;credit\r\n")
             for row in obj.ligne_ids:
-                f.write(str(row.ligne)+'\t')
-                f.write(row.journal_code+'\t')
-                f.write(row.ecriture_num+'\t')
-                f.write(row.ecriture_date.strftime('%Y%m%d')+'\t')
-                f.write((row.compte_num or '')+'\t')
-                f.write((row.comp_aux_num or '')+'\t')
-                f.write(row.piece_ref+'\t')
-                f.write(row.piece_date.strftime('%Y%m%d')+'\t')
-                f.write(row.ecriture_lib+'\t')
-                f.write(str(row.debit).replace('.','.')+'\t')
-                f.write(str(row.credit).replace('.','.')+'\t')
+                f.write(row.code_journal+';')
+                f.write(str(row.date)+';')
+                f.write((row.num_piece or '')+';')
+                f.write((row.num_facture or '')+';')
+                f.write(row.num_compte+';')
+                f.write(row.libelle+';')
+                f.write(str(row.debit)+';')
+                f.write(str(row.credit))
                 f.write('\r\n')
+
+
+                # f.write(row.ecriture_num+'\t')
+                # f.write(row.ecriture_date.strftime('%Y%m%d')+'\t')
+                # f.write((row.compte_num or '')+'\t')
+                # f.write((row.comp_aux_num or '')+'\t')
+                # f.write(row.piece_ref+'\t')
+                # f.write(row.piece_date.strftime('%Y%m%d')+'\t')
+                # f.write(row.ecriture_lib+'\t')
+                # f.write(str(row.debit).replace('.','.')+'\t')
+                # f.write(str(row.credit).replace('.','.')+'\t')
             f.close()
             r = open(dest,'rb').read()
             r=base64.b64encode(r)

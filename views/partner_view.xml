@@ -153,6 +153,16 @@
             </group>
         </field>
     </record>
+    <record id="is_view_partner_property_form" model="ir.ui.view">
+        <field name="name">is_view_partner_property_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account.view_partner_property_form" />
+        <field name="arch" type="xml">
+            <field name="property_account_payable_id" position="after">
+                <field name="is_compte_auxiliaire"/>
+            </field>
+        </field>
+    </record>
     <record id="is_view_partner_tree" model="ir.ui.view">
         <field name="name">is_view_partner_tree</field>
         <field name="model">res.partner</field>

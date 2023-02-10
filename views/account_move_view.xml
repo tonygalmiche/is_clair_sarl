@@ -55,7 +55,7 @@
 
 
             <div name="journal_div" position="after">
-                <field name="is_export_compta_id" readonly="1"/>
+                <field name="is_export_compta_id"/>
             </div>
 
 

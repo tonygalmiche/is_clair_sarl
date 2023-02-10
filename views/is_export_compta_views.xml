@@ -9,19 +9,16 @@
                 <sheet>
                     <group>
                         <field name="ligne"/>
-                        <field name="journal_code"/>
-                        <field name="partner_id"/>
-                        <field name="ecriture_num"/>
-                        <field name="ecriture_date"/>
-                        <field name="compte_num"/>
-                        <field name="comp_aux_num"/>
-                        <field name="piece_ref"/>
-                        <field name="piece_date"/>
-                        <field name="ecriture_lib"/>
+                        <field name="code_journal"/>
+                        <field name="date"/>
+                        <field name="num_piece"/>
+                        <field name="num_facture"/>
+                        <field name="num_compte"/>
+                        <field name="libelle"/>
                         <field name="debit"/>
                         <field name="credit"/>
+                        <field name="partner_id"/>
                         <field name="invoice_id"/>
-                        <field name="payment_id"/>
                     </group>
                 </sheet>
             </form>
@@ -33,17 +30,16 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="ligne"/>
-                <field name="journal_code"/>
-                <field name="partner_id"/>
-                <field name="ecriture_num"/>
-                <field name="ecriture_date"/>
-                <field name="compte_num"/>
-                <field name="comp_aux_num"/>
-                <field name="piece_ref"/>
-                <field name="piece_date"/>
-                <field name="ecriture_lib"/>
+                <field name="code_journal"/>
+                <field name="date"/>
+                <field name="num_piece"/>
+                <field name="num_facture"/>
+                <field name="num_compte"/>
+                <field name="libelle"/>
                 <field name="debit"  sum="Total"/>
                 <field name="credit" sum="Total"/>
+                <field name="partner_id" widget="many2one_clickable"/>
+                <field name="invoice_id" widget="many2one_clickable"/>
             </tree>
         </field>
     </record>
@@ -53,17 +49,15 @@
         <field name="arch" type="xml">
             <search>
                 <field name="ligne"/>
-                <field name="journal_code"/>
+                <field name="code_journal"/>
+                <field name="date"/>
+                <field name="num_piece"/>
+                <field name="num_facture"/>
+                <field name="num_compte"/>
+                <field name="libelle"/>
                 <field name="partner_id"/>
-                <field name="ecriture_num"/>
-                <field name="compte_num"/>
-                <field name="compte_lib"/>
-                <field name="comp_aux_num"/>
-                <field name="comp_aux_lib"/>
-                <field name="piece_ref"/>
-                <field name="ecriture_lib"/>
                 <field name="invoice_id"/>
-           </search>
+            </search>
         </field>
     </record>
     <record  id="is_export_compta_ligne_action" model="ir.actions.act_window">
