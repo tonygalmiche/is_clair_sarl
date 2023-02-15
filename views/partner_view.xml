@@ -175,6 +175,7 @@
                 <field name="is_statut_id"           optional="show"/>
                 <field name="is_profil_id"           optional="show"/>
                 <field name="is_origine_id"          optional="show"/>
+                <field name="is_compte_auxiliaire"   optional="show"/>
                 <field name="is_condition_tarifaire" optional="hide"/>
                 <field name="is_banque_id"           optional="hide"/>
             </field>
