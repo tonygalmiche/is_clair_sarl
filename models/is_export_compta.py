@@ -74,6 +74,42 @@ class IsExportCompta(models.Model):
                      am.state='posted'
                 ORDER BY am.invoice_date, am.name, aml.sequence
             """
+
+            sql="""
+                SELECT  
+                    aj.code code_journal,
+                    am.invoice_date date,
+                    am.ref num_piece,
+                    am.name num_facture,
+                    aa.code num_compte,
+                    rp.is_compte_auxiliaire,
+                    am.partner_id,
+                    am.id invoice_id,
+                    sum(aml.debit) debit,
+                    sum(aml.credit) credit
+                    FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
+                                           inner join account_account aa             on aml.account_id=aa.id
+                                           left outer join res_partner rp            on aml.partner_id=rp.id
+                                           inner join account_journal aj             on aml.journal_id=aj.id
+
+                WHERE 
+                     am.is_export_compta_id is null and
+                     am.invoice_date<=%s and aj.code in ('VE','AC') and
+                     am.state='posted'
+                GROUP BY
+                    aj.code,
+                    am.invoice_date,
+                    am.ref,
+                    am.name,
+                    aa.code,
+                    rp.is_compte_auxiliaire,
+                    am.partner_id,
+                    am.id
+                ORDER BY am.invoice_date, am.name
+            """
+
+
+
             cr.execute(sql,[obj.date_fin])
             ct=0
             for row in cr.dictfetchall():
