@@ -53,7 +53,7 @@ class IsExportCompta(models.Model):
             sql="""
                 SELECT  
                     aj.code code_journal,
-                    am.date date,
+                    am.invoice_date date,
                     am.ref num_piece,
                     am.name num_facture,
                     aa.code num_compte,
@@ -70,9 +70,9 @@ class IsExportCompta(models.Model):
 
                 WHERE 
                      am.is_export_compta_id is null and
-                     aml.date<=%s and aj.code in ('VE','AC') and
+                     am.invoice_date<=%s and aj.code in ('VE','AC') and
                      am.state='posted'
-                ORDER BY am.date, am.name, aml.sequence
+                ORDER BY am.invoice_date, am.name, aml.sequence
             """
             cr.execute(sql,[obj.date_fin])
             ct=0
