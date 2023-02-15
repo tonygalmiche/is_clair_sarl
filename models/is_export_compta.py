@@ -30,7 +30,7 @@ class IsExportCompta(models.Model):
     _order = 'name desc'
 
     name       = fields.Char("N°Folio", readonly=True)
-    date_fin   = fields.Date("Date de fin"  , required=True)
+    date_fin   = fields.Date("Date de fin"  , required=True, default=lambda *a: fields.Date.today())
     ligne_ids  = fields.One2many('is.export.compta.ligne', 'export_compta_id', 'Lignes')
     file_ids   = fields.Many2many('ir.attachment', 'is_export_compta_attachment_rel', 'doc_id', 'file_id', u'Fichiers')
     company_id = fields.Many2one('res.company', 'Société',required=True,default=lambda self: self.env.user.company_id.id)
