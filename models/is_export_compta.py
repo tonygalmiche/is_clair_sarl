@@ -108,7 +108,7 @@ class IsExportCompta(models.Model):
     def generer_fichier_action(self):
         cr=self._cr
         for obj in self:
-            name='export-compta.txt.xls'
+            name='export-compta.csv'
             model='is.export.compta'
             attachments = self.env['ir.attachment'].search([('res_model','=',model),('res_id','=',obj.id),('name','=',name)])
             attachments.unlink()
@@ -117,13 +117,13 @@ class IsExportCompta(models.Model):
             f.write("code_journal;date;num_piece;num_facture;num_compte;libelle;debit;credit\r\n")
             for row in obj.ligne_ids:
                 f.write(row.code_journal+';')
-                f.write(str(row.date)+';')
+                f.write(row.date.strftime('%d%m%Y')+';')
                 f.write((row.num_piece or '')+';')
                 f.write((row.num_facture or '')+';')
                 f.write(row.num_compte+';')
                 f.write(row.libelle+';')
-                f.write(str(row.debit)+';')
-                f.write(str(row.credit))
+                f.write(str(row.debit).replace('.',',')+';')
+                f.write(str(row.credit).replace('.',','))
                 f.write('\r\n')
 
 
