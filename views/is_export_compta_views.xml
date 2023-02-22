@@ -105,6 +105,7 @@
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="journal" required="True"/>
                         <field name="company_id" readonly="1"/>
                         <field name="date_fin"/>
                         <field 
@@ -124,6 +125,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="journal"/>
                 <field name="date_fin"/>
             </tree>
         </field>
@@ -134,15 +136,24 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                <field name="journal"/>
                 <field name="date_fin"/>
            </search>
         </field>
     </record>
-    <record  id="is_export_compta_action" model="ir.actions.act_window">
-        <field name="name">Export Compta</field>
+    <record  id="is_export_compta_achat_action" model="ir.actions.act_window">
+        <field name="name">Export Compta Achat</field>
         <field name="res_model">is.export.compta</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[]</field>
+        <field name="context">{'default_journal': 'AC'}</field>
+    </record>
+    <record  id="is_export_compta_vente_action" model="ir.actions.act_window">
+        <field name="name">Export Compta Vente</field>
+        <field name="res_model">is.export.compta</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{'default_journal': 'VE'}</field>
     </record>
 
 

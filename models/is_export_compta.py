@@ -30,6 +30,10 @@ class IsExportCompta(models.Model):
     _order = 'name desc'
 
     name       = fields.Char("N°Folio", readonly=True)
+    journal    = fields.Selection([
+        ('AC', 'Achat'),
+        ('VE', 'Ventes'),
+    ], 'Journal')
     date_fin   = fields.Date("Date de fin"  , required=True, default=lambda *a: fields.Date.today())
     ligne_ids  = fields.One2many('is.export.compta.ligne', 'export_compta_id', 'Lignes')
     file_ids   = fields.Many2many('ir.attachment', 'is_export_compta_attachment_rel', 'doc_id', 'file_id', u'Fichiers')
@@ -50,30 +54,30 @@ class IsExportCompta(models.Model):
             for invoice in invoices:
                 invoice.is_export_compta_id=False
             obj.ligne_ids.unlink()
-            sql="""
-                SELECT  
-                    aj.code code_journal,
-                    am.invoice_date date,
-                    am.ref num_piece,
-                    am.name num_facture,
-                    aa.code num_compte,
-                    aml.name libelle,
-                    aml.debit,
-                    aml.credit,
-                    rp.is_compte_auxiliaire,
-                    am.partner_id,
-                    am.id invoice_id
-                FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
-                                           inner join account_account aa             on aml.account_id=aa.id
-                                           left outer join res_partner rp            on aml.partner_id=rp.id
-                                           inner join account_journal aj             on aml.journal_id=aj.id
+            # sql="""
+            #     SELECT  
+            #         aj.code code_journal,
+            #         am.invoice_date date,
+            #         am.ref num_piece,
+            #         am.name num_facture,
+            #         aa.code num_compte,
+            #         aml.name libelle,
+            #         aml.debit,
+            #         aml.credit,
+            #         rp.is_compte_auxiliaire,
+            #         am.partner_id,
+            #         am.id invoice_id
+            #     FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
+            #                                inner join account_account aa             on aml.account_id=aa.id
+            #                                left outer join res_partner rp            on aml.partner_id=rp.id
+            #                                inner join account_journal aj             on aml.journal_id=aj.id
 
-                WHERE 
-                     am.is_export_compta_id is null and
-                     am.invoice_date<=%s and aj.code in ('VE','AC') and
-                     am.state='posted'
-                ORDER BY am.invoice_date, am.name, aml.sequence
-            """
+            #     WHERE 
+            #          am.is_export_compta_id is null and
+            #          am.invoice_date<=%s and aj.code=%s in ('VE','AC') and
+            #          am.state='posted'
+            #     ORDER BY am.invoice_date, am.name, aml.sequence
+            # """
 
             sql="""
                 SELECT  
@@ -94,7 +98,7 @@ class IsExportCompta(models.Model):
 
                 WHERE 
                      am.is_export_compta_id is null and
-                     am.invoice_date<=%s and aj.code in ('VE','AC') and
+                     am.invoice_date<=%s and aj.code=%s and
                      am.state='posted'
                 GROUP BY
                     aj.code,
@@ -110,7 +114,7 @@ class IsExportCompta(models.Model):
 
 
 
-            cr.execute(sql,[obj.date_fin])
+            cr.execute(sql,[obj.date_fin,obj.journal])
             ct=0
             for row in cr.dictfetchall():
                 partner = self.env['res.partner'].browse(row["partner_id"])
@@ -124,13 +128,20 @@ class IsExportCompta(models.Model):
                     if row["is_compte_auxiliaire"]:
                         num_compte = row["is_compte_auxiliaire"]
                 ct=ct+1
+
+                num_piece   = invoice.ref
+                num_facture = invoice.name
+
+                if obj.journal=="VE":
+                    num_piece = num_facture
+
                 vals={
                     'export_compta_id': obj.id,
                     'ligne'           : ct,
                     'code_journal'    : row["code_journal"],
                     'date'            : row["date"],
-                    'num_piece'       : invoice.ref,
-                    'num_facture'     : invoice.name,
+                    'num_piece'       : num_piece,
+                    'num_facture'     : num_facture,
                     'num_compte'      : num_compte,
                     'libelle'         : libelle,
                     'debit'           : row["debit"],

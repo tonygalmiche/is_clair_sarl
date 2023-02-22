@@ -160,13 +160,19 @@
         parent="account.menu_finance_payables" 
     />
     <menuitem
-        id="is_export_compta_menu"
-        name="Export Compta"
+        id="is_export_compta_achat_menu"
+        name="Export Compta Achat"
         parent="account.menu_finance_payables"
         sequence="910"
-        action="is_export_compta_action"
+        action="is_export_compta_achat_action"
     />
-
+    <menuitem
+        id="is_export_compta_vente_menu"
+        name="Export Compta Vente"
+        parent="account.menu_finance_receivables"
+        sequence="910"
+        action="is_export_compta_vente_action"
+    />
 
 
     <!-- Déplacement des menus inutiles -->
