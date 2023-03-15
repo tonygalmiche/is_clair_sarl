@@ -10,6 +10,8 @@ class AccountMove(models.Model):
     is_banque_id        = fields.Many2one('account.journal', 'Banque par défaut', related='partner_id.is_banque_id')
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
     is_courrier_id      = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
+    is_traite_id        = fields.Many2one('is.traite', 'Traite')
+
 
     def acceder_facture_action(self):
         for obj in self:

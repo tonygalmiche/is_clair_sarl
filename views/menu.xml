@@ -167,6 +167,16 @@
         action="is_export_compta_achat_action"
     />
     <menuitem
+        id="is_traite_menu"
+        name="Traites"
+        parent="account.menu_finance_payables"
+        sequence="911"
+        action="is_traite_action"
+    />
+
+
+
+    <menuitem
         id="is_export_compta_vente_menu"
         name="Export Compta Vente"
         parent="account.menu_finance_receivables"

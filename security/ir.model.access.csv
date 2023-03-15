@@ -67,3 +67,5 @@ access_is_export_compta_ligne,access_is_export_compta_ligne,model_is_export_comp
 access_is_export_compta,access_is_export_compta,model_is_export_compta,account.group_account_invoice,1,1,1,1
 
 access_is_courrier_expedie,access_is_courrier_expedie,model_is_courrier_expedie,account.group_account_invoice,1,1,1,1
+
+access_is_traite,access_is_traite,model_is_traite,account.group_account_invoice,1,1,1,1

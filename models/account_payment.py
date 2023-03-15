@@ -1,6 +1,27 @@
 # -*- coding: utf-8 -*-
 from odoo import models,fields,api
 
+class IsTraite(models.Model):
+    _name='is.traite'
+    _description = "Traite"
+    _order='date_retour desc'
+    _rec_name='date_retour'
+
+    date_retour    = fields.Date('Date de retour', required=True, index=True, default=fields.Date.context_today)
+    partner_id     = fields.Many2one('res.partner' , 'Fournisseur', required=True)
+    montant        = fields.Float("Montant", digits=(14,2), store=True, readonly=True, compute='_compute_montant')
+    date_reglement = fields.Date('Date de règlement')
+    ligne_ids      = fields.One2many('account.move', 'is_traite_id', 'Lignes')
+
+
+    @api.depends('ligne_ids')
+    def _compute_montant(self):
+        for obj in self:
+            montant = 0
+            for line in obj.ligne_ids:
+                montant+=line.amount_total_signed
+            obj.montant = montant
+
 
 class AccountPayment(models.Model):
     _inherit = "account.payment"
@@ -21,8 +42,6 @@ class AccountPayment(models.Model):
             }
             courrier = self.env['is.courrier.expedie'].create(vals)
             obj.is_courrier_id = courrier.id
-
-
 
 
 class AccountPaymentRegister(models.TransientModel):

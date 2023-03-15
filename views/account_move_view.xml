@@ -72,19 +72,15 @@
             <xpath expr="//field[@name='invoice_line_ids']/tree" position="attributes">
                 <attribute name="limit">1000</attribute>
             </xpath>
-
-
             <div name="journal_div" position="after">
                 <field name="is_export_compta_id"/>
+                <field name="is_traite_id"/>
                 <field 
                     name="is_courrier_id"
                     attrs="{'invisible': [('is_courrier_id', '=', False)], 'readonly': True}"
                 />
+
             </div>
-
-
-
-
         </field>
     </record> 
     <record id="is_view_out_invoice_tree" model="ir.ui.view">
@@ -114,6 +110,7 @@
             <field name="state" position="before">
                 <field name="is_banque_id"        optional="hide"/>
                 <field name="is_export_compta_id" optional="show"/>
+                <field name="is_traite_id"        optional="show"/>
             </field>
         </field>
     </record>
