@@ -176,7 +176,7 @@
 
     <menuitem
         id="is_courrier_expedie_menu"
-        name="Courrier expédié"
+        name="Courrier"
         parent="account.menu_finance"
         sequence="4"
         action="is_courrier_expedie_action"
