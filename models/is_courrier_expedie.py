@@ -15,5 +15,6 @@ class IsCourrierExpedie(models.Model):
     partner_id = fields.Many2one('res.partner' , 'Destinataire', required=True)
     affaire_id = fields.Many2one('is.affaire', 'Affaire')
     invoice_id = fields.Many2one('account.move', 'Facture')
+    traite_id  = fields.Many2one('is.traite', 'Traite')
     objet      = fields.Char('Objet', required=True)
     montant    = fields.Float("Montant", digits=(14,2), required=True)

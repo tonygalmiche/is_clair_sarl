@@ -10,7 +10,8 @@ class IsTraite(models.Model):
     date_retour    = fields.Date('Date de retour', required=True, index=True, default=fields.Date.context_today)
     partner_id     = fields.Many2one('res.partner' , 'Fournisseur', required=True)
     montant        = fields.Float("Montant", digits=(14,2), store=True, readonly=True, compute='_compute_montant')
-    date_reglement = fields.Date('Date de règlement')
+    date_reglement = fields.Date('Date de règlement', store=True, readonly=True, compute='_compute_montant')
+    is_courrier_id = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
     ligne_ids      = fields.One2many('account.move', 'is_traite_id', 'Lignes')
 
 
@@ -18,9 +19,25 @@ class IsTraite(models.Model):
     def _compute_montant(self):
         for obj in self:
             montant = 0
+            date_reglement = False
             for line in obj.ligne_ids:
                 montant+=line.amount_total_signed
-            obj.montant = montant
+                date_reglement = line.invoice_date_due
+            obj.montant        = montant
+            obj.date_reglement = date_reglement
+
+
+    def enregistre_courrier_action(self):
+        for obj in self:
+            objet="Traite retournée le %s en réglement du %s"%(obj.date_retour.strftime('%d/%m/%Y'),obj.date_reglement.strftime('%d/%m/%Y'))
+            vals={
+                "partner_id": obj.partner_id.id,
+                "objet"     : objet,
+                "montant"   : obj.montant,
+                "traite_id" : obj.id,
+            }
+            courrier = self.env['is.courrier.expedie'].create(vals)
+            obj.is_courrier_id = courrier.id
 
 
 class AccountPayment(models.Model):
