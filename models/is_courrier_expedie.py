@@ -7,8 +7,11 @@ class IsCourrierExpedie(models.Model):
     _order='date desc'
     _rec_name='date'
 
-
-    date       = fields.Datetime('Date', required=True, index=True, default=fields.Datetime.now)
+    date = fields.Datetime('Date', required=True, index=True, default=fields.Datetime.now)
+    sens = fields.Selection([
+        ('expedie', 'Expédié'),
+        ('recu'   , 'Recu'),
+    ], 'Sens', default='expedie', required=True)
     partner_id = fields.Many2one('res.partner' , 'Destinataire', required=True)
     affaire_id = fields.Many2one('is.affaire', 'Affaire')
     invoice_id = fields.Many2one('account.move', 'Facture')

@@ -6,8 +6,21 @@
         <field name="model">account.payment</field>
         <field name="inherit_id" ref="account.view_account_payment_form"/>
         <field name="arch" type="xml">
+            <button name="action_post" position="before">
+                <button 
+                    name="enregistre_courrier_action" 
+                    string="Enregistrer courrier expédié" 
+                    class="oe_highlight" 
+                    type="object"
+                    attrs="{'invisible': [('is_courrier_id', '!=', False)], 'readonly': True}"
+                />
+            </button>
             <field name="ref" position="after">
                 <field name="is_num_cheque"/>
+                <field 
+                    name="is_courrier_id"
+                    attrs="{'invisible': [('is_courrier_id', '=', False)], 'readonly': True}"
+                />
             </field>
         </field>
     </record>
@@ -29,6 +42,7 @@
             <field name="partner_id" position="after">
                 <field name="ref"           optional="show"/>
                 <field name="is_num_cheque" optional="show"/>
+                <field name="is_courrier_id" optional="show"/>
             </field>
         </field>
     </record>

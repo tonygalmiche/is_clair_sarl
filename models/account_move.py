@@ -9,7 +9,7 @@ class AccountMove(models.Model):
     is_affaire_id       = fields.Many2one('is.affaire', 'Affaire', related='is_order_id.is_affaire_id')
     is_banque_id        = fields.Many2one('account.journal', 'Banque par défaut', related='partner_id.is_banque_id')
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
-
+    is_courrier_id      = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
 
     def acceder_facture_action(self):
         for obj in self:
@@ -25,22 +25,22 @@ class AccountMove(models.Model):
             return res
 
 
-    def action_post(self):
-        res = super().action_post()
-        print(res)
+    # def action_post(self):
+    #     res = super().action_post()
+    #     return res
 
+
+    def enregistre_courrier_action(self):
         for obj in self:
             vals={
                 "partner_id": obj.partner_id.id,
                 "affaire_id": obj.is_affaire_id.id,
                 "invoice_id": obj.id,
-                "objet"     : "Validation facture",
+                "objet"     : "Facture client",
                 "montant"   : obj.amount_untaxed_signed,
             }
             courrier = self.env['is.courrier.expedie'].create(vals)
-
-
-        return res
+            obj.is_courrier_id = courrier.id
 
 
 class AccountMoveLine(models.Model):
