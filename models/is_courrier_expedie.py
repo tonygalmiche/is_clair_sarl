@@ -1,0 +1,16 @@
+from odoo import fields, models
+
+
+class IsCourrierExpedie(models.Model):
+    _name='is.courrier.expedie'
+    _description = "Courrier expédié"
+    _order='date desc'
+    _rec_name='date'
+
+
+    date       = fields.Datetime('Date', required=True, index=True, default=fields.Datetime.now)
+    partner_id = fields.Many2one('res.partner' , 'Destinataire', required=True)
+    affaire_id = fields.Many2one('is.affaire', 'Affaire')
+    invoice_id = fields.Many2one('account.move', 'Facture')
+    objet      = fields.Char('Objet', required=True)
+    montant    = fields.Float("Montant", digits=(14,2), required=True)

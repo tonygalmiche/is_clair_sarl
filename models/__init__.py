@@ -8,5 +8,6 @@ from . import res_partner
 from . import account_move
 from . import is_export_compta
 from . import account_payment
+from . import is_courrier_expedie
 
 

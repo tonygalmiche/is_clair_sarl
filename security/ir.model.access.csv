@@ -66,4 +66,4 @@ access_is_affaire_budget_famille_manager,access_is_affaire_budget_famille_manage
 access_is_export_compta_ligne,access_is_export_compta_ligne,model_is_export_compta_ligne,account.group_account_invoice,1,1,1,1
 access_is_export_compta,access_is_export_compta,model_is_export_compta,account.group_account_invoice,1,1,1,1
 
-
+access_is_courrier_expedie,access_is_courrier_expedie,model_is_courrier_expedie,account.group_account_invoice,1,1,1,1

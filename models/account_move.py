@@ -25,6 +25,23 @@ class AccountMove(models.Model):
             return res
 
 
+    def action_post(self):
+        res = super().action_post()
+        print(res)
+
+        for obj in self:
+            vals={
+                "partner_id": obj.partner_id.id,
+                "affaire_id": obj.is_affaire_id.id,
+                "invoice_id": obj.id,
+                "objet"     : "Validation facture",
+                "montant"   : obj.amount_untaxed_signed,
+            }
+            courrier = self.env['is.courrier.expedie'].create(vals)
+
+
+        return res
+
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
