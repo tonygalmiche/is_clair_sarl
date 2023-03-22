@@ -52,8 +52,7 @@ class AccountPayment(models.Model):
             objet="Règlement %s %s"%(obj.ref, (obj.is_num_cheque or ''))
             vals={
                 "partner_id": obj.partner_id.id,
-                #"affaire_id": obj.is_affaire_id.id,
-                #"invoice_id": obj.id,
+                "payment_id": obj.id,
                 "objet"     : objet,
                 "montant"   : obj.amount,
             }
@@ -67,15 +66,15 @@ class AccountPaymentRegister(models.TransientModel):
     is_num_cheque = fields.Char("Mode de règlement", help="N° du chèque")
 
 
-    # def _create_payment_vals_from_wizard(self):
-    #     payment_vals = super(AccountPaymentRegister, self)._create_payment_vals_from_wizard()
-    #     payment_vals["is_num_cheque"] = self.is_num_cheque
-    #     for obj in self:
-    #         objet="Règlement %s %s"%(self.communication, payment_vals["is_num_cheque"])
-    #         vals={
-    #             "partner_id": payment_vals["partner_id"],
-    #             "objet"     : objet,
-    #             "montant"   : payment_vals["amount"],
-    #         }
-    #         courrier = self.env['is.courrier.expedie'].create(vals)
-    #     return payment_vals
+    def _create_payment_vals_from_wizard(self):
+        payment_vals = super(AccountPaymentRegister, self)._create_payment_vals_from_wizard()
+        payment_vals["is_num_cheque"] = "%s sur %s"%(self.is_num_cheque,self.journal_id.name)
+        # for obj in self:
+        #     objet="Règlement %s %s"%(self.communication, payment_vals["is_num_cheque"])
+        #     vals={
+        #         "partner_id": payment_vals["partner_id"],
+        #         "objet"     : objet,
+        #         "montant"   : payment_vals["amount"],
+        #     }
+        #     courrier = self.env['is.courrier.expedie'].create(vals)
+        return payment_vals
