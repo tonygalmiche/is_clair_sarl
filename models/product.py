@@ -108,50 +108,62 @@ class product_template(models.Model):
             if obj.is_famille_id.is_longueur:
                 vsb=True
             obj.is_longueur_vsb = vsb
+
             vsb=False
             if obj.is_famille_id.is_largeur_utile:
                 vsb=True
             obj.is_largeur_utile_vsb = vsb
+
             vsb=False
             if obj.is_famille_id.is_surface_panneau:
                 vsb=True
             obj.is_surface_panneau_vsb = vsb
+
             vsb=False
             if obj.is_famille_id.is_surface_palette:
                 vsb=True
             obj.is_surface_palette_vsb = vsb
+
             vsb=False
             if obj.is_famille_id.is_poids:
                 vsb=True
             obj.is_poids_vsb = vsb
+
             vsb=False
             if obj.is_famille_id.is_poids_rouleau:
                 vsb=True
             obj.is_poids_rouleau_vsb = vsb
+
             vsb=False
             if obj.is_famille_id.is_ondes:
                 vsb=True
             obj.is_ondes_vsb = vsb
+
             vsb=False
             if obj.is_famille_id.is_resistance_thermique:
                 vsb=True
             obj.is_resistance_thermique_vsb = vsb
+
             vsb=False
             if obj.is_famille_id.is_lambda:
                 vsb=True
-            vsb=False
             obj.is_lambda_vsb = vsb
+
+            vsb=False
             if obj.is_famille_id.is_lg_mini_forfait:
                 vsb=True
-            vsb=False
             obj.is_lg_mini_forfait_vsb = vsb
+
+            vsb=False
             if obj.is_famille_id.is_forfait_coupe_id:
                 vsb=True
             obj.is_forfait_coupe_id_vsb = vsb
+
             vsb=False
             if obj.is_famille_id.is_ordre_tri:
                 vsb=True
             obj.is_ordre_tri_vsb = vsb
+            
             vsb=False
             if obj.is_famille_id.is_sous_article_ids:
                 vsb=True
