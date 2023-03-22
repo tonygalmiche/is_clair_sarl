@@ -102,6 +102,11 @@
                 <field name="date_retour"/>
                 <field name="partner_id"/>
                 <field name="date_reglement"/>
+
+                <filter string="Date de règlement" name="date_reglement" context="{'group_by':'date_reglement:day'}"/>
+
+
+
             </search>
         </field>
     </record>
