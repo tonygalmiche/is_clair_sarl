@@ -69,3 +69,5 @@ access_is_export_compta,access_is_export_compta,model_is_export_compta,account.g
 access_is_courrier_expedie,access_is_courrier_expedie,model_is_courrier_expedie,account.group_account_invoice,1,1,1,1
 
 access_is_traite,access_is_traite,model_is_traite,account.group_account_invoice,1,1,1,1
+
+access_is_preparation_facture,access_is_preparation_facture,model_is_preparation_facture,base.group_user,1,1,1,1

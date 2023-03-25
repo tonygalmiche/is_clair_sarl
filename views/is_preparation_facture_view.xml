@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--is.preparation.facture -->
+    <record model="ir.ui.view" id="is_preparation_facture_lignes_tree_view">
+        <field name="name">is_preparation_facture_lignes_tree_view</field>
+        <field name="model">purchase.order.line</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree limit="1000" editable="bottom" default_order="is_sequence_facturation">
+            <!-- <tree limit="1000" editable="bottom"> -->
+                <field name="is_sequence_facturation" widget="handle"/>
+                <!-- <field name="is_sequence_facturation"/> -->
+                <field name="order_id"          optional="show" readonly="1" string="Cde"/>
+                <field name="is_date_livraison" optional="show" readonly="1"/>
+                <field name="product_id"        optional="show" readonly="1"/>
+                <field name="name"              optional="hide" readonly="1"/>
+                <field name="date_planned"      optional="hide" readonly="1"/>
+                <field name="product_qty"       optional="show" readonly="1" string="Qt Cde"/>
+                <field name="qty_invoiced"      optional="show" readonly="1" string="Qt Fac"/>
+                <field name="is_qt_a_facturer"  optional="show"/>
+                <field name="price_unit"        optional="show" readonly="1"/>
+                <field name="is_montant_a_facturer" optional="show" readonly="1" sum="Total"/>
+                <field name="is_affaire_id"     optional="show" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_preparation_facture_form_view" model="ir.ui.view">
+        <field name="name">is_preparation_facture_from_view</field>
+        <field name="model">is.preparation.facture</field>
+        <field name="arch" type="xml">
+            <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
+                    }
+                    .modal-lg, .modal-xl {
+                      max-width: 1500px;
+                    }
+                </style>
+
+
+                <header>
+                    <button
+                        name="creer_facture_action"
+                        type="object"
+                        string="Créer la facture"
+                        class="oe_highlight" 
+                        attrs="{'invisible': [('invoice_id', '!=', False)]}"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="date_limite"/>
+                        </group>
+                        <group>
+                            <field name="montant"/>
+                            <field name="invoice_id" attrs="{'invisible': [('invoice_id', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <field 
+                        name="ligne_ids" 
+                        widget="many2many"
+
+                        domain="[
+                            ('partner_id','=',partner_id),
+                            ('state'     ,'=','purchase'),
+                            ('qty_to_invoice','&gt;',0),
+                            ('is_date_livraison','&lt;',date_limite),
+                        ]" 
+                        context="{'tree_view_ref':'is_clair_sarl.is_preparation_facture_lignes_tree_view'}"
+                    />
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_preparation_facture_tree_view">
+        <field name="name">is_preparation_facture_tree_view</field>
+        <field name="model">is.preparation.facture</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id"/>
+                <field name="date_limite"/>
+                <field name="montant"/>
+                <field name="invoice_id"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_preparation_facture_search_view" model="ir.ui.view">
+        <field name="name">is_preparation_facture_search_view</field>
+        <field name="model">is.preparation.facture</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="invoice_id"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_preparation_facture_action" model="ir.actions.act_window">
+        <field name="name">Préparation facture</field>
+        <field name="res_model">is.preparation.facture</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+</odoo>

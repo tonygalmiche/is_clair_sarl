@@ -160,6 +160,13 @@
         parent="account.menu_finance_payables" 
     />
     <menuitem
+        id="is_preparation_facture_menu"
+        name="Préparation facture"
+        parent="account.menu_finance_payables"
+        sequence="902"
+        action="is_preparation_facture_action"
+    />
+    <menuitem
         id="is_export_compta_achat_menu"
         name="Export Compta Achat"
         parent="account.menu_finance_payables"
@@ -173,6 +180,7 @@
         sequence="911"
         action="is_traite_action"
     />
+
 
 
 

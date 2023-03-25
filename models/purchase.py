@@ -248,6 +248,7 @@ class purchase_order_line(models.Model):
 
     is_famille_id      = fields.Many2one('is.famille', 'Famille'          , related='product_id.is_famille_id')
     is_sous_famille_id = fields.Many2one('is.sous.famille', 'Sous-famille', related='product_id.is_sous_famille_id')
+    is_affaire_id      = fields.Many2one(related='order_id.is_affaire_id')
     is_finition_id     = fields.Many2one('is.finition'  , 'Finition')
     is_traitement_id   = fields.Many2one('is.traitement', 'Traitement')
     is_largeur         = fields.Float('Largeur')
@@ -257,6 +258,27 @@ class purchase_order_line(models.Model):
     is_colisage               = fields.Text("Colisage", store=False, readonly=True, compute='_compute_is_colisage')
     is_repere_ids             = fields.One2many('is.purchase.order.line.repere', 'line_id', 'Repère de plan')
     is_mois_ids               = fields.One2many('is.purchase.order.line.mois'  , 'line_id', 'Mois')
+    is_preparation_id         = fields.Many2one('is.preparation.facture', 'Préparation facture')
+    is_qt_a_facturer          = fields.Float('Qt à facturer', digits='Product Unit of Measure')
+    is_montant_a_facturer     = fields.Float("Montant à facturer")
+
+    is_date_livraison = fields.Date(related='order_id.is_date_livraison')
+    is_sequence_facturation = fields.Integer("Ordre") #, store=True, readonly=True, compute='_compute_is_sequence_facturation') #, default=lambda self: self._default_is_sequence_facturation())
+
+
+
+    # def _default_is_sequence_facturation(self):
+    #     return 1234
+
+
+    # @api.depends('is_preparation_id')
+    # def _compute_is_sequence_facturation(self):
+    #     for obj in self:
+    #         obj.is_sequence_facturation = obj.is_preparation_id.id
+    #         print("_compute_is_sequence_facturation", obj,obj.is_preparation_id.id)
+
+
+
 
     @api.depends('is_colis_ids')
     def _compute_is_colisage(self):

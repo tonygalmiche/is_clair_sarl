@@ -22,6 +22,7 @@ Module Odoo 15 pour CLAIR-SARL
         "security/ir.model.access.csv",
         "views/is_affaire_view.xml",
         "views/is_import_clair_views.xml",
+        "views/is_preparation_facture_view.xml",
         "views/partner_view.xml",
         "views/product_view.xml",
         "views/purchase_view.xml",

@@ -218,12 +218,6 @@
             <field name="user_id" position="replace"/>
         </field>
     </record>
-
-
-
-
-
-
     <record id="is_view_purchase_order_filter" model="ir.ui.view">
         <field name="name">is_view_purchase_order_filter</field>
         <field name="model">purchase.order</field>
@@ -237,7 +231,17 @@
     </record>
 
 
-
+    <!-- purchase.order.line -->
+    <record id="is_purchase_order_line_search" model="ir.ui.view">
+        <field name="name">is_purchase_order_line_search</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_line_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_affaire_id"/>
+            </field>
+        </field>
+    </record>
 
 
     <!--is.finition -->
@@ -542,4 +546,3 @@
 
 
 </odoo>
-
