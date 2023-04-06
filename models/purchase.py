@@ -40,6 +40,7 @@ class purchase_order(models.Model):
     is_repere_ids          = fields.One2many('is.purchase.order.repere', 'order_id', 'Repère de plan')
     is_mois_ids            = fields.One2many('is.purchase.order.mois'  , 'order_id', 'Mois de réalisation des tâches')
     is_sale_order_id       = fields.Many2one('sale.order', 'Commande client associée')
+    is_modele_commande_id  = fields.Many2one(related='partner_id.is_modele_commande_id')
 
 
     @api.onchange('is_affaire_id')
@@ -174,8 +175,19 @@ class purchase_order(models.Model):
             }
 
 
-
-
+    def initialiser_depuis_modele_commande(self):
+        for obj in self:
+            sequence=10
+            for line in obj.is_modele_commande_id.ligne_ids:
+                vals={
+                    'order_id'    : obj.id,
+                    'sequence'    : sequence,
+                    'product_id'  : line.product_id.id,
+                    'name'        : line.product_id.name_get()[0][1],
+                    'product_qty' : 0,
+                }
+                self.env['purchase.order.line'].create(vals)
+                sequence+=10
 
 
 class IsPurchaseOrderMois(models.Model):
@@ -264,20 +276,6 @@ class purchase_order_line(models.Model):
 
     is_date_livraison = fields.Date(related='order_id.is_date_livraison')
     is_sequence_facturation = fields.Integer("Ordre") #, store=True, readonly=True, compute='_compute_is_sequence_facturation') #, default=lambda self: self._default_is_sequence_facturation())
-
-
-
-    # def _default_is_sequence_facturation(self):
-    #     return 1234
-
-
-    # @api.depends('is_preparation_id')
-    # def _compute_is_sequence_facturation(self):
-    #     for obj in self:
-    #         obj.is_sequence_facturation = obj.is_preparation_id.id
-    #         print("_compute_is_sequence_facturation", obj,obj.is_preparation_id.id)
-
-
 
 
     @api.depends('is_colis_ids')

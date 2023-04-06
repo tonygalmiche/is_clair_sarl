@@ -49,7 +49,6 @@ access_is_purchase_order_mois_manager,access_is_purchase_order_mois_manager,mode
 access_is_purchase_order_line_mois,access_is_purchase_order_line_mois,model_is_purchase_order_line_mois,base.group_user,1,0,0,0
 access_is_purchase_order_line_mois_manager,access_is_purchase_order_line_mois_manager,model_is_purchase_order_line_mois,purchase.group_purchase_manager,1,1,1,1
 
-
 access_is_sous_article,access_is_sous_article,model_is_sous_article,base.group_user,1,0,0,0
 access_is_sous_article_manager,access_is_sous_article_manager,model_is_sous_article,sales_team.group_sale_manager,1,1,1,1
 
@@ -58,10 +57,8 @@ access_is_sale_order_section_manager,access_is_sale_order_section_manager,model_
 
 access_is_affaire_analyse,access_is_affaire_analyse,model_is_affaire_analyse,base.group_user,1,0,0,0
 
-
 access_is_affaire_budget_famille,access_is_affaire_budget_famille,model_is_affaire_budget_famille,base.group_user,1,0,0,0
 access_is_affaire_budget_famille_manager,access_is_affaire_budget_famille_manager,model_is_affaire_budget_famille,sales_team.group_sale_manager,1,1,1,1
-
 
 access_is_export_compta_ligne,access_is_export_compta_ligne,model_is_export_compta_ligne,account.group_account_invoice,1,1,1,1
 access_is_export_compta,access_is_export_compta,model_is_export_compta,account.group_account_invoice,1,1,1,1
@@ -71,3 +68,6 @@ access_is_courrier_expedie,access_is_courrier_expedie,model_is_courrier_expedie,
 access_is_traite,access_is_traite,model_is_traite,account.group_account_invoice,1,1,1,1
 
 access_is_preparation_facture,access_is_preparation_facture,model_is_preparation_facture,base.group_user,1,1,1,1
+
+access_is_modele_commande_ligne,access_is_modele_commande_ligne,model_is_modele_commande_ligne,base.group_user,1,1,1,1
+access_is_modele_commande,access_is_modele_commande,model_is_modele_commande,base.group_user,1,1,1,1

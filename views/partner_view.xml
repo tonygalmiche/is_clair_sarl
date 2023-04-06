@@ -151,6 +151,17 @@
                     <field name="is_banque_id"/>
                 </group>
             </group>
+            <group name="misc" position="after">
+                <group>
+                    <field name="is_modele_commande_id"/>
+                    <button
+                        name="creer_modele_commande"
+                        type="object"
+                        string="Créer un modèle de commande"
+                        attrs="{'invisible': [('is_modele_commande_id', '!=', False)]}"
+                    />
+                </group>
+            </group>
         </field>
     </record>
     <record id="is_view_partner_property_form" model="ir.ui.view">

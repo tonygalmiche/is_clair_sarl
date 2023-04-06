@@ -22,6 +22,22 @@
             <field name="partner_id" position="after">
                 <field name="is_affaire_id"/>
                 <field name="is_contact_chantier_id"/>
+                <field 
+                    name="is_modele_commande_id" 
+                    attrs="{'invisible': [
+                        ('is_modele_commande_id', '=', False),
+                    ]}"
+                />
+                <button
+                    name="initialiser_depuis_modele_commande"
+                    type="object"
+                    string="Initialiser la commande à partir de ce modèle"
+                    attrs="{'invisible': ['|','|',
+                        ('is_modele_commande_id', '=', False),
+                        ('state', 'not in', ['draft','sent']),
+                        ('order_line', '!=', []),
+                    ]}"
+                />
             </field>
             <field name="date_order" position="before">
                 <field name="is_date"/>

@@ -36,3 +36,14 @@ class ResPartner(models.Model):
     is_condition_tarifaire = fields.Text('Conditions tarifaire', help="Informations sur les conditions tarifaires affichées sur la commande")
     is_banque_id           = fields.Many2one('account.journal', 'Banque par défaut', domain=[('type','=','bank')])
     is_compte_auxiliaire   = fields.Char('Compte auxiliaire', help="Code du fournisseur ou client pour l'export en compta")
+    is_modele_commande_id  = fields.Many2one('is.modele.commande' , 'Modèle de commande')
+
+
+    def creer_modele_commande(self):
+        for obj in self:
+            vals={
+                'name'  : obj.name,
+            }
+            modele=self.env['is.modele.commande'].create(vals)
+            obj.is_modele_commande_id = modele.id
+            modele.initialiser_action()

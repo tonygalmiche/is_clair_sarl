@@ -99,6 +99,13 @@
         action="is_affaire_action" 
         parent="purchase.menu_procurement_management" 
     />
+    <menuitem 
+        id="is_modele_commande_menu" 
+        sequence="800" 
+        name="Modèles de commandes"
+        action="is_modele_commande_action" 
+        parent="purchase.menu_procurement_management" 
+    />
 
     <!-- Achats / Configuration -->
     <menuitem 
