@@ -11,7 +11,7 @@
                 <field name="is_sequence_facturation" widget="handle"/>
                 <!-- <field name="is_sequence_facturation"/> -->
                 <field name="order_id"          optional="show" readonly="1" string="Cde"/>
-                <field name="is_date_livraison" optional="show" readonly="1"/>
+                <field name="is_date_livraison" optional="show" readonly="1" string="Date liv"/>
                 <field name="product_id"        optional="show" readonly="1"/>
                 <field name="name"              optional="hide" readonly="1"/>
                 <field name="date_planned"      optional="hide" readonly="1"/>
@@ -19,6 +19,7 @@
                 <field name="qty_invoiced"      optional="show" readonly="1" string="Qt Fac"/>
                 <field name="is_qt_a_facturer"  optional="show"/>
                 <field name="price_unit"        optional="show" readonly="1"/>
+                <field name="price_subtotal"    optional="show" readonly="1" sum="Total" string="Montant Cde"/>
                 <field name="is_montant_a_facturer" optional="show" readonly="1" sum="Total"/>
                 <field name="is_affaire_id"     optional="show" readonly="1"/>
             </tree>
@@ -37,7 +38,7 @@
                         max-width: 1800px;
                     }
                     .modal-lg, .modal-xl {
-                      max-width: 1500px;
+                      max-width: 1700px;
                     }
                 </style>
 
