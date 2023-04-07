@@ -55,7 +55,7 @@
                     <group>
                         <group>
                             <field name="partner_id"/>
-                            <field name="date_limite"/>
+                            <!-- <field name="date_limite"/> -->
                         </group>
                         <group>
                             <field name="montant"/>
@@ -70,7 +70,6 @@
                             ('partner_id','=',partner_id),
                             ('state'     ,'=','purchase'),
                             ('qty_to_invoice','&gt;',0),
-                            ('is_date_livraison','&lt;',date_limite),
                         ]" 
                         context="{'tree_view_ref':'is_clair_sarl.is_preparation_facture_lignes_tree_view'}"
                     />
@@ -86,7 +85,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="partner_id"/>
-                <field name="date_limite"/>
+                <!-- <field name="date_limite"/> -->
                 <field name="montant"/>
                 <field name="invoice_id"/>
             </tree>

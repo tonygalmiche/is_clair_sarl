@@ -10,7 +10,7 @@ class IsPreparationFacture(models.Model):
     _rec_name='partner_id'
 
     partner_id     = fields.Many2one('res.partner' , 'Fournisseur', required=True)
-    date_limite    = fields.Date('Date livraison maxi', required=True, default=fields.Date.context_today)
+    #date_limite    = fields.Date('Date livraison maxi', required=True, default=fields.Date.context_today)
     montant        = fields.Float("Montant", digits=(14,2), store=True, readonly=True, compute='_compute_montant')
     invoice_id     = fields.Many2one('account.move' , 'Facture créée', readonly=True)
     ligne_ids      = fields.One2many('purchase.order.line', 'is_preparation_id', 'Lignes')
