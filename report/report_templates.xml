@@ -6,6 +6,9 @@
                 .o_boxed_header {
                     border-bottom: 0;
                 }
+                .o_boxed_footer {
+                    border-top: 0;
+                }
             </style>
             <div class="o_boxed_header">
                 <div class="row mb8">
@@ -21,5 +24,30 @@
                 </div>
             </div>
         </xpath>
+        <xpath expr="//div[3]" position="replace">
+            <div t-attf-class="footer o_boxed_footer o_company_#{company.id}_layout" style="border-top:0">
+                <div class="text-center">
+                    <!-- <div t-field="company.report_footer"/> -->
+
+                    <img src="/is_clair_sarl/static/src/img/bas-de-page-correspondance-clair-150.png" style="max-width:190mm"/>
+                     <!-- style="max-height:70mm;max-width:90mm"/> -->
+
+
+
+                    <div t-if="report_type == 'pdf'">
+                        Page: <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
     </template>
 </odoo>
+
+<!-- <div t-attf-class="footer o_boxed_footer o_company_#{company.id}_layout">
+    <div class="text-center">
+        <div t-field="company.report_footer"/>
+        <div t-if="report_type == 'pdf'">
+            Page: <span class="page"/> / <span class="topage"/>
+        </div>
+    </div>
+</div> -->
