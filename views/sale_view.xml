@@ -57,6 +57,7 @@
 
             <field name="partner_shipping_id" position="after">
                 <field name="is_affaire_id"/>
+                <field name="is_affichage_pdf"/>
             </field>
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree" position="attributes">
                 <attribute name="editable"></attribute>
@@ -79,19 +80,21 @@
             </xpath>
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
                 <field name="is_facturable_pourcent" readonly="1" optional="hide"/>
-                <field name="is_facturable"   optional="hide" sum="Total"/>
-                <field name="is_deja_facture" optional="hide" sum="Total"/>
-                <field name="is_a_facturer"   optional="hide" sum="Total"/>
+                <field name="is_facturable"    optional="hide" sum="Total"/>
+                <field name="is_deja_facture"  optional="hide" sum="Total"/>
+                <field name="is_a_facturer"    optional="hide" sum="Total"/>
+                <field name="is_masquer_ligne" optional="hide" widget="boolean_toggle"/>
             </xpath>
             <xpath expr="//page[@name='order_lines']" position="after">
                 <page string="Import devis xlsx">
                     <group string="Fichier à importer">
-                        <field name="is_import_excel_ids" widget="many2many_binary" nolabel="1"/>
+                        <field name="is_import_excel_ids" widget="many2many_binary" nolabel="1" attrs="{'readonly':[('is_invoice_ids','!=',[])]}"/>
                     </group>
                     <group>
                         <button 
                             name="import_fichier_xlsx" 
                             string="Importer le devis" type="object" 
+                            attrs="{'invisible':[('is_invoice_ids','!=',[])]}"
                         />
                     </group>
                     <group string="Alertes importation" attrs="{'invisible':[('is_import_alerte','=',False)]}" >
@@ -99,6 +102,26 @@
                             <field name="is_import_alerte" nolabel="1"/>
                         </div>
                     </group>
+                    <group string="Fonctionnement"/>
+                    <div style="background-color:#F2F2F2">
+                        Colonne A : Description<br />
+                        Colonne C : Quantité<br />
+                        Colonne E : Prix unitaire<br />
+                        Colonne H : SECTION, OPTION, NOTE ou Référence interne d'un article<br />
+                        Colonne I : Remise (%)<br />
+                        Colonne J : Prix d'achat<br />
+                        Colonne K : x pour masquer la ligne sur le PDF<br />
+                    </div>
+                    <!-- <group string="Tâches associées">
+                        <field 
+                            name="is_taches_associees_ids"
+                            context="{'tree_view_ref': 'is_clair_sarl.is_taches_associees_tree_view'}"
+                            nolabel="1"
+                        />
+                    </group> -->
+                </page>
+                <page string="Facturation">
+
                     <group string="Sections">
                         <field name="is_section_ids" nolabel="1">
                             <tree editable="bottom">
@@ -120,15 +143,7 @@
                             </tree>
                         </field>
                     </group>
-                    <group string="Tâches associées">
-                        <field 
-                            name="is_taches_associees_ids"
-                            context="{'tree_view_ref': 'is_clair_sarl.is_taches_associees_tree_view'}"
-                            nolabel="1"
-                        />
-                    </group>
-                </page>
-                <page string="Facturation">
+
 
                     <group string="Factures">
                         <field name="is_a_facturer"/>

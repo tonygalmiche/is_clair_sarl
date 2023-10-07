@@ -42,6 +42,7 @@ class sale_order_line(models.Model):
     is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     is_a_facturer          = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     is_prix_achat          = fields.Float("Prix d'achat", digits=(14,4))
+    is_masquer_ligne       = fields.Boolean("Masquer",default=False,help="Masquer la ligne sur le PDF de la commande")
 
 
 class is_sale_order_section(models.Model):
@@ -58,7 +59,6 @@ class is_sale_order_section(models.Model):
     line_ids   = fields.One2many('sale.order.line', 'is_section_id', 'Lignes')
 
 
-
     def write(self, vals):
         res = super(is_sale_order_section, self).write(vals)
         if "facturable_pourcent" in vals:
@@ -66,10 +66,6 @@ class is_sale_order_section(models.Model):
                 for line in obj.order_id.order_line:
                     if line.is_section_id==obj:
                         line.is_facturable_pourcent = vals["facturable_pourcent"]
-
-
-        print(vals)
-
         if "sequence" in vals:
             for obj in self:
                 x=10
@@ -77,11 +73,7 @@ class is_sale_order_section(models.Model):
                     if line.is_section_id==obj:
                         line.sequence = vals["sequence"]*10000+x
                     x+=10
-
-
-
         return res
-
 
 
     def option_section_action(self):
@@ -128,7 +120,11 @@ class sale_order(models.Model):
     is_section_ids          = fields.One2many('is.sale.order.section', 'order_id', 'Sections')
     is_invoice_ids          = fields.One2many('account.move', 'is_order_id', 'Factures', readonly=True) #, domain=[('state','=','posted')])
     is_a_facturer           = fields.Float("A Facturer", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-
+    is_affichage_pdf        = fields.Selection([
+        ('standard'       , 'Standard'),
+        ('masquer_montant', 'Masquer le détail des montants'),
+        ('total_section'  , 'Afficher uniquement le total des sections'),
+    ], 'Affichage PDF', default='standard', required=True)
 
     def import_fichier_xlsx(self):
         for obj in self:
@@ -159,8 +155,14 @@ class sale_order(models.Model):
                 lig=0
                 option=False
                 for row in ws.rows:
-                    name = cells[lig][0].value
-                    ref  = cells[lig][7].value
+                    name    = cells[lig][0].value
+                    ref     = cells[lig][7].value
+                    masquer = cells[lig][10].value # Colonne K => Mettre un x pour masquer la ligne sur le PDF
+
+                    is_masquer_ligne=False
+                    if masquer and masquer=="x":
+                        is_masquer_ligne = True
+
                     vals=False
                     if ref in ["SECTION", "OPTION"] and name:
                         vals={
@@ -187,18 +189,19 @@ class sale_order(models.Model):
                             ("is_sale_order_id"  ,"=", obj.id),
                             ("partner_ref"  ,"=", name),
                         ]
-                        orders = self.env['purchase.order'].search(filtre)
-                        if orders:
-                            purchase_order = orders[0]
-                            purchase_order.order_line.unlink()
-                        else:
-                            v={
-                                "partner_id"      : 1,
-                                "is_sale_order_id": obj.id,
-                                "partner_ref"     : name,
-                                "is_affaire_id"   : obj.is_affaire_id.id,
-                            }
-                            purchase_order = self.env['purchase.order'].create(v)
+                        #TODO : Désactivation de la création des taches le 07/10/2023
+                        # orders = self.env['purchase.order'].search(filtre)
+                        # if orders:
+                        #     purchase_order = orders[0]
+                        #     purchase_order.order_line.unlink()
+                        # else:
+                        #     v={
+                        #         "partner_id"      : 1,
+                        #         "is_sale_order_id": obj.id,
+                        #         "partner_ref"     : name,
+                        #         "is_affaire_id"   : obj.is_affaire_id.id,
+                        #     }
+                        #     purchase_order = self.env['purchase.order'].create(v)
 
                     if ref=="NOTE" and name:
                         vals={
@@ -245,22 +248,24 @@ class sale_order(models.Model):
                                 "is_prix_achat"  : is_prix_achat,
                                 "product_uom"    : product.uom_id.id,
                                 "is_section_id"  : section_id,
+                                "is_masquer_ligne": is_masquer_ligne,
                             }
-                            if purchase_order:
-                                v={
-                                    "order_id"    : purchase_order.id,
-                                    "product_id"  : product.id,
-                                    "sequence"    : sequence,
-                                    "name"        : name,
-                                    "product_qty" : qty,
-                                    "display_type": False,
-                                }
-                                if product.is_sous_article_ids:
-                                    for line in product.is_sous_article_ids:
-                                        v["product_id"]=line.product_id.id
-                                        res = self.env['purchase.order.line'].create(v)
-                                else:
-                                    res = self.env['purchase.order.line'].create(v)
+                            #TODO : Désactivation de la création des taches le 07/10/2023
+                            # if purchase_order:
+                            #     v={
+                            #         "order_id"    : purchase_order.id,
+                            #         "product_id"  : product.id,
+                            #         "sequence"    : sequence,
+                            #         "name"        : name,
+                            #         "product_qty" : qty,
+                            #         "display_type": False,
+                            #     }
+                            #     if product.is_sous_article_ids:
+                            #         for line in product.is_sous_article_ids:
+                            #             v["product_id"]=line.product_id.id
+                            #             res = self.env['purchase.order.line'].create(v)
+                            #     else:
+                            #         res = self.env['purchase.order.line'].create(v)
                     if vals:
                         res = self.env['sale.order.line'].create(vals)
                     lig+=1
@@ -277,9 +282,7 @@ class sale_order(models.Model):
         for obj in self:
             if obj.is_a_facturer==0:
                 raise ValidationError("Il n'y a rien à facturer")
-
             products = self.env['product.product'].search([("default_code","=",'FACTURE')])
-            print(products,len(products))
             if not len(products):
                 raise ValidationError("Article 'FACTURE' non trouvé")
             product=products[0]
@@ -288,7 +291,6 @@ class sale_order(models.Model):
             invoice_line_ids=[]
             sequence=0
             for line in obj.order_line:
-                print(line.sequence, line)
                 if line.display_type=="line_section":
                     vals={
                         'sequence'    : line.sequence,
@@ -330,9 +332,7 @@ class sale_order(models.Model):
                 tax_ids=[]
                 for tax in taxes:
                     tax_ids.append(tax.id)
-
                 sequence+=10
-                print(sequence,invoice)
                 vals={
                     'sequence'  : sequence,
                     'product_id': product.id,
