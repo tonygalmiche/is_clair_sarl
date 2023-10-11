@@ -157,12 +157,13 @@ class sale_order(models.Model):
                 for row in ws.rows:
                     name    = cells[lig][0].value
                     ref     = cells[lig][7].value
-                    masquer = cells[lig][10].value # Colonne K => Mettre un x pour masquer la ligne sur le PDF
-
-                    is_masquer_ligne=False
-                    if masquer and masquer=="x":
-                        is_masquer_ligne = True
-
+                    is_masquer_ligne = False
+                    try:
+                        masquer = cells[lig][10].value # Colonne K => Mettre un x pour masquer la ligne sur le PDF
+                        if masquer=="x":
+                            is_masquer_ligne = True
+                    except:
+                        continue
                     vals=False
                     if ref in ["SECTION", "OPTION"] and name:
                         vals={
@@ -217,6 +218,7 @@ class sale_order(models.Model):
                             ("default_code"  ,"=", ref),
                         ]
                         products = self.env['product.product'].search(filtre)
+                        qty=price=discount=is_prix_achat=0
                         if not products:
                             alertes.append("Code '%s' non trouvé"%(ref))
                         else:
