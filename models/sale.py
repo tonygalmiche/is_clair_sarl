@@ -163,7 +163,7 @@ class sale_order(models.Model):
                         if masquer=="x":
                             is_masquer_ligne = True
                     except:
-                        continue
+                        is_masquer_ligne = False
                     vals=False
                     if ref in ["SECTION", "OPTION"] and name:
                         vals={
@@ -225,19 +225,19 @@ class sale_order(models.Model):
                             product=products[0]
                             try:
                                 qty = float(cells[lig][2].value or 0)
-                            except ValueError:
+                            except :
                                 qty = 0
                             try:
                                 price = float(cells[lig][4].value or 0)
-                            except ValueError:
+                            except:
                                 price = 0
                             try:
                                 discount = float(cells[lig][8].value or 0)
-                            except ValueError:
+                            except:
                                 discount = 0
                             try:
                                 is_prix_achat = float(cells[lig][9].value or 0)
-                            except ValueError:
+                            except:
                                 is_prix_achat = 0
                             vals={
                                 "order_id"       : not option and obj.id,
