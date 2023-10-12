@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
 <template id="is_report_saleorder_document" name="is_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+    <!-- Permet de supprimer l'adrese de livraison et de facturation -->
+    <t t-set="information_block"  position="replace"/>
     <xpath expr="//div[hasclass('page')]" position="replace">
         <div class="page">
-
             <style>
                 .o_report_layout_boxed .page > table:not(.o_main_table) tr td:last-child {
                     background-color: white;
@@ -18,7 +17,6 @@
                     font-size:12pt;
                     font-weight: bolder;
                 }
-
                 .o_boxed_footer, .o_boxed_header, .o_report_layout_boxed{
                     font-size:11pt;
                 }
@@ -31,12 +29,12 @@
                     padding-left:0.3em;
                     padding-right:0.3em;
                 }
+                .o_report_layout_boxed table tbody tr.o_line_section td, .o_report_layout_boxed table tbody tr.o_line_note td, .o_report_layout_boxed table tbody tr.is-subtotal td {
+                    border-top: 0px solid #495057;
+                    border-bottom: 0px solid #495057;
+                }
             </style>
-
-
-
             <div class="oe_structure"/>
-
             <h2 class="mt16">
                 <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
                     <span t-if="doc.state not in ['draft','sent']">Devis n°</span>
@@ -74,10 +72,7 @@
             <!-- Is there a discount on at least one line? -->
             <t t-set="display_discount" t-value="any(l.discount for l in doc.order_line)"/>
 
-
             <t t-if="not doc.is_section_ids">
-
-
                 <table class="table table-sm o_main_table">
                     <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                     <thead style="display: table-row-group">
@@ -96,14 +91,10 @@
                         </tr>
                     </thead>
                     <tbody class="sale_tbody">
-
                         <t t-set="current_subtotal" t-value="0"/>
-
                         <t t-foreach="doc.order_line" t-as="line">
-
                             <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
                             <t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
-
                             <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                                 <t t-if="not line.display_type">
                                     <t t-if="line.is_masquer_ligne==False">
@@ -151,13 +142,10 @@
                         </t>
                     </tbody>
                 </table>
-
             </t>
 
 
             <t t-if="doc.is_section_ids">
-
-
                 <t t-foreach="doc.is_section_ids" t-as="l">
                     <h3 t-field="l.section"/>
                     <table class="table table-sm o_main_table">
