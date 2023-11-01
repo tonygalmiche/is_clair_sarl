@@ -326,9 +326,8 @@ class sale_order(models.Model):
                 sequence=line.sequence
 
             #** Ajout des factures ********************************************
-            invoices = self.env['account.move'].search([("is_order_id","=",obj.id)])
+            invoices = self.env['account.move'].search([('is_order_id','=',obj.id),('state','=','posted')])
             for invoice in invoices:
-
                 taxes = product.taxes_id
                 taxes = obj.fiscal_position_id.map_tax(taxes)
                 tax_ids=[]
