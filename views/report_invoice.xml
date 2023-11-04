@@ -24,7 +24,7 @@
                                 <th class="text-center"><span>Date facture</span></th>
                                 <th class="text-center"><span>Date échéance</span></th>
                                 <th class="text-center"><span>Affaire</span></th>
-                                <th class="text-center"><span>Situation</span></th>
+                                <th t-if="o.is_situation" class="text-center"><span>Situation</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,7 +36,7 @@
                                     <div t-field="o.is_affaire_id.name"/>
                                     <div t-field="o.is_affaire_id.nom"/>
                                 </td>
-                                <td class="text-center"><span t-field="o.is_situation"/></td>
+                                <td t-if="o.is_situation"  class="text-center"><span t-field="o.is_situation"/></td>
                             </tr>
                         </tbody>
                     </table>
