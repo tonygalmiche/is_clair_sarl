@@ -54,9 +54,12 @@
             <xpath expr="//button[@name='action_quotation_send'][4]" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-
+            <field name="client_order_ref" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
             <field name="partner_shipping_id" position="after">
                 <field name="is_affaire_id"/>
+                <field name="client_order_ref"/>
                 <field name="is_affichage_pdf"/>
             </field>
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree" position="attributes">
@@ -158,9 +161,11 @@
                         <field name="is_invoice_ids" nolabel="1">
                             <tree>
                                 <button title="Facture" name="acceder_facture_action" type="object" icon="fa-search-plus"/>
+                                <field name="is_situation"/>
                                 <field name="name"/>
                                 <field name="invoice_date"/>
                                 <field name="invoice_date_due"/>
+                                <field name="is_a_facturer" sum="Total"/>
                                 <field name="amount_untaxed_signed" sum="Total" string="Montant HT"/>
                                 <field name="payment_state" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')" attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}" optional="show"/>
                                 <field name="state" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'" optional="show"/>
@@ -222,18 +227,13 @@
             <tree editable="bottom">
                 <field name="order_id" optional="hide"/>
                 <field name="order_partner_id" optional="hide"/>
-                <field name="name" readonly="1"/>
+                <field name="name"            readonly="1"/>
                 <field name="product_uom_qty" readonly="1"/>
-                <!-- <field name="qty_invoiced"/> -->
-                <!-- <field name="qty_to_invoice"/> -->
-
+                <field name="price_unit"      readonly="1"/>
                 <field name="is_facturable_pourcent"/>
                 <field name="is_facturable"/>
                 <field name="is_deja_facture"/>
                 <field name="is_a_facturer"/>
-
-
-
                 <field name="product_uom_category_id" invisible="1"/>
                 <field name="product_uom" string="Unité"  optional="hide" readonly="1"/>
                 <field name="price_subtotal" sum="Total" widget="monetary"/>
@@ -241,11 +241,5 @@
             </tree>
         </field>
     </record>
-
-<!-- Field 'product_uom_category_id' used in domain of field 'product_uom' ([('category_id', '=', product_uom_category_id)]) must be present in view but is missing. -->
-
-
-
-
 
 </odoo>

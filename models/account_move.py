@@ -11,6 +11,22 @@ class AccountMove(models.Model):
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
     is_courrier_id      = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
     is_traite_id        = fields.Many2one('is.traite', 'Traite')
+    is_situation        = fields.Char("Situation")
+    is_a_facturer       = fields.Monetary("Total à facturer", currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer')
+    is_facture          = fields.Monetary("Total facturé"   , currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer', help="Montant total facturé hors remises")
+
+
+    @api.depends('invoice_line_ids','state')
+    def _compute_is_a_facturer(self):
+        for obj in self:
+            is_a_facturer = 0
+            is_facture = 0
+            for line in obj.invoice_line_ids:
+                is_a_facturer+=line.is_a_facturer
+                if line.is_facturable_pourcent!=0:
+                    is_facture+=line.price_subtotal
+            obj.is_a_facturer = is_a_facturer
+            obj.is_facture    = is_facture
 
 
     def acceder_facture_action(self):

@@ -283,25 +283,42 @@
                         <field name="type_travaux_ids"   widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                         <field name="specificite_ids"    widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                         <field name="commentaire"/>
-                        <field name="active"/>
                     </group>
-                    <field name="budget_famille_ids" nolabel="1">
-                        <tree editable="bottom">
-                            <field name="famille_id"/>
-                            <field name="budget" sum="Total"/>
-                        </tree>
-                    </field>
-                    <button
-                        name="ajout_famille_action"
-                        type="object"
-                        string="Ajout de toutes les familles"
-                        attrs="{'invisible': [('budget_famille_ids', '!=', [])]}"
-                    />
-                    <button
-                        name="import_budget_famille_action"
-                        type="object"
-                        string="Importation des budgets des commandes client"
-                    />
+
+                    <notebook>
+                        <page string="Facturation">
+                            <group>
+                                <field name="compte_prorata"/>
+                                <field name="retenue_garantie"/>    
+                            </group>
+                        </page>
+                        <page string="Budget">
+                            <field name="budget_famille_ids" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="famille_id"/>
+                                    <field name="budget" sum="Total"/>
+                                </tree>
+                            </field>
+                            <button
+                                name="ajout_famille_action"
+                                type="object"
+                                string="Ajout de toutes les familles"
+                                attrs="{'invisible': [('budget_famille_ids', '!=', [])]}"
+                            />
+                            <button
+                                name="import_budget_famille_action"
+                                type="object"
+                                string="Importation des budgets des commandes client"
+                            />
+                            <group>
+                                <field name="active"/>
+                            </group>
+                        </page>
+                    </notebook>
+                    
+ 
+
+
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>

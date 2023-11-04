@@ -282,16 +282,15 @@ class sale_order(models.Model):
     def generer_facture_action(self):
         cr,uid,context,su = self.env.args
         for obj in self:
+            #is_a_facturer = 0
             if obj.is_a_facturer==0:
                 raise ValidationError("Il n'y a rien à facturer")
-            products = self.env['product.product'].search([("default_code","=",'FACTURE')])
-            if not len(products):
-                raise ValidationError("Article 'FACTURE' non trouvé")
-            product=products[0]
 
             #** Création des lignes *******************************************
+            total_ht=0
             invoice_line_ids=[]
             sequence=0
+            is_a_facturer = 0
             for line in obj.order_line:
                 if line.display_type=="line_section":
                     vals={
@@ -322,11 +321,27 @@ class sale_order(models.Model):
                         'tax_ids'               : tax_ids,
                         "is_a_facturer"         : line.is_a_facturer,
                     }
+                    total_ht+=quantity*line.price_unit
+                    is_a_facturer+=line.is_a_facturer
                 invoice_line_ids.append(vals)
                 sequence=line.sequence
 
+            #** Ajout de la section pour le repport des factures **************
+            sequence+=10
+            vals={
+                "sequence"       : sequence,
+                "name"           : "AUTRE",
+                "display_type"   : "line_section",
+            }
+            invoice_line_ids.append(vals)
+            #******************************************************************
+
             #** Ajout des factures ********************************************
-            invoices = self.env['account.move'].search([('is_order_id','=',obj.id),('state','=','posted')])
+            products = self.env['product.product'].search([("default_code","=",'FACTURE')])
+            if not len(products):
+                raise ValidationError("Article 'FACTURE' non trouvé")
+            product=products[0]
+            invoices = self.env['account.move'].search([('is_order_id','=',obj.id),('state','=','posted')],order="id")
             for invoice in invoices:
                 taxes = product.taxes_id
                 taxes = obj.fiscal_position_id.map_tax(taxes)
@@ -337,22 +352,71 @@ class sale_order(models.Model):
                 vals={
                     'sequence'  : sequence,
                     'product_id': product.id,
-                    'name'      : invoice.name,
+                    'name'      : "%s (Facture %s)"%(invoice.is_situation,invoice.name),
                     'quantity'  : -1,
-                    'price_unit': invoice.amount_untaxed_signed,
+                    'price_unit': invoice.is_a_facturer,
+                    'tax_ids'   : tax_ids,
+                }
+                total_ht-=invoice.amount_untaxed_signed
+                invoice_line_ids.append(vals)
+
+            #** Ajout Compte Prorata ******************************************
+            if obj.is_affaire_id.compte_prorata>0:
+                compte_prorata = obj.is_affaire_id.compte_prorata
+                products = self.env['product.product'].search([("default_code","=",'COMPTE_PRORATA')])
+                if not len(products):
+                    raise ValidationError("Article 'COMPTE_PRORATA' non trouvé")
+                product=products[0]
+                taxes = product.taxes_id
+                taxes = obj.fiscal_position_id.map_tax(taxes)
+                tax_ids=[]
+                for tax in taxes:
+                    tax_ids.append(tax.id)
+                sequence+=10
+                name="Compte prorata %s%%"%compte_prorata
+                vals={
+                    'sequence'  : sequence,
+                    'product_id': product.id,
+                    'name'      : name,
+                    'quantity'  : -1*compte_prorata/100,
+                    'price_unit': is_a_facturer,
                     'tax_ids'   : tax_ids,
                 }
                 invoice_line_ids.append(vals)
 
+            #** Ajout Retenue de garantie *************************************
+            if obj.is_affaire_id.retenue_garantie>0:
+                retenue_garantie = obj.is_affaire_id.retenue_garantie
+                products = self.env['product.product'].search([("default_code","=",'RETENUE_GARANTIE')])
+                if not len(products):
+                    raise ValidationError("Article 'RETENUE_GARANTIE' non trouvé")
+                product=products[0]
+                taxes = product.taxes_id
+                taxes = obj.fiscal_position_id.map_tax(taxes)
+                tax_ids=[]
+                for tax in taxes:
+                    tax_ids.append(tax.id)
+                sequence+=10
+                name="Retenue de garantie %s%%"%retenue_garantie
+                vals={
+                    'sequence'  : sequence,
+                    'product_id': product.id,
+                    'name'      : name,
+                    'quantity'  : -1*retenue_garantie/100,
+                    'price_unit': is_a_facturer,
+                    'tax_ids'   : tax_ids,
+                }
+                invoice_line_ids.append(vals)
 
             #** Création entête facture ***************************************
             vals={
-                'invoice_date'      : datetime.date.today(),
-                'partner_id'        : obj.partner_id.id,
-                'is_order_id'       : obj.id,
-                'fiscal_position_id': obj.fiscal_position_id.id,
-                'move_type'         : 'out_invoice',
-                'invoice_line_ids'  : invoice_line_ids,
+                'invoice_date'       : datetime.date.today(),
+                'partner_id'         : obj.partner_id.id,
+                'is_order_id'        : obj.id,
+                'fiscal_position_id' : obj.fiscal_position_id.id,
+                'move_type'          : 'out_invoice',
+                'invoice_line_ids'   : invoice_line_ids,
+                #'is_a_facturer'      : is_a_facturer,
             }
             move=self.env['account.move'].create(vals)
             move.action_post()

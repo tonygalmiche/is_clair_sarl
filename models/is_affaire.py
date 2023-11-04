@@ -97,6 +97,8 @@ class IsAffaire(models.Model):
     analyse_ids         = fields.One2many('is.affaire.analyse'       , 'affaire_id', 'Analyse de commandes')
     budget_famille_ids  = fields.One2many('is.affaire.budget.famille', 'affaire_id', 'Budget par famille')
     active              = fields.Boolean("Active", default=True)
+    compte_prorata      = fields.Float("Compte prorata (%)", digits=(14,2))
+    retenue_garantie    = fields.Float("Retenue de garantie (%)", digits=(14,2))
 
 
     @api.depends('name')
@@ -261,14 +263,9 @@ class IsAffaire(models.Model):
     def import_budget_famille_action(self):
         cr,uid,context,su = self.env.args
         for obj in self:
-            # print(obj)
             # filtre=[('is_affaire_id', '=', obj.id)]
             # orders = self.env['sale.order'].search(filtre)
-            # print(orders)
             # for order in orders:
-            #     print(order.name)
-
-
             for line in obj.budget_famille_ids:
                 SQL="""
                     SELECT sum(sol.product_uom_qty*sol.is_prix_achat)
@@ -282,7 +279,6 @@ class IsAffaire(models.Model):
                 cr.execute(SQL,[obj.id, line.famille_id.id])
                 budget=0
                 for row in cr.fetchall():
-                    print(row)
                     budget = row[0] or 0
                 line.budget=budget
 

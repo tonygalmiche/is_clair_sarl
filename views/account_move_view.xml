@@ -43,6 +43,7 @@
             <field name="payment_reference" position="after">
                 <field name="is_order_id"   attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
                 <field name="is_affaire_id" attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
+                <field name="is_situation"  attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
                 <field name="is_banque_id"  attrs="{'invisible': [('is_banque_id', '=', False)]}"/>
             </field>
 
@@ -79,7 +80,14 @@
                     name="is_courrier_id"
                     attrs="{'invisible': [('is_courrier_id', '=', False)], 'readonly': True}"
                 />
-
+                <field 
+                    name="is_a_facturer"
+                    attrs="{'invisible': [('is_a_facturer', '=', 0)], 'readonly': True}"
+                />
+                <field 
+                    name="is_facture"
+                    attrs="{'invisible': [('is_facture', '=', 0)], 'readonly': True}"
+                />
             </div>
         </field>
     </record> 

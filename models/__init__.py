@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from . import res_company
 from . import is_affaire
 from . import is_import_clair
 from . import is_modele_commande
