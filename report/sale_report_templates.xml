@@ -4,36 +4,9 @@
     <!-- Permet de supprimer l'adrese de livraison et de facturation -->
     <t t-set="information_block"  position="replace"/>
     <xpath expr="//div[hasclass('page')]" position="replace">
-        <div class="page">
-            <style>
-                .o_report_layout_boxed .page > table:not(.o_main_table) tr td:last-child {
-                    background-color: white;
-                }
-                h2{
-                    font-size:14pt;
-                    font-weight: bolder;
-                }
-                h3{
-                    font-size:12pt;
-                    font-weight: bolder;
-                }
-                .o_boxed_footer, .o_boxed_header, .o_report_layout_boxed{
-                    font-size:11pt;
-                }
-                .colisage th{
-                    font-size:11pt;
-                }
-                .colisage td{
-                    font-size:11pt;
-                    padding: 0;
-                    padding-left:0.3em;
-                    padding-right:0.3em;
-                }
-                .o_report_layout_boxed table tbody tr.o_line_section td, .o_report_layout_boxed table tbody tr.o_line_note td, .o_report_layout_boxed table tbody tr.is-subtotal td {
-                    border-top: 0px solid #495057;
-                    border-bottom: 0px solid #495057;
-                }
-            </style>
+
+
+        <div class="page clair_report">
             <div class="oe_structure"/>
             <h2 class="mt16">
                 <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
@@ -122,9 +95,11 @@
                                     <t t-set="current_subtotal" t-value="0"/>
                                 </t>
                                 <t t-if="line.display_type == 'line_note'">
-                                    <td name="td_note_line" colspan="99">
-                                        <span t-field="line.name"/>
-                                    </td>
+                                    <td name="td_note_line"><span t-field="line.name"/></td>
+                                    <td />
+                                    <td />
+                                    <td t-if="display_discount"/>
+                                    <td />
                                 </t>
                             </tr>
 
@@ -149,15 +124,16 @@
                 <t t-foreach="doc.is_section_ids" t-as="l">
                     <h3 t-field="l.section"/>
                     <table class="table table-sm o_main_table">
-                        <thead style="display: table-row-group">
-                            <tr>
-                                <th name="th_description" class="text-left">Description</th>
+                        <!-- <thead style="display: table-row-group"> -->
+                        <thead style="display: table-header-group;}">
+                                <tr>
+                                <th name="th_description" class="text-left">Description 2</th>
                                 <th name="th_quantity" class="text-right">Quantité</th>
                                 <th name="th_priceunit" class="text-right">Prix</th>
                                 <th name="th_subtotal" class="text-right">Montant</th>
                             </tr>
                         </thead>
-                        <tbody class="sale_tbody">
+                        <tbody class="sale_tbody" >
                             <t t-set="current_subtotal" t-value="0"/>
                             <t t-foreach="l.line_ids" t-as="line">
                                 <t t-set="subtotal" t-value="line.price_subtotal"/>
@@ -170,29 +146,29 @@
                                                     <span t-field="line.name"/>
                                                 </td>
                                                 <td name="td_quantity" class="text-right" width="10%">
-                                                    <span t-field="line.product_uom_qty"/>
+                                                    <span t-if="line.product_uom_qty" t-field="line.product_uom_qty"/>
                                                 </td>
-                                                <td name="td_priceunit" class="text-right" width="10%">
-                                                    <span t-field="line.price_unit" t-if="doc.is_affichage_pdf=='standard'"/>
+                                                <td name="td_priceunit" class="text-right" width="10%" style="white-space: nowrap;">
+                                                    <t t-if="line.price_unit">
+                                                        <span t-field="line.price_unit" t-if="doc.is_affichage_pdf=='standard'"/> €
+                                                    </t>
                                                 </td>
                                                 <td class="text-right" width="10%">
                                                     <span
                                                         t-esc="subtotal"
                                                         t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'
-                                                        t-if="doc.is_affichage_pdf=='standard'"
+                                                        t-if="doc.is_affichage_pdf=='standard' and subtotal"
                                                     />
                                                 </td>
                                             </t>
                                         </t>
                                     </t>
-                                    <!-- <t t-if="line.display_type == 'line_section'">
-                                        <t t-set="current_section" t-value="line"/>
-                                        <t t-set="current_subtotal" t-value="0"/>
-                                    </t> -->
                                     <t t-if="line.display_type == 'line_note'">
-                                        <td name="td_note_line" colspan="99">
-                                            <span t-field="line.name"/>
-                                        </td>
+                                        <td name="td_note_line"><span t-field="line.name"/></td>
+                                        <td />
+                                        <td />
+                                        <td t-if="display_discount"/>
+                                        <td />
                                     </t>
                                 </tr>
                                 <!-- <t t-if="current_section and (line_last or doc.order_line[line_index+1].display_type == 'line_section')">

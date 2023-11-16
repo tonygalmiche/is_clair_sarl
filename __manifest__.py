@@ -40,13 +40,13 @@ Module Odoo 15 pour CLAIR-SARL
         "report/sale_report_templates.xml",
         "report/report_templates.xml",
     ],
-
- 
-
     'assets': {
         'web.assets_qweb': [
             'is_clair_sarl/static/src/xml/**/*',
         ],
+       'web.report_assets_common': [
+            'is_clair_sarl/static/src/scss/report.scss',
+        ]
     },
 
 

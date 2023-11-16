@@ -1,0 +1,45 @@
+
+
+
+
+.clair_report .o_report_layout_boxed .page > table:not(.o_main_table) tr td:last-child {
+    background-color: white;
+}
+.clair_report h2{
+    font-size:14pt;
+    font-weight: bolder;
+}
+.clair_report h3{
+    font-size:12pt;
+    font-weight: bolder;
+}
+.clair_report .o_boxed_footer, .o_boxed_header, .o_report_layout_boxed{
+    font-size:11pt;
+}
+.clair_report .colisage th{
+    font-size:11pt;
+}
+.clair_report .colisage td{
+    font-size:11pt;
+    padding: 0;
+    padding-left:0.3em;
+    padding-right:0.3em;
+}
+// .clair_report .o_report_layout_boxed table tbody tr.o_line_section td, .clair_report .o_report_layout_boxed table tbody tr.o_line_note td, .clair_report .o_report_layout_boxed table tbody tr.is-subtotal td {
+//     border-top: 0px solid #495057;
+//     border-bottom: 0px solid #495057;
+// }
+
+.clair_report table tbody tr.o_line_section td, .clair_report table tbody tr.o_line_note td, .clair_report table tbody tr.is-subtotal td {
+    border-top: 0;
+    border-bottom: 0;
+}
+
+
+
+ .clair_report .table-sm .o_line_note td {
+    padding: 0;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    background-color: Gainsboro;
+}
