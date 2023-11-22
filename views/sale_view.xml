@@ -198,14 +198,25 @@
                 <field name="is_affaire_id" optional="show"/>
             </field>
             <field name="amount_total" position="after">
-                <field name="is_a_facturer" sum="Total" widget="monetary" decoration-bf="1" optional="show"/>
+                <field name="is_a_facturer"   sum="Total" widget="monetary" decoration-bf="1" optional="show"/>
+                <field name="is_deja_facture" sum="Total" widget="monetary" decoration-bf="1" optional="show"/>
             </field>
             <field name="invoice_status" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
+
+            <field name="user_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+           </field>
+           <field name="activity_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+
         </field>
     </record>
 
+    
+    
 
 
     <record id="is_view_sales_order_filter" model="ir.ui.view">

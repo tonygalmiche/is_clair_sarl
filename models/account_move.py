@@ -6,7 +6,8 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     is_order_id         = fields.Many2one('sale.order', 'Commande')
-    is_affaire_id       = fields.Many2one('is.affaire', 'Affaire', related='is_order_id.is_affaire_id')
+    #is_affaire_id       = fields.Many2one('is.affaire', 'Affaire', related='is_order_id.is_affaire_id')
+    is_affaire_id       = fields.Many2one('is.affaire', 'Affaire', compute='_compute_is_affaire_id', store=True, readonly=True)
     is_banque_id        = fields.Many2one('account.journal', 'Banque par défaut', related='partner_id.is_banque_id')
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
     is_courrier_id      = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
@@ -14,6 +15,23 @@ class AccountMove(models.Model):
     is_situation        = fields.Char("Situation")
     is_a_facturer       = fields.Monetary("Total à facturer", currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer')
     is_facture          = fields.Monetary("Total facturé"   , currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer', help="Montant total facturé hors remises")
+
+
+    @api.depends('is_order_id','purchase_id','invoice_line_ids','state')
+    def _compute_is_affaire_id(self):
+        for obj in self:
+            affaire_id = False
+            if obj.purchase_id and obj.purchase_id.is_affaire_id:
+                affaire_id = obj.purchase_id.is_affaire_id.id
+            if obj.is_order_id and obj.is_order_id.is_affaire_id:
+                affaire_id = obj.is_order_id.is_affaire_id.id
+            if not affaire_id:
+                for line in obj.invoice_line_ids:
+                    if line.is_affaire_id:
+                        affaire_id = line.is_affaire_id.id
+                        break
+            print(obj.name, affaire_id)
+            obj.is_affaire_id = affaire_id
 
 
     @api.depends('invoice_line_ids','state')
@@ -43,11 +61,6 @@ class AccountMove(models.Model):
             return res
 
 
-    # def action_post(self):
-    #     res = super().action_post()
-    #     return res
-
-
     def enregistre_courrier_action(self):
         for obj in self:
             vals={
@@ -59,6 +72,16 @@ class AccountMove(models.Model):
             }
             courrier = self.env['is.courrier.expedie'].create(vals)
             obj.is_courrier_id = courrier.id
+
+
+    def initialiser_affaire_action(self):
+        for obj in self:
+            if obj.is_affaire_id:
+                for line in obj.invoice_line_ids:
+                    if not line.is_affaire_id:
+                        line.is_affaire_id = obj.is_affaire_id.id
+                        print(obj.name,line)
+
 
 
 class AccountMoveLine(models.Model):

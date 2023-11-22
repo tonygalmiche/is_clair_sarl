@@ -109,9 +109,15 @@ class sale_order(models.Model):
     def _compute_facturable(self):
         for obj in self:
             is_a_facturer=0
+            is_deja_facture=0
             for line in obj.order_line:
                 is_a_facturer+=line.is_a_facturer
+                is_deja_facture+=line.is_deja_facture
             obj.is_a_facturer=is_a_facturer
+            obj.is_deja_facture=is_deja_facture
+
+
+
 
     is_import_excel_ids     = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Devis .xlsx à importer')
     is_import_alerte        = fields.Text('Alertes importation')
@@ -119,7 +125,23 @@ class sale_order(models.Model):
     is_affaire_id           = fields.Many2one('is.affaire', 'Affaire')
     is_section_ids          = fields.One2many('is.sale.order.section', 'order_id', 'Sections')
     is_invoice_ids          = fields.One2many('account.move', 'is_order_id', 'Factures', readonly=True) #, domain=[('state','=','posted')])
-    is_a_facturer           = fields.Float("A Facturer", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    is_a_facturer           = fields.Float("A Facturer"      , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    is_deja_facture         = fields.Float("Déjà Facturé"    , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    #is_reste_a_facturer     = fields.Float("Reste à facturer", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+
+
+
+
+
+    # is_facturable          = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    # is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    # is_a_facturer          = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+
+
+
+
+
+
     is_affichage_pdf        = fields.Selection([
         ('standard'       , 'Standard'),
         ('masquer_montant', 'Masquer le détail des montants'),
