@@ -15,6 +15,7 @@ class AccountMove(models.Model):
     is_situation        = fields.Char("Situation")
     is_a_facturer       = fields.Monetary("Total à facturer", currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer')
     is_facture          = fields.Monetary("Total facturé"   , currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer', help="Montant total facturé hors remises")
+    is_attente_avoir    = fields.Char("Attente avoir", help="Motif de l'attente de l'avoir")
 
 
     @api.depends('is_order_id','purchase_id','invoice_line_ids','state')
