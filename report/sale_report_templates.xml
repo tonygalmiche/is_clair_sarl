@@ -122,11 +122,12 @@
 
             <t t-if="doc.is_section_ids">
                 <t t-foreach="doc.is_section_ids" t-as="l">
-                    <h3 t-field="l.section"/>
                     <table class="table table-sm o_main_table">
-                        <!-- <thead style="display: table-row-group"> -->
                         <thead style="display: table-header-group;}">
-                                <tr>
+                            <tr>
+                                <th colspan="4" class="text-left"><h3 t-field="l.section"/></th>
+                            </tr>
+                            <tr>
                                 <th name="th_description" class="text-left">Description</th>
                                 <th name="th_quantity" class="text-right">Quantité</th>
                                 <th name="th_priceunit" class="text-right">Prix</th>
