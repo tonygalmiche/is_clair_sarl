@@ -3,6 +3,9 @@ from itertools import product
 from pdb import line_prefix
 from odoo import models,fields,api
 from odoo.tools.misc import formatLang, get_lang
+import base64
+from subprocess import PIPE, Popen
+import re
 
 
 def str2float(x):
@@ -41,6 +44,9 @@ class purchase_order(models.Model):
     is_mois_ids            = fields.One2many('is.purchase.order.mois'  , 'order_id', 'Mois de réalisation des tâches')
     is_sale_order_id       = fields.Many2one('sale.order', 'Commande client associée')
     is_modele_commande_id  = fields.Many2one(related='partner_id.is_modele_commande_id')
+
+    is_import_pdf_ids      = fields.Many2many('ir.attachment' , 'purchase_order_is_import_pdf_ids_rel', 'order_id', 'attachment_id', 'PDF à importer')
+    is_import_pdf_resultat = fields.Text("Résultat de l'importation", readonly=1)
 
 
     @api.onchange('is_affaire_id')
@@ -188,6 +194,205 @@ class purchase_order(models.Model):
                 }
                 self.env['purchase.order.line'].create(vals)
                 sequence+=10
+
+
+    def import_pdf_action(self):
+        for obj in self:
+            for attachment in obj.is_import_pdf_ids:
+                pdf=base64.b64decode(attachment.datas)
+                name = 'purchase_order-%s'%obj.id
+                path = "/tmp/%s.pdf"%name
+                f = open(path,'wb')
+                f.write(pdf)
+                f.close()
+                cde = "cd /tmp && pdftotext -layout %s.pdf"%name
+                p = Popen(cde, shell=True, stdout=PIPE, stderr=PIPE)
+                stdout, stderr = p.communicate()
+                path = "/tmp/%s.txt"%name
+                r = open(path,'rb').read().decode('utf-8')
+                lines = r.split('\n')
+                res=[]
+                dict={}
+                chantier=False
+                ligne_chantier = 0
+                lignes_chantier=[]
+
+                montants = []
+
+
+                #** Recherche si c'est bien un PDF de LOXAM *******************
+                test=False
+                for line in lines:
+                    x = re.findall("LOXAM", line) 
+                    if x:
+                        test = True
+                        break
+                if test==False:
+                    obj.is_import_pdf_resultat = "Ce PDF n'est pas de LOXAM => Importation impossible"
+                if test:
+                    #** Initialisation du fournisseur *************************
+                    partners = self.env['res.partner'].search([("name"  ,"ilike", 'LOXAM')])
+                    for partner in partners:
+                        obj.partner_id = partner.id
+                        break
+                    #**********************************************************
+
+                    fin_lignes = False
+                    for line in lines:
+                        if len(line):
+
+                            #** Recherche NACELLE *****************************
+                            x = re.findall("(.*)(NACELLE.*)([0-9]*\.[0-9]*$)", line)
+                            if x:
+                                if len(x[0])>1:
+                                    nacelle = x[0][1][0:40].strip()
+                                    #dict["NACELLE"] = nacelle
+
+                            #** Recherche des montants ************************
+                            if line[0:23]!='                 Dégr. ':
+                                if fin_lignes==False:
+                                    #** Recherche des montants en fin de ligne avec 1 décimale
+                                    x = re.findall("[0-9]*\.[0-9]{1}$", line.strip())
+                                    v = 0
+                                    if x:
+                                        for l in x:
+                                            try:
+                                                v=float(l.strip())
+                                            except:
+                                                v=0
+                                    if v:
+                                        description = line[0:50].strip()
+                                        if len(description)==0:
+                                            description = nacelle
+                                        print("'%s' => '%s'"%(description, v), len(description))
+
+                                        #montants.append("%s : %s (%s)"%(description,l.strip(),v))
+                                        montants.append([description,l.strip(),v])
+
+
+
+                            #**************************************************
+
+
+                            if line[0:14]=='Date sortie : ':
+                                dict["Date sortie"] = line[14:22]
+                            if line[0:15]=='Retour prévu : ':
+                                dict["Retour prévu"] = line[15:23]
+                            if line[0:11]=='  Acheteur:':
+                                dict["Acheteur"] = line[11:].strip().replace(" ","").replace(":","")
+
+
+                            if  line[0:11]=='  Chantier:' and chantier==False:
+                                chantier = True
+                                ligne_chantier = 0
+
+                            if ligne_chantier>=1 and ligne_chantier<=2:
+                                x = " ".join(line.split()) # Supprimer les espaces en double
+                                lignes_chantier.append(x)
+                            if chantier:
+                                ligne_chantier+=1
+
+
+                            #** Fin des lignes avec un montant ****************
+                            x = re.findall("Nom et signature", line)
+                            if x:
+                                fin_lignes = True
+
+                            #** Recherche du montant total ********************
+                            x = re.findall("Sous-Tot.HT:", line)
+                            if x:
+                                x = re.findall("[0-9]*\.[0-9]{1}$", line) 
+                                if x:
+                                    for l in x:
+                                        dict["Sous-Tot.HT"] = l
+                                        try:
+                                            montant_total=float(l.strip())
+                                        except:
+                                            montant_total=0
+                                        break
+
+
+
+                    dict["Chantier"]      = ', '.join(lignes_chantier)
+                    #dict["montant_total"] = montant_total
+
+
+                    for key in dict:
+                        x = "%s : %s"%(key.ljust(15), dict[key])
+                        res.append(x)
+
+                    if montants:
+                        res.append("Montants trouvés avec 1 décimale en fin de ligne : ")
+                        for m in montants:
+                            x = "%s : %s (%s)"%(m[0], m[1], m[2])
+                            res.append("- %s"%x)
+
+                    res.append('\n' + '-'*160)
+                    for line in lines:
+                        if len(line):
+                            res.append(line)
+                    obj.is_import_pdf_resultat = '\n'.join(res)
+
+
+                    if montants:
+                        obj.order_line.unlink()
+
+                        #** Ajout d'une note sur la premiere ligne ****************
+                        note = []
+                        for key in dict:
+                            note.append("%s : %s"%(key, dict[key]))
+                        note = "\n".join(note)
+                        sequence = 10
+                        vals={
+                            "order_id"       : obj.id,
+                            "sequence"       : 10,
+                            "name"           : note,
+                            "product_qty"    : 0,
+                            "display_type"   : "line_note",
+                        }
+                        order_line = self.env['purchase.order.line'].create(vals)
+                        #**********************************************************
+
+                        #** Ajout des lignes de la commande ***********************
+
+
+
+
+                        for m in montants:
+                            sequence+=10
+
+                            filtre=[
+                                ("name"  ,"=", 'divers'),  
+                            ]
+                            if re.search('nacelle', m[0], re.IGNORECASE):
+                                filtre=[
+                                    ("name"  ,"=", 'Nacelle'), 
+                                ]
+                            if re.search('transport', m[0], re.IGNORECASE):
+                                filtre=[
+                                    ("default_code"  ,"=", 'TCHANTIER'),  
+                                ]
+                            products = self.env['product.product'].search(filtre)
+                            product = False
+                            for p in products:
+                                product = p
+                                break 
+                            if p:
+                                print(products)
+                                vals={
+                                    "order_id"       : obj.id,
+                                    "product_id"     : product.id,
+                                    "sequence"       : sequence,
+                                    "name"           : m[0],
+                                    "product_qty"    : 1,
+                                    "price_unit"     : m[2],
+                                    "product_uom"    : product.uom_id.id,
+                                }
+                                order_line = self.env['purchase.order.line'].create(vals)
+                        #**********************************************************
+
+
+
 
 
 class IsPurchaseOrderMois(models.Model):

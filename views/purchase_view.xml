@@ -169,6 +169,22 @@
                         </group>
                     </group>
                 </page>
+                <page string="Import PDF">
+                    <group string="Fichier à importer">
+                        <field name="is_import_pdf_ids" widget="many2many_binary" nolabel="1"/>
+                    </group>
+                    <group>
+                        <button 
+                            name="import_pdf_action" 
+                            string="Importation du PDF (Loxam)" type="object" 
+                        />
+                    </group>
+                    <group string="Résultat importation" attrs="{'invisible':[('is_import_pdf_resultat','=',False)]}" >
+                        <div style="background:gainsboro;font-weight:normal;padding-left:5pt;font-family:courier, courier new, serif;">
+                            <field name="is_import_pdf_resultat" nolabel="1"/>
+                        </div>
+                    </group>
+                </page>
             </xpath>
             <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='notes']" position="after">
                 <page string="Repères de plan">
