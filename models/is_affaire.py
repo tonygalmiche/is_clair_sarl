@@ -71,9 +71,30 @@ class IsAffaireBudgetFamille(models.Model):
     _name='is.affaire.budget.famille'
     _description = "Budget affaire par famille"
 
+    affaire_id = fields.Many2one('is.affaire', 'Affaire', required=True, ondelete='cascade')
+    famille_id = fields.Many2one('is.famille', 'Famille', required=True)
+    budget     = fields.Float("Budget", digits=(14,2))
+
+
+class IsAffaireSalaire(models.Model):
+    _name='is.affaire.salaire'
+    _description = "Salaires des affaires"
+
     affaire_id     = fields.Many2one('is.affaire', 'Affaire', required=True, ondelete='cascade')
-    famille_id     = fields.Many2one('is.famille', 'Famille', required=True)
-    budget         = fields.Float("Budget", digits=(14,2))
+    importation_id = fields.Many2one('is.import.salaire', 'Importation')
+    date           = fields.Date("Date", required=True)
+    montant        = fields.Float("Montant", digits=(14,2))
+
+
+    def view_affaire_action(self):
+        for obj in self:
+            return {
+                "name": "Affaire %s"%(obj.importation_id.name),
+                "view_mode": "form",
+                "res_model": "is.affaire",
+                "res_id"   : obj.affaire_id.id,
+                "type": "ir.actions.act_window",
+            }
 
 
 class IsAffaire(models.Model):
@@ -99,6 +120,17 @@ class IsAffaire(models.Model):
     active              = fields.Boolean("Active", default=True)
     compte_prorata      = fields.Float("Compte prorata (%)", digits=(14,2))
     retenue_garantie    = fields.Float("Retenue de garantie (%)", digits=(14,2))
+    salaire_ids         = fields.One2many('is.affaire.salaire', 'affaire_id', 'Salaires')
+    montant_salaire     = fields.Float("Montant salaire", digits=(14,2), store=True, readonly=True, compute='_compute_montant_salaire')
+
+
+    @api.depends('salaire_ids','salaire_ids.montant')
+    def _compute_montant_salaire(self):
+        for obj in self:
+            montant = 0
+            for line in obj.salaire_ids:
+                montant+=line.montant
+            obj.montant_salaire = montant
 
 
     @api.depends('name')
@@ -379,6 +411,58 @@ class IsAffaire(models.Model):
         if ids:
             search_domain.append(('id', 'not in', ids))
         ids += list(self._search(search_domain + args, limit=limit))
-
         return ids
+
+
+class IsImportSalaire(models.Model):
+    _name='is.import.salaire'
+    _description = "Importation des salaires dans les affaires"
+    _order='name desc'
+
+    name        = fields.Date('Date', required=True, index=True)
+    importation = fields.Text('Données à importer', help="Faire un copier / coller d'Excel dans ce champ")
+    total       = fields.Float('Total importé', readonly=1)
+    resultat    = fields.Text('Résultat importation', readonly=1)
+    salaire_ids = fields.One2many('is.affaire.salaire', 'importation_id', 'Salaires')
+
+
+    def importation_salaire_action(self):
+        for obj in self:
+            lines = obj.importation.split('\n')
+            total = 0
+            resultat = []
+            obj.salaire_ids.unlink()
+            for line in lines:
+                t = line.split('\t')
+                if len(t)==2:
+                    name    = t[0][0:7].strip()
+                    montant = t[1]
+                    affaires=self.env['is.affaire'].search([('name', '=',name),('name', '!=','')])
+                    affaire = False
+                    for a in affaires:
+                        affaire = a
+                        break
+                    if affaire:
+                        try:
+                            montant=float(t[1].replace(',','.'))
+                        except:
+                            montant=0
+                        total+=montant
+                        vals={
+                            'affaire_id'    : affaire.id,
+                            'importation_id': obj.id,
+                            'date'          : obj.name,
+                            'montant'       : montant,
+                        }
+                        res = self.env['is.affaire.salaire'].create(vals)
+                    else:
+                        if name:
+                            resultat.append("Affaire non trouvée => %s"%line)
+            if len(resultat)==0:
+                resultat = False
+            else:
+                resultat = "\n".join(resultat)
+            obj.resultat = resultat
+            obj.total = total
+
 

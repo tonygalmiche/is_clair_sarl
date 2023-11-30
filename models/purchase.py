@@ -238,8 +238,15 @@ class purchase_order(models.Model):
                     #**********************************************************
 
                     fin_lignes = False
+                    agence = False
                     for line in lines:
                         if len(line):
+
+                            #** Agence ****************************************
+                            x = re.findall("LOXAM ACCESS", line)
+                            if x:
+                                agence = line.strip()
+                                dict["Agence"] = agence
 
                             #** Recherche NACELLE *****************************
                             x = re.findall("(.*)(NACELLE.*)([0-9]*\.[0-9]*$)", line)
@@ -252,6 +259,10 @@ class purchase_order(models.Model):
                             if line[0:23]!='                 Dégr. ':
                                 if fin_lignes==False:
                                     #** Recherche des montants en fin de ligne avec 1 décimale
+                                    # if agence=="LOXAM ACCESS CHALON":
+                                    #     x = re.findall("[0-9]*\.[0-9]{1}$", line.strip())
+                                    # else:
+                                    #     x = re.findall("[0-9]*\.[0-9]{2}$", line.strip())
                                     x = re.findall("[0-9]*\.[0-9]{1}$", line.strip())
                                     v = 0
                                     if x:
@@ -300,6 +311,8 @@ class purchase_order(models.Model):
 
                             #** Recherche du montant total ********************
                             x = re.findall("Sous-Tot.HT:", line)
+                            if not x:
+                                x = re.findall("Total HT", line)
                             if x:
                                 x = re.findall("[0-9]*\.[0-9]{1}$", line) 
                                 if x:

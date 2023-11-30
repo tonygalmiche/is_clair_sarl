@@ -10,6 +10,31 @@
         parent="sale.sale_order_menu" 
     />
 
+
+    <!-- Ventes / Affaire-->
+    <menuitem 
+        id="is_affaire_top_menu" 
+        sequence="3" 
+        name="Affaires"
+        parent="sale.sale_menu_root" 
+    />
+    <menuitem 
+        id="is_affaire_affaire_menu" 
+        sequence="10" 
+        name="Affaires"
+        action="is_affaire_action" 
+        parent="is_affaire_top_menu" 
+    />
+    <menuitem 
+        id="is_import_salaire_menu" 
+        sequence="20" 
+        name="Importation des salaires dans les affaires"
+        action="is_import_salaire_action" 
+        parent="is_affaire_top_menu" 
+    />
+
+
+
     <!-- Ventes / Configuration / Clients -->
     <menuitem 
         id="is_config_client_menu" 

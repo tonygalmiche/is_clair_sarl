@@ -71,3 +71,6 @@ access_is_preparation_facture,access_is_preparation_facture,model_is_preparation
 
 access_is_modele_commande_ligne,access_is_modele_commande_ligne,model_is_modele_commande_ligne,base.group_user,1,1,1,1
 access_is_modele_commande,access_is_modele_commande,model_is_modele_commande,base.group_user,1,1,1,1
+
+access_is_import_salaire,access_is_import_salaire,model_is_import_salaire,sales_team.group_sale_manager,1,1,1,1
+access_is_affaire_salaire,access_is_affaire_salaire,model_is_affaire_salaire,base.group_user,1,1,1,1

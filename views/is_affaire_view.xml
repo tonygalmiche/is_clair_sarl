@@ -314,11 +314,18 @@
                                 <field name="active"/>
                             </group>
                         </page>
+                        <page string="Salaires">
+                            <field name="salaire_ids" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="date"/>
+                                    <field name="montant" sum="Total"/>
+                                </tree>
+                            </field>
+                            <group>
+                                <field name="montant_salaire"/>
+                            </group>
+                        </page>
                     </notebook>
-                    
- 
-
-
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
@@ -349,6 +356,7 @@
                 <field name="commentaire"         optional="show"/>
                 <field name="achat_facture"       optional="show" sum="Total"/>
                 <field name="vente_facture"       optional="show" sum="Total"/>
+                <field name="montant_salaire"     optional="show" sum="Total"/>
             </tree>
         </field>
     </record>
@@ -374,5 +382,85 @@
         <field name="res_model">is.affaire</field>
         <field name="view_mode">tree,form,activity</field>
     </record>
+
+
+
+
+
+
+    <!--is.import.salaire -->
+    <record id="is_import_salaire_form_view" model="ir.ui.view">
+        <field name="name">is_import_salaire_from_view</field>
+        <field name="model">is.import.salaire</field>
+        <field name="arch" type="xml">
+            <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+
+                <header>
+                    <button
+                        name="importation_salaire_action"
+                        type="object"
+                        string="Importation des salaires dans les affaires"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="total" attrs="{'invisible': [('total', '==', 0)]}"/>
+                        <field name="importation"/>
+                    </group>
+
+                    <group string="Résultat importation" attrs="{'invisible':[('resultat','=',False)]}" >
+                        <div style="background:gainsboro;font-weight:normal;padding-left:5pt;font-family:courier, courier new, serif;">
+                            <field name="resultat" nolabel="1"/>
+                        </div>
+                    </group>
+
+                    <field name="salaire_ids" nolabel="1">
+                        <tree limit="500" readonly="1">
+                            <button name="view_affaire_action" type="object" icon="fa-search-plus" title="Voir affaire"/>
+                            <field name="affaire_id"/>
+                            <field name="date"/>
+                            <field name="montant" sum="Total"/>
+                        </tree>
+                    </field>
+
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_import_salaire_tree_view">
+        <field name="name">is_import_salaire_tree_view</field>
+        <field name="model">is.import.salaire</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="total" sum="Total" />
+            </tree>
+        </field>
+    </record>
+    <record id="is_import_salaire_search_view" model="ir.ui.view">
+        <field name="name">is_import_salaire_search_view</field>
+        <field name="model">is.import.salaire</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_import_salaire_action" model="ir.actions.act_window">
+        <field name="name">Importation des salaires dans les affaires</field>
+        <field name="res_model">is.import.salaire</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
 
 </odoo>
