@@ -433,31 +433,35 @@ class IsImportSalaire(models.Model):
             resultat = []
             obj.salaire_ids.unlink()
             for line in lines:
+                test=False
                 t = line.split('\t')
                 if len(t)==2:
-                    name    = t[0][0:7].strip()
-                    montant = t[1]
-                    affaires=self.env['is.affaire'].search([('name', '=',name),('name', '!=','')])
-                    affaire = False
-                    for a in affaires:
-                        affaire = a
-                        break
-                    if affaire:
-                        try:
-                            montant=float(t[1].replace(',','.'))
-                        except:
-                            montant=0
-                        total+=montant
-                        vals={
-                            'affaire_id'    : affaire.id,
-                            'importation_id': obj.id,
-                            'date'          : obj.name,
-                            'montant'       : montant,
-                        }
-                        res = self.env['is.affaire.salaire'].create(vals)
-                    else:
-                        if name:
-                            resultat.append("Affaire non trouvée => %s"%line)
+                    t2 = t[0].split(' ')
+                    if len(t2)>=2:
+                        #name    = t[0][0:7].strip()
+                        name    = t2[0]
+                        montant = t[1]
+                        affaires=self.env['is.affaire'].search([('name', '=',name),('name', '!=','')])
+                        affaire = False
+                        for a in affaires:
+                            affaire = a
+                            break
+                        if affaire:
+                            try:
+                                montant=float(t[1].replace(',','.'))
+                            except:
+                                montant=0
+                            total+=montant
+                            vals={
+                                'affaire_id'    : affaire.id,
+                                'importation_id': obj.id,
+                                'date'          : obj.name,
+                                'montant'       : montant,
+                            }
+                            res = self.env['is.affaire.salaire'].create(vals)
+                            test=True
+                if test==False and line.strip()!='':
+                    resultat.append("Affaire non trouvée => %s"%line)
             if len(resultat)==0:
                 resultat = False
             else:
