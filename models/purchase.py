@@ -6,7 +6,9 @@ from odoo.tools.misc import formatLang, get_lang
 import base64
 from subprocess import PIPE, Popen
 import re
-
+from thefuzz import fuzz 
+from collections import OrderedDict
+import operator
 
 def str2float(x):
     try:
@@ -275,8 +277,7 @@ class purchase_order(models.Model):
                                         description = line[0:50].strip()
                                         if len(description)==0:
                                             description = nacelle
-                                        print("'%s' => '%s'"%(description, v), len(description))
-
+                                        #print("'%s' => '%s'"%(description, v), len(description))
                                         #montants.append("%s : %s (%s)"%(description,l.strip(),v))
                                         montants.append([description,l.strip(),v])
 
@@ -323,12 +324,21 @@ class purchase_order(models.Model):
                                         except:
                                             montant_total=0
                                         break
-
-
-
-                    dict["Chantier"]      = ', '.join(lignes_chantier)
-                    #dict["montant_total"] = montant_total
-
+                    #** Recherche de l'affaire ********************************
+                    chantier = ', '.join(lignes_chantier)
+                    dict["Chantier"] = chantier
+                    affaires = self.env['is.affaire'].search([])
+                    affaire_dict={}
+                    for affaire in affaires:
+                        name = '%s %s %s'%(affaire.name, affaire.nom, affaire.chantier_adresse)
+                        ratio = fuzz.ratio(chantier, name)
+                        affaire_dict[ratio] = (affaire, affaire.name)
+                    key_sorted = sorted(affaire_dict, reverse=True)
+                    for key in key_sorted:
+                        affaire = affaire_dict[key][0]
+                        obj.is_affaire_id = affaire.id
+                        break
+                    #**********************************************************
 
                     for key in dict:
                         x = "%s : %s"%(key.ljust(15), dict[key])
@@ -391,7 +401,6 @@ class purchase_order(models.Model):
                                 product = p
                                 break 
                             if p:
-                                print(products)
                                 vals={
                                     "order_id"       : obj.id,
                                     "product_id"     : product.id,

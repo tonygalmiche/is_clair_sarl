@@ -108,6 +108,7 @@ class IsAffaire(models.Model):
     date_creation       = fields.Date("Date de création", default=lambda *a: fields.Date.today())
     client_id           = fields.Many2one('res.partner' , 'Client')
     chantier_id         = fields.Many2one('res.partner' , 'Adresse du chantier')
+    chantier_adresse    = fields.Text('Adresse complète du chantier', related='chantier_id.is_adresse')
     nature_travaux_ids  = fields.Many2many('is.nature.travaux', 'is_affaire_nature_travaux_rel', 'affaire_id', 'nature_id'     , string="Nature des travaux")
     type_travaux_ids    = fields.Many2many('is.type.travaux'  , 'is_affaire_type_travaux_rel'  , 'affaire_id', 'type_id'       , string="Type des travaux")
     specificite_ids     = fields.Many2many('is.specificite'   , 'is_affaire_specificite_rel'   , 'affaire_id', 'specificite_id', string="Spécificités")

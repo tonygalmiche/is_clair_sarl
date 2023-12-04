@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models, _
 import datetime
+import re
 
 class IsStatut(models.Model):
     _name='is.statut'
@@ -37,6 +38,17 @@ class ResPartner(models.Model):
     is_banque_id           = fields.Many2one('account.journal', 'Banque par défaut', domain=[('type','=','bank')])
     is_compte_auxiliaire   = fields.Char('Compte auxiliaire', help="Code du fournisseur ou client pour l'export en compta")
     is_modele_commande_id  = fields.Many2one('is.modele.commande' , 'Modèle de commande')
+    is_adresse             = fields.Text("Adresse complète", store=True, readonly=True, compute='_compute_is_adresse')
+
+
+    @api.depends('name', 'street','street2','city','zip')
+    def _compute_is_adresse(self):
+        for obj in self:
+            adresse = '%s\n%s\n%s'%((obj.name or ''), (obj.street or ''), (obj.street2 or ''))
+            if obj.zip or obj.city:
+                adresse += '\n%s - %s'%((obj.zip or ''), (obj.city or ''))
+            adresse = re.sub('\\n+','\n',adresse) # Supprimer les \n en double
+            obj.is_adresse = adresse
 
 
     def creer_modele_commande(self):

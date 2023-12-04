@@ -179,6 +179,9 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_tree" />
         <field name="arch" type="xml">
+            <field name="display_name" position="after">
+                <field name="is_adresse" optional="hide"/>
+            </field>
             <field name="phone" position="after">
                 <field name="mobile" optional="show"/>
             </field>
@@ -199,6 +202,7 @@
         <field name="inherit_id" ref="base.view_res_partner_filter" />
         <field name="arch" type="xml">
             <field name="name" position="after">
+                <field name="is_adresse"/>
                 <field name="is_statut_id"/>
                 <field name="is_profil_id"/>
                 <field name="is_origine_id"/>

@@ -117,6 +117,13 @@
 
 
     <!-- Achats / Commandes -->
+    <menuitem
+        id="is_purchase_order_line_menu"
+        name="Lignes des commandes"
+        parent="purchase.menu_procurement_management"
+        sequence="7"
+        action="is_purchase_order_line_action"
+    />
     <menuitem 
         id="is_purchase_affaire_menu" 
         sequence="900" 
