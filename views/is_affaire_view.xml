@@ -271,7 +271,14 @@
                             <field name="name"/>
                             <field name="nom"/>
                             <field name="client_id"   widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" options="{&quot;always_reload&quot;: True}"/>
-                            <field name="chantier_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" options="{&quot;always_reload&quot;: True}"/>
+                            <!-- <field name="chantier_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" options="{&quot;always_reload&quot;: True}"/> -->
+                            <span class="o_form_label o_td_label" name="address_name"><b>Adresse du chantier</b></span>
+                            <div class="o_address_format">
+                                <field name="street"  placeholder="Rue"         class="o_address_street"/>
+                                <field name="street2" placeholder="Rue 2"       class="o_address_street"/>
+                                <field name="zip"     placeholder="Code postal" class="o_address_street"/>
+                                <field name="city"    placeholder="Ville"       class="o_address_street"/>
+                            </div>
                         </group>
                         <group>
                             <field name="date_creation"/>
@@ -349,8 +356,9 @@
                 <field name="date_creation"       optional="show"/>
                 <field name="contact_chantier_id" optional="hide"/>
                 <field name="client_id"           optional="show"/>
-                <field name="chantier_id"         optional="show"/>
-                <field name="chantier_adresse"    optional="hide"/>
+                <field name="adresse_chantier"    optional="show"/>
+                <!-- <field name="chantier_id"         optional="show"/> -->
+                <!-- <field name="chantier_adresse"    optional="hide"/> -->
                 <field name="nature_travaux_ids"  optional="show" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                 <field name="type_travaux_ids"    optional="show" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                 <field name="specificite_ids"     optional="show" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
@@ -369,7 +377,8 @@
                 <field name="name"/>
                 <field name="nom"/>
                 <field name="client_id"/>
-                <field name="chantier_adresse"/>
+                <field name="adresse_chantier"/>
+                <!-- <field name="chantier_adresse"/> -->
                 <field name="nature_travaux_ids"/>
                 <field name="type_travaux_ids"/>
                 <field name="specificite_ids"/>

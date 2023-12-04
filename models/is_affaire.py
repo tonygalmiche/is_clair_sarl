@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
 from random import randint
+import re
 
 
 class IsNatureTravaux(models.Model):
@@ -107,8 +108,13 @@ class IsAffaire(models.Model):
     nom                 = fields.Char("Nom de l'affaire")
     date_creation       = fields.Date("Date de création", default=lambda *a: fields.Date.today())
     client_id           = fields.Many2one('res.partner' , 'Client')
-    chantier_id         = fields.Many2one('res.partner' , 'Adresse du chantier')
-    chantier_adresse    = fields.Text('Adresse complète du chantier', related='chantier_id.is_adresse')
+    # chantier_id         = fields.Many2one('res.partner' , 'Adresse du chantier')
+    # chantier_adresse    = fields.Text('Adresse complète du chantier', related='chantier_id.is_adresse')
+    street              = fields.Char("Rue")
+    street2             = fields.Char("Rue 2")
+    zip                 = fields.Char("CP")
+    city                = fields.Char("Ville")
+    adresse_chantier    = fields.Text('Adresse du chantier', store=True, readonly=True, compute='_compute_adresse_chantier')
     nature_travaux_ids  = fields.Many2many('is.nature.travaux', 'is_affaire_nature_travaux_rel', 'affaire_id', 'nature_id'     , string="Nature des travaux")
     type_travaux_ids    = fields.Many2many('is.type.travaux'  , 'is_affaire_type_travaux_rel'  , 'affaire_id', 'type_id'       , string="Type des travaux")
     specificite_ids     = fields.Many2many('is.specificite'   , 'is_affaire_specificite_rel'   , 'affaire_id', 'specificite_id', string="Spécificités")
@@ -123,6 +129,16 @@ class IsAffaire(models.Model):
     retenue_garantie    = fields.Float("Retenue de garantie (%)", digits=(14,2))
     salaire_ids         = fields.One2many('is.affaire.salaire', 'affaire_id', 'Salaires')
     montant_salaire     = fields.Float("Montant salaire", digits=(14,2), store=True, readonly=True, compute='_compute_montant_salaire')
+
+
+    @api.depends('street','street2','city','zip')
+    def _compute_adresse_chantier(self):
+        for obj in self:
+            adresse = '%s\n%s'%((obj.street or ''), (obj.street2 or ''))
+            if obj.zip or obj.city:
+                adresse += '\n%s - %s'%((obj.zip or ''), (obj.city or ''))
+            adresse = re.sub('\\n+','\n',adresse) # Supprimer les \n en double
+            obj.adresse_chantier = adresse
 
 
     @api.depends('salaire_ids','salaire_ids.montant')
@@ -380,8 +396,8 @@ class IsAffaire(models.Model):
                 name = "%s"%(obj.name)
             if obj.nom and not obj.name:
                 name = "%s"%(obj.nom)
-            if obj.chantier_id:
-                name+=" - %s %s %s %s"%(obj.chantier_id.street or '', obj.chantier_id.street2 or '', obj.chantier_id.zip or '', obj.chantier_id.city or '')
+            #if obj.chantier_id:
+            #    name+=" - %s %s %s %s"%(obj.chantier_id.street or '', obj.chantier_id.street2 or '', obj.chantier_id.zip or '', obj.chantier_id.city or '')
             result.append((obj.id, name))
         return result
 
@@ -396,11 +412,11 @@ class IsAffaire(models.Model):
                 '|','|','|','|','|','|',
                 ('name', 'ilike', name),
                 ('nom', 'ilike', name),
-                ('chantier_id.name', 'ilike', name),
-                ('chantier_id.street', 'ilike', name),
-                ('chantier_id.street2', 'ilike', name),
-                ('chantier_id.zip', 'ilike', name),
-                ('chantier_id.city', 'ilike', name),
+                #('chantier_id.name', 'ilike', name),
+                #('chantier_id.street', 'ilike', name),
+                #('chantier_id.street2', 'ilike', name),
+                #('chantier_id.zip', 'ilike', name),
+                #('chantier_id.city', 'ilike', name),
             ]
             if name=="[":
                 filtre=[('name', '!=', False)]
