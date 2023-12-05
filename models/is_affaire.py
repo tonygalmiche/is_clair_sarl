@@ -398,7 +398,15 @@ class IsAffaire(models.Model):
                 name = "%s"%(obj.nom)
             #if obj.chantier_id:
             #    name+=" - %s %s %s %s"%(obj.chantier_id.street or '', obj.chantier_id.street2 or '', obj.chantier_id.zip or '', obj.chantier_id.city or '')
+            
+            name+=" - %s %s %s %s"%(obj.street or '', obj.street2 or '', obj.zip or '', obj.city or '')
+
+
+            
             result.append((obj.id, name))
+
+
+
         return result
 
 
@@ -408,16 +416,29 @@ class IsAffaire(models.Model):
 
         ids = []
         if len(name) >= 1:
+            # filtre=[
+            #     '|','|','|','|','|','|',
+            #     ('name', 'ilike', name),
+            #     ('nom', 'ilike', name),
+            #     ('chantier_id.name', 'ilike', name),
+            #     ('chantier_id.street', 'ilike', name),
+            #     ('chantier_id.street2', 'ilike', name),
+            #     ('chantier_id.zip', 'ilike', name),
+            #     ('chantier_id.city', 'ilike', name),
+            # ]
+
             filtre=[
-                '|','|','|','|','|','|',
-                ('name', 'ilike', name),
-                ('nom', 'ilike', name),
-                #('chantier_id.name', 'ilike', name),
-                #('chantier_id.street', 'ilike', name),
-                #('chantier_id.street2', 'ilike', name),
-                #('chantier_id.zip', 'ilike', name),
-                #('chantier_id.city', 'ilike', name),
+                '|','|','|','|','|',
+                ('name'   , 'ilike', name),
+                ('nom'    , 'ilike', name),
+                ('street' , 'ilike', name),
+                ('street2', 'ilike', name),
+                ('zip'    , 'ilike', name),
+                ('city'   , 'ilike', name),
             ]
+
+
+
             if name=="[":
                 filtre=[('name', '!=', False)]
             if name=="#":
