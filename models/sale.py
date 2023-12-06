@@ -323,10 +323,10 @@ class sale_order(models.Model):
             sequence=0
             is_a_facturer = 0
             for line in obj.order_line:
-                if line.display_type=="line_section":
+                if line.display_type in ["line_section", "line_note"]:
                     vals={
                         'sequence'    : line.sequence,
-                        'display_type': 'line_section',
+                        'display_type': line.display_type ,
                         'name'        : line.name,
                     }
                 else:

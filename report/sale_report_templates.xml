@@ -148,11 +148,19 @@
                                                         <span t-field="line.name"/>
                                                     </td>
                                                     <td name="td_quantity" class="text-right" width="10%">
-                                                        <span t-if="line.product_uom_qty" t-field="line.product_uom_qty"/>
+                                                        <span 
+                                                            t-if="line.product_uom_qty" 
+                                                            t-field="line.product_uom_qty"
+                                                            t-options="{'widget': 'float', 'precision': 2}"
+                                                        />
                                                     </td>
                                                     <td name="td_priceunit" class="text-right" width="10%" style="white-space: nowrap;">
                                                         <t t-if="line.price_unit">
-                                                            <span t-field="line.price_unit" t-if="doc.is_affichage_pdf=='standard'"/> €
+                                                            <span 
+                                                                t-field="line.price_unit" 
+                                                                t-if="doc.is_affichage_pdf=='standard'"
+                                                                t-options="{'widget': 'float', 'precision': 2}"
+                                                            /> €
                                                         </t>
                                                     </td>
                                                     <td class="text-right" width="10%">
@@ -245,11 +253,19 @@
                                                             <span t-field="line.name"/>
                                                         </td>
                                                         <td name="td_quantity" class="text-right" width="10%">
-                                                            <span t-if="line.product_uom_qty" t-field="line.product_uom_qty"/>
+                                                            <span 
+                                                                t-if="line.product_uom_qty" 
+                                                                t-field="line.product_uom_qty"
+                                                                t-options="{'widget': 'float', 'precision': 2}"
+                                                            />
                                                         </td>
                                                         <td name="td_priceunit" class="text-right" width="10%" style="white-space: nowrap;">
                                                             <t t-if="line.price_unit">
-                                                                <span t-field="line.price_unit" t-if="doc.is_affichage_pdf=='standard'"/> €
+                                                                <span 
+                                                                    t-field="line.price_unit" 
+                                                                    t-if="doc.is_affichage_pdf=='standard'"
+                                                                    t-options="{'widget': 'float', 'precision': 2}"
+                                                                /> €
                                                             </t>
                                                         </td>
                                                         <td class="text-right" width="10%">

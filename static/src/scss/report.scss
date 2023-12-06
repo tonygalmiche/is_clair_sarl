@@ -49,6 +49,17 @@
     padding-right: 0.3rem;
 }
 
+.clair_report .table-sm th {
+    padding: 0.1rem;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    white-space: nowrap;
+}
+
+.o_report_layout_boxed table thead tr th {
+    text-transform: none;
+}
+
 .clair_report .situation{
     margin-top: 1rem;
     margin-bottom: 1rem;
