@@ -74,10 +74,10 @@
 
 
             <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='analytic_tag_ids']" position="after">
-                <field name="is_affaire_id" optional="hide"/>
+                <field name="is_affaire_id" optional="hide" class="white_space_normal"/>
             </xpath>
             <xpath expr="//page[@id='aml_tab']/field[@name='line_ids']/tree/field[@name='name']" position="after">
-                <field name="is_affaire_id" optional="hide"/>
+                <field name="is_affaire_id" optional="hide" class="white_space_normal"/>
             </xpath>
 
 
@@ -115,7 +115,7 @@
         <field name="inherit_id" ref="account.view_out_invoice_tree" />
         <field name="arch" type="xml">
             <field name="invoice_date" position="before">
-                <field name="is_affaire_id" optional="show"/>
+                <field name="is_affaire_id" optional="show" class="white_space_normal"/>
             </field>
             <field name="invoice_date_due" position="before">
                 <field name="invoice_payment_term_id" optional="show"/>
@@ -134,7 +134,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <!-- <field name="purchase_id" optional="hide"/> -->
-                <field name="is_affaire_id" optional="show"/>
+                <field name="is_affaire_id" optional="show" class="white_space_normal"/>
             </field>
             <field name="invoice_date_due" position="before">
                 <field name="invoice_payment_term_id" optional="show"/>
@@ -163,16 +163,11 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_account_invoice_filter" />
         <field name="arch" type="xml">
-
-
             <filter name="myinvoices" position="after">
                 <filter domain="[('is_attente_avoir', '!=', False)]" string="Attente avoir" name="attente_avoir" help="Attente avoir"/>
             </filter>
-
-
-
             <field name="partner_id" position="after">
-                <field name="is_affaire_id" optional="show"/>
+                <field name="is_affaire_id"/>
             </field>
         </field>
     </record>
@@ -216,7 +211,7 @@
                 <field name="partner_id"/>
                 <field name="product_id"/>
                 <field name="name"/>
-                <field name="is_affaire_id"/>
+                <field name="is_affaire_id" class="white_space_normal"/>
                 <field name="account_id"/>
                 <field name="quantity" sum="Total"/>
                 <field name="product_uom_category_id" invisible="1"/>

@@ -350,9 +350,9 @@
         <field name="type">tree</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="display_name"        optional="hide" string="Nom complet" />
+                <field name="display_name"        optional="hide" class="white_space_normal" string="Nom complet" />
                 <field name="name"                optional="show"/>
-                <field name="nom"                 optional="show"/>
+                <field name="nom"                 optional="show" class="white_space_normal"/>
                 <field name="date_creation"       optional="show"/>
                 <field name="contact_chantier_id" optional="hide"/>
                 <field name="client_id"           optional="show"/>

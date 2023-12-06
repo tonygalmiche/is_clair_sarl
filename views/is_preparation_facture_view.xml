@@ -21,7 +21,7 @@
                 <field name="price_unit"        optional="show" readonly="1"/>
                 <field name="price_subtotal"    optional="show" readonly="1" sum="Total" string="Montant Cde"/>
                 <field name="is_montant_a_facturer" optional="show" readonly="1" sum="Total"/>
-                <field name="is_affaire_id"     optional="show" readonly="1"/>
+                <field name="is_affaire_id"     optional="show" readonly="1" class="white_space_normal"/>
             </tree>
         </field>
     </record>

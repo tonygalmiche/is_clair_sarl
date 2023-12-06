@@ -185,7 +185,7 @@
         <field name="inherit_id" ref="sale.view_quotation_tree"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <field name="is_affaire_id" optional="show"/>
+                <field name="is_affaire_id" optional="show" class="white_space_normal"/>
             </field>
         </field>
     </record>
@@ -195,7 +195,7 @@
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <field name="is_affaire_id" optional="show"/>
+                <field name="is_affaire_id" optional="show" class="white_space_normal"/>
             </field>
             <field name="amount_total" position="after">
                 <field name="is_a_facturer"   sum="Total" widget="monetary" decoration-bf="1" optional="show"/>
@@ -225,7 +225,7 @@
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <field name="is_affaire_id" optional="show"/>
+                <field name="is_affaire_id"/>
             </field>
         </field>
     </record>

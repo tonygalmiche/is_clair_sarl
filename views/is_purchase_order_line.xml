@@ -33,18 +33,18 @@
             <tree>
                 <field name="order_id"           optional="show" widget="many2one_clickable" />
                 <field name="partner_id"         optional="show" widget="many2one_clickable" />
-                <field name="is_affaire_id"      optional="show" widget="many2one_clickable" />
+                <field name="is_affaire_id"      optional="show" widget="many2one_clickable" class="white_space_normal"/>
                 <field name="is_date_livraison"  optional="show"/>
-                <field name="product_id"         optional="show" widget="many2one_clickable" />
+                <field name="product_id"         optional="show" widget="many2one_clickable" class="white_space_normal"/>
                 <field name="description"        optional="show"/>
                 <field name="product_qty"        optional="show"/>
                 <field name="product_uom"        optional="show"/>
                 <field name="price_unit"         optional="show"/>
                 <field name="price_subtotal"     optional="show" sum="Total"/>
-                <field name="is_famille_id"      optional="hide"/>
-                <field name="is_sous_famille_id" optional="hide"/>
-                <field name="is_finition_id"     optional="hide"/>
-                <field name="is_traitement_id"   optional="hide"/>
+                <field name="is_famille_id"      optional="hide" class="white_space_normal"/>
+                <field name="is_sous_famille_id" optional="hide" class="white_space_normal"/>
+                <field name="is_finition_id"     optional="hide" class="white_space_normal"/>
+                <field name="is_traitement_id"   optional="hide" class="white_space_normal"/>
             </tree>
         </field>
     </record>
