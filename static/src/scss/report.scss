@@ -36,10 +36,15 @@
 }
 
 
-
- .clair_report .table-sm .o_line_note td {
+.clair_report .table-sm .o_line_note td {
     padding: 0;
     padding-left: 0.3em;
     padding-right: 0.3em;
     // background-color: Gainsboro;
 }
+
+.clair_report .table-sm th, .table-sm td {
+    padding: 0.1rem;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+  }
