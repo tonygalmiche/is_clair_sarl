@@ -51,12 +51,21 @@ class is_sale_order_section(models.Model):
     _rec_name = 'section'
     _order='sequence'
 
-    order_id   = fields.Many2one('sale.order', 'Commande', required=True, ondelete='cascade')
-    sequence   = fields.Integer("Sequence")
-    section    = fields.Char("Section", required=True)
+    order_id    = fields.Many2one('sale.order', 'Commande', required=True, ondelete='cascade')
+    sequence    = fields.Integer("Sequence")
+    section     = fields.Char("Section", required=True)
     facturable_pourcent = fields.Float("% facturable", digits=(14,2))
-    option     = fields.Boolean("Option", default=False)
-    line_ids   = fields.One2many('sale.order.line', 'is_section_id', 'Lignes')
+    option      = fields.Boolean("Option", default=False)
+    line_ids    = fields.One2many('sale.order.line', 'is_section_id', 'Lignes')
+    currency_id = fields.Many2one(related='order_id.currency_id')
+    montant     = fields.Monetary("Montant HT", currency_field='currency_id', store=False, readonly=True, compute='_compute_montant')
+
+    def _compute_montant(self):
+        for obj in self:
+            montant = 0
+            for line in obj.line_ids:
+                montant+=line.price_subtotal
+            obj.montant = montant
 
 
     def write(self, vals):

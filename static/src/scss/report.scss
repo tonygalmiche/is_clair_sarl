@@ -1,7 +1,3 @@
-
-
-
-
 .clair_report .o_report_layout_boxed .page > table:not(.o_main_table) tr td:last-child {
     background-color: white;
 }
@@ -11,6 +7,10 @@
 }
 .clair_report h3{
     font-size:12pt;
+    font-weight: bolder;
+}
+.clair_report h4{
+    font-size:11pt;
     font-weight: bolder;
 }
 .clair_report .o_boxed_footer, .o_boxed_header, .o_report_layout_boxed{
@@ -47,4 +47,14 @@
     padding: 0.1rem;
     padding-left: 0.3rem;
     padding-right: 0.3rem;
-  }
+}
+
+.clair_report .situation{
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-size:13pt;
+    font-weight: bolder;
+    border: 2px solid;
+    text-align: center;
+}
+  

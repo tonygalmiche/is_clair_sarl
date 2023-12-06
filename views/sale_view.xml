@@ -135,6 +135,7 @@
                                     title="Lignes de la section"
                                 />
                                 <field name="section"/>
+                                <field name="montant" sum="Total"/>
                                 <field name="facturable_pourcent"/>
                                 <button 
                                     name="option_section_action" 
