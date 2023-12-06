@@ -42,6 +42,9 @@ Module Odoo 15 pour CLAIR-SARL
         "report/report_templates.xml",
     ],
     'assets': {
+        'web.assets_backend': [
+            'is_clair_sarl/static/src/scss/styles.scss',
+        ],
         'web.assets_qweb': [
             'is_clair_sarl/static/src/xml/**/*',
         ],
@@ -49,6 +52,10 @@ Module Odoo 15 pour CLAIR-SARL
             'is_clair_sarl/static/src/scss/report.scss',
         ]
     },
+
+
+
+
 
 
 

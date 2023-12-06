@@ -162,6 +162,31 @@
                     />
                 </group>
             </group>
+
+            <page name="internal_notes" position="after">
+                <page string="Affaires">
+                    <field name="is_affaire_ids" nolabel="1">
+                        <tree>
+                            <field name="display_name"        optional="hide" class="white_space_normal" string="Nom complet" />
+                            <field name="name"                optional="show"/>
+                            <field name="nom"                 optional="show" class="white_space_normal"/>
+                            <field name="date_creation"       optional="show"/>
+                            <field name="contact_chantier_id" optional="hide"/>
+                            <field name="adresse_chantier"    optional="show" class="test_scss"/>
+                            <field name="nature_travaux_ids"  optional="show" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                            <field name="type_travaux_ids"    optional="show" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                            <field name="specificite_ids"     optional="hide" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                            <field name="commentaire"         optional="hide"/>
+                            <field name="achat_facture"       optional="show" sum="Total"/>
+                            <field name="vente_facture"       optional="show" sum="Total"/>
+                            <field name="montant_salaire"     optional="show" sum="Total"/>
+                        </tree>
+                    </field>
+                </page>
+            </page>
+
+
+
         </field>
     </record>
     <record id="is_view_partner_property_form" model="ir.ui.view">
