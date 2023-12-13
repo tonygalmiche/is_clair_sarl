@@ -46,7 +46,7 @@ class IsPreparationFacture(models.Model):
             #** Création des lignes *******************************************
             invoice_line_ids=[]
             for line in obj.ligne_ids:
-                taxes = line.product_id.taxes_id
+                taxes = line.product_id.supplier_taxes_id
                 taxes = obj.partner_id.property_account_position_id.map_tax(taxes)
                 tax_ids=[]
                 for tax in taxes:
