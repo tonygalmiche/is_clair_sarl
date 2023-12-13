@@ -73,8 +73,30 @@
                                     </t>
                                     <tr>
                                         <td class="text-right"><b>Total HT : </b></td>
+                                        <!-- <td class="text-right"><span t-field="o.amount_untaxed"/></td> -->
+                                        <td class="text-right"><span t-field="o.is_facture"/></td>
+                                    </tr>
+
+                                    <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
+                                    <t t-foreach="lines" t-as="line">
+                                        <t t-if="line.product_id and line.product_id.default_code in ['FACTURE','COMPTE_PRORATA','RETENUE_GARANTIE']">
+                                            <tr>
+                                                <td class="text-right" style="color:black"><span t-field="line.name"/> : </td>
+                                                <td class="text-right">
+                                                    <span t-field="line.price_subtotal"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+
+
+                                    <tr>
+                                        <td class="text-right"><b>Total HT : </b></td>
                                         <td class="text-right"><span t-field="o.amount_untaxed"/></td>
                                     </tr>
+
+
+
                                     <!-- Affichage des taxes -->
                                     <t t-set="tax_totals" t-value="json.loads(o.tax_totals_json)"/>
                                     <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
@@ -101,6 +123,10 @@
                                             </tr>
                                         </t>
                                     </t>
+
+
+
+
                                     <tr>
                                         <td class="text-right"><strong>TTC : </strong></td>
                                         <td class="text-right">
