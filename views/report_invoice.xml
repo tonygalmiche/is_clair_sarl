@@ -36,7 +36,7 @@
                                             <t t-set="total" t-value="total + l.montant"/>
                                             <tr>
                                                 <td class="text-left"><span t-field="l.section"/></td>
-                                                <td class="text-right"><span t-field="l.montant"/></td>
+                                                <td class="text-right"><span t-if="l.montant" t-field="l.montant"/></td>
                                             </tr>
                                         </t>
                                     </t>
@@ -67,7 +67,7 @@
                                             </t>
                                             <tr>
                                                 <td class="text-left"><span t-field="l.section"/></td>
-                                                <td class="text-right"><span t-esc="total_section" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                                <td class="text-right"><span  t-if="total_section" t-esc="total_section" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
                                             </tr>
                                         </t>
                                     </t>
