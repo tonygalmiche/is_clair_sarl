@@ -198,6 +198,12 @@ class purchase_order(models.Model):
                 sequence+=10
 
 
+
+
+
+
+
+
     def import_pdf_action(self):
         for obj in self:
             for attachment in obj.is_import_pdf_ids:
@@ -213,14 +219,12 @@ class purchase_order(models.Model):
                 path = "/tmp/%s.txt"%name
                 r = open(path,'rb').read().decode('utf-8')
                 lines = r.split('\n')
-                res=[]
+                order_lines=[]
                 dict={}
-                chantier=False
-                ligne_chantier = 0
-                lignes_chantier=[]
-
-                montants = []
-
+                # chantier=False
+                # ligne_chantier = 0
+                # lignes_chantier=[]
+                # montants = []
 
                 #** Recherche si c'est bien un PDF de LOXAM *******************
                 test=False
@@ -231,187 +235,438 @@ class purchase_order(models.Model):
                         break
                 if test==False:
                     obj.is_import_pdf_resultat = "Ce PDF n'est pas de LOXAM => Importation impossible"
+                #**************************************************************
+
+                #** Recherche de l'adresse du chantier ************************
+                affaire=[]
                 if test:
-                    #** Initialisation du fournisseur *************************
-                    partners = self.env['res.partner'].search([("name"  ,"ilike", 'LOXAM')])
-                    for partner in partners:
-                        obj.partner_id = partner.id
-                        break
-                    #**********************************************************
-
-                    fin_lignes = False
-                    agence = False
+                    lig=0
                     for line in lines:
-                        if len(line):
+                        x = re.findall("Adresse de chantier", line) 
+                        if x:
+                            lig=1
+                        if lig>1 and lig<=6:
+                            #print(line)
+                            v = line[0:160].strip()
+                            affaire.append(v)
+                        if lig>=6:
+                            break
+                        if lig:
+                            lig+=1
+                if affaire:
+                    dict["Chantier"] = affaire = ' '.join(affaire)
+                #**************************************************************
 
-                            #** Agence ****************************************
-                            x = re.findall("LOXAM ACCESS", line)
-                            if x:
-                                agence = line.strip()
-                                dict["Agence"] = agence
-
-                            #** Recherche NACELLE *****************************
-                            x = re.findall("(.*)(NACELLE.*)([0-9]*\.[0-9]*$)", line)
-                            if x:
-                                if len(x[0])>1:
-                                    nacelle = x[0][1][0:40].strip()
-                                    #dict["NACELLE"] = nacelle
-
-                            #** Recherche des montants ************************
-                            if line[0:23]!='                 Dégr. ':
-                                if fin_lignes==False:
-                                    #** Recherche des montants en fin de ligne avec 1 décimale
-                                    # if agence=="LOXAM ACCESS CHALON":
-                                    #     x = re.findall("[0-9]*\.[0-9]{1}$", line.strip())
-                                    # else:
-                                    #     x = re.findall("[0-9]*\.[0-9]{2}$", line.strip())
-                                    x = re.findall("[0-9]*\.[0-9]{1}$", line.strip())
-                                    v = 0
-                                    if x:
-                                        for l in x:
-                                            try:
-                                                v=float(l.strip())
-                                            except:
-                                                v=0
-                                    if v:
-                                        description = line[0:50].strip()
-                                        if len(description)==0:
-                                            description = nacelle
-                                        #print("'%s' => '%s'"%(description, v), len(description))
-                                        #montants.append("%s : %s (%s)"%(description,l.strip(),v))
-                                        montants.append([description,l.strip(),v])
-
-
-
-                            #**************************************************
-
-
-                            if line[0:14]=='Date sortie : ':
-                                dict["Date sortie"] = line[14:22]
-                            if line[0:15]=='Retour prévu : ':
-                                dict["Retour prévu"] = line[15:23]
-                            if line[0:11]=='  Acheteur:':
-                                dict["Acheteur"] = line[11:].strip().replace(" ","").replace(":","")
-
-
-                            if  line[0:11]=='  Chantier:' and chantier==False:
-                                chantier = True
-                                ligne_chantier = 0
-
-                            if ligne_chantier>=1 and ligne_chantier<=2:
-                                x = " ".join(line.split()) # Supprimer les espaces en double
-                                lignes_chantier.append(x)
-                            if chantier:
-                                ligne_chantier+=1
-
-
-                            #** Fin des lignes avec un montant ****************
-                            x = re.findall("Nom et signature", line)
-                            if x:
-                                fin_lignes = True
-
-                            #** Recherche du montant total ********************
-                            x = re.findall("Sous-Tot.HT:", line)
-                            if not x:
-                                x = re.findall("Total HT", line)
-                            if x:
-                                x = re.findall("[0-9]*\.[0-9]{1}$", line) 
-                                if x:
-                                    for l in x:
-                                        dict["Sous-Tot.HT"] = l
-                                        try:
-                                            montant_total=float(l.strip())
-                                        except:
-                                            montant_total=0
-                                        break
-                    #** Recherche de l'affaire ********************************
-                    chantier = ', '.join(lignes_chantier)
-                    dict["Chantier"] = chantier
-                    affaires = self.env['is.affaire'].search([])
+                #** Recherche de l'affaire ************************************
+                if test and affaire:
+                    chantier = dict["Chantier"]
+                    affaires = self.env['is.affaire'].search([],order="adresse_chantier")
                     affaire_dict={}
                     for affaire in affaires:
-                        name = '%s %s %s'%(affaire.name, affaire.nom, affaire.chantier_adresse)
-                        ratio = fuzz.ratio(chantier, name)
-                        affaire_dict[ratio] = (affaire, affaire.name)
+                        adresse = affaire.adresse_chantier.replace('\n',' ').strip()
+                        #adresse = "%s %s"%(affaire.zip,affaire.city)
+                        if adresse!='':
+                            ratio = fuzz.ratio(chantier, adresse)
+                            affaire_dict[ratio] = (affaire, affaire.name)
+                            #print(ratio,adresse)
                     key_sorted = sorted(affaire_dict, reverse=True)
+
                     for key in key_sorted:
                         affaire = affaire_dict[key][0]
                         obj.is_affaire_id = affaire.id
+                        #print(key,affaire.adresse_chantier.replace('\n',' ').strip())
                         break
-                    #**********************************************************
+                #**************************************************************
 
+                #** Recherche Acheteur ****************************************
+                if test:
+                    for line in lines:
+                        x = re.findall("Acheteur", line) 
+                        if x:
+                            v = line.strip()[0:30].strip()
+                            v = v.split(' : ')
+                            if len(v)==2:
+                                dict["Acheteur"] = v[1]
+                            break
+                #**************************************************************
+
+                #** N°BDC *****************************************************
+                if test:
+                    for line in lines:
+                        x = re.findall("N°BDC", line) 
+                        if x:
+                            v = line.strip()[0:30].strip()
+                            v = v.split(' : ')
+                            if len(v)==2:
+                                dict["N°BDC"] = v[1].strip()
+                            break
+                #**************************************************************
+
+
+                #** Lignes avec des Quantités ou des montants *****************
+                if test:
+                    debut=fin=False
+                    debut_libelle = fin_libelle = False
+                    libelles = []
+                    qte = 0
+                    montant_total = 0
+                    res=[]
+                    new=False
+                    for line in lines:
+                        if debut and not fin:
+                            #** Quantité **************************************
+                            qte = 0
+                            libelle = False
+                            montant = 0
+                            tab = line.strip().split(' ')
+                            if len(tab)>1:
+                                try:
+                                    qte=float(tab[0].strip())
+                                except:
+                                    qte=0
+                            
+                            #** Montant ***************************************
+                            x = re.findall("[0-9]*\.[0-9]{2}$", line.strip())
+                            if x:
+                                x2 = " ".join(line.split()) # Supprimer les espaces en double
+                                list = x2.split()
+                                if len(list)>1:
+                                    try:
+                                        montant=float(x[0].strip())
+                                    except:
+                                        montant=0
+
+                            #** Libellé sans Qté et sans Montant **************
+                            l = False
+                            if not qte and not montant:
+                                x = " ".join(line.split()) # Supprimer les espaces en double
+                                list = x.split()
+                                l = ' '.join(list)
+
+                            #** Libellé avec Qté et Montant *******************
+                            if qte and montant:
+                                x = " ".join(line.split()) # Supprimer les espaces en double
+                                list = x.split()
+                                list.pop(0) # Supprime le premier element (la quantité)
+                                list.pop()  # Supprime le dernier element (le montant)
+                                l = ' '.join(list)
+
+                            #** Libellé avec Qté et sans Montant **************
+                            if qte and not montant:
+                                x = " ".join(line.split()) # Supprimer les espaces en double
+                                list = x.split()
+                                list.pop(0) # Supprime le premier element (la quantité)
+                                l = ' '.join(list)
+
+
+                            #** Autres libellés *******************************
+                            x = re.findall("Total période", line)
+                            if montant and x:
+                                l=x[0].strip()
+                            x = re.findall("Contribution verte", line)
+                            if montant and x:
+                                l=x[0].strip()
+                                qte = qte or 1
+                            x = re.findall("Forfait transport Aller", line)
+                            if montant and x:
+                                l=x[0].strip()
+                                qte = qte or 1
+
+                            if l:
+                                l=l.strip()
+                                if l!='' and l!='Total période':
+                                    libelles.append(l.strip())
+
+                            #** Test si nouvelle ligne ************************
+                            new = False
+                            if qte and montant:
+                                new=True
+                            if l=="Total période":
+                                new=True
+                            if new:
+                                libelle = '\n'.join(libelles)
+                                libelles=[]
+                                montant_total+=montant
+                                order_lines.append([qte, libelle, montant])
+
+                        x = re.findall("Qté.*Libellé.*Montant", line)
+                        if x:
+                            debut = True
+                        x = re.findall("Total HT", line)
+                        if x:
+                            fin=True
+                            x = re.findall("[0-9]*\.[0-9]{2}$", line.strip())
+                            if x:
+                                try:
+                                    ht=float(x[0].strip())
+                                except:
+                                    ht=0
+                                dict["Total HT"] = ht
+                dict["Total calculé"] = montant_total
+
+                #** Résultat du traitement ************************************
+                if test:
                     for key in dict:
                         x = "%s : %s"%(key.ljust(15), dict[key])
                         res.append(x)
-
-                    if montants:
-                        res.append("Montants trouvés avec 1 décimale en fin de ligne : ")
-                        for m in montants:
-                            x = "%s : %s (%s)"%(m[0], m[1], m[2])
-                            res.append("- %s"%x)
-
-                    res.append('\n' + '-'*160)
-                    for line in lines:
-                        if len(line):
-                            res.append(line)
                     obj.is_import_pdf_resultat = '\n'.join(res)
+                #**************************************************************
 
-
-                    if montants:
-                        obj.order_line.unlink()
-
-                        #** Ajout d'une note sur la premiere ligne ****************
-                        note = []
-                        for key in dict:
-                            note.append("%s : %s"%(key, dict[key]))
-                        note = "\n".join(note)
-                        sequence = 10
-                        vals={
-                            "order_id"       : obj.id,
-                            "sequence"       : 10,
-                            "name"           : note,
-                            "product_qty"    : 0,
-                            "display_type"   : "line_note",
-                        }
-                        order_line = self.env['purchase.order.line'].create(vals)
-                        #**********************************************************
-
-                        #** Ajout des lignes de la commande ***********************
-
-
-
-
-                        for m in montants:
-                            sequence+=10
-
+                #** Ajout des lignes de la commande ***************************
+                if test:
+                    obj.order_line.unlink()
+                    sequence = 0
+                    for line in order_lines:
+                        libelle = line[1]
+                        sequence+=10
+                        filtre=[
+                            ("name"  ,"=", 'divers'),  
+                        ]
+                        if re.search('nacelle', libelle, re.IGNORECASE):
                             filtre=[
-                                ("name"  ,"=", 'divers'),  
+                                ("name"  ,"=", 'Nacelle'), 
                             ]
-                            if re.search('nacelle', m[0], re.IGNORECASE):
-                                filtre=[
-                                    ("name"  ,"=", 'Nacelle'), 
-                                ]
-                            if re.search('transport', m[0], re.IGNORECASE):
-                                filtre=[
-                                    ("default_code"  ,"=", 'TCHANTIER'),  
-                                ]
-                            products = self.env['product.product'].search(filtre)
-                            product = False
-                            for p in products:
-                                product = p
-                                break 
-                            if p:
-                                vals={
-                                    "order_id"       : obj.id,
-                                    "product_id"     : product.id,
-                                    "sequence"       : sequence,
-                                    "name"           : m[0],
-                                    "product_qty"    : 1,
-                                    "price_unit"     : m[2],
-                                    "product_uom"    : product.uom_id.id,
-                                }
-                                order_line = self.env['purchase.order.line'].create(vals)
-                        #**********************************************************
+                        if re.search('chariot telesc', libelle, re.IGNORECASE):
+                            filtre=[
+                                ("name"  ,"=", 'chariot télescopique'), 
+                            ]
+                        if re.search('benne', libelle, re.IGNORECASE):
+                            filtre=[
+                                ("name"  ,"=", 'Location Benne'), 
+                            ]
+                        if re.search('transport', libelle, re.IGNORECASE):
+                            filtre=[
+                                ("default_code"  ,"=", 'TCHANTIER'),  
+                            ]
+                        if re.search('Contribution verte', libelle, re.IGNORECASE):
+                            filtre=[
+                                ("name"  ,"=", 'Contribution verte'),  
+                            ]
+                        products = self.env['product.product'].search(filtre)
+                        product = False
+                        for p in products:
+                            product = p
+                            break 
+                        if p:
+                            vals={
+                                "order_id"       : obj.id,
+                                "product_id"     : product.id,
+                                "sequence"       : sequence,
+                                "name"           : line[1],
+                                "product_qty"    : 1,
+                                "price_unit"     : line[2],
+                                "product_uom"    : product.uom_id.id,
+                            }
+                            order_line = self.env['purchase.order.line'].create(vals)
+                    #**********************************************************
+
+
+
+
+
+    # def import_pdf_action(self):
+    #     for obj in self:
+    #         for attachment in obj.is_import_pdf_ids:
+    #             pdf=base64.b64decode(attachment.datas)
+    #             name = 'purchase_order-%s'%obj.id
+    #             path = "/tmp/%s.pdf"%name
+    #             f = open(path,'wb')
+    #             f.write(pdf)
+    #             f.close()
+    #             cde = "cd /tmp && pdftotext -layout %s.pdf"%name
+    #             p = Popen(cde, shell=True, stdout=PIPE, stderr=PIPE)
+    #             stdout, stderr = p.communicate()
+    #             path = "/tmp/%s.txt"%name
+    #             r = open(path,'rb').read().decode('utf-8')
+    #             lines = r.split('\n')
+    #             res=[]
+    #             dict={}
+    #             chantier=False
+    #             ligne_chantier = 0
+    #             lignes_chantier=[]
+
+    #             montants = []
+
+    #             #** Recherche si c'est bien un PDF de LOXAM *******************
+    #             test=False
+    #             for line in lines:
+    #                 x = re.findall("LOXAM", line) 
+    #                 if x:
+    #                     test = True
+    #                     break
+    #             if test==False:
+    #                 obj.is_import_pdf_resultat = "Ce PDF n'est pas de LOXAM => Importation impossible"
+    #             if test:
+    #                 #** Initialisation du fournisseur *************************
+    #                 partners = self.env['res.partner'].search([("name"  ,"ilike", 'LOXAM')])
+    #                 for partner in partners:
+    #                     obj.partner_id = partner.id
+    #                     break
+    #                 #**********************************************************
+
+    #                 fin_lignes = False
+    #                 agence = False
+    #                 for line in lines:
+    #                     if len(line):
+
+    #                         #** Agence ****************************************
+    #                         x = re.findall("LOXAM ACCESS", line)
+    #                         if x:
+    #                             agence = line.strip()
+    #                             dict["Agence"] = agence
+
+    #                         #** Recherche NACELLE *****************************
+    #                         x = re.findall("(.*)(NACELLE.*)([0-9]*\.[0-9]*$)", line)
+    #                         if x:
+    #                             if len(x[0])>1:
+    #                                 nacelle = x[0][1][0:40].strip()
+    #                                 #dict["NACELLE"] = nacelle
+
+    #                         #** Recherche des montants ************************
+    #                         if line[0:23]!='                 Dégr. ':
+    #                             if fin_lignes==False:
+    #                                 #** Recherche des montants en fin de ligne avec 1 décimale
+    #                                 # if agence=="LOXAM ACCESS CHALON":
+    #                                 #     x = re.findall("[0-9]*\.[0-9]{1}$", line.strip())
+    #                                 # else:
+    #                                 #     x = re.findall("[0-9]*\.[0-9]{2}$", line.strip())
+    #                                 x = re.findall("[0-9]*\.[0-9]{1}$", line.strip())
+    #                                 v = 0
+    #                                 if x:
+    #                                     for l in x:
+    #                                         try:
+    #                                             v=float(l.strip())
+    #                                         except:
+    #                                             v=0
+    #                                 if v:
+    #                                     description = line[0:50].strip()
+    #                                     if len(description)==0:
+    #                                         description = nacelle
+    #                                     #print("'%s' => '%s'"%(description, v), len(description))
+    #                                     #montants.append("%s : %s (%s)"%(description,l.strip(),v))
+    #                                     montants.append([description,l.strip(),v])
+    #                        #**************************************************
+
+    #                         if line[0:14]=='Date sortie : ':
+    #                             dict["Date sortie"] = line[14:22]
+    #                         if line[0:15]=='Retour prévu : ':
+    #                             dict["Retour prévu"] = line[15:23]
+    #                         if line[0:11]=='  Acheteur:':
+    #                             dict["Acheteur"] = line[11:].strip().replace(" ","").replace(":","")
+
+    #                         if  line[0:11]=='  Chantier:' and chantier==False:
+    #                             chantier = True
+    #                             ligne_chantier = 0
+
+    #                         if ligne_chantier>=1 and ligne_chantier<=2:
+    #                             x = " ".join(line.split()) # Supprimer les espaces en double
+    #                             lignes_chantier.append(x)
+    #                         if chantier:
+    #                             ligne_chantier+=1
+
+    #                         #** Fin des lignes avec un montant ****************
+    #                         x = re.findall("Nom et signature", line)
+    #                         if x:
+    #                             fin_lignes = True
+
+    #                         #** Recherche du montant total ********************
+    #                         x = re.findall("Sous-Tot.HT:", line)
+    #                         if not x:
+    #                             x = re.findall("Total HT", line)
+    #                         if x:
+    #                             x = re.findall("[0-9]*\.[0-9]{1}$", line) 
+    #                             if x:
+    #                                 for l in x:
+    #                                     dict["Sous-Tot.HT"] = l
+    #                                     try:
+    #                                         montant_total=float(l.strip())
+    #                                     except:
+    #                                         montant_total=0
+    #                                     break
+    #                 #** Recherche de l'affaire ********************************
+    #                 chantier = ', '.join(lignes_chantier)
+    #                 dict["Chantier"] = chantier
+    #                 affaires = self.env['is.affaire'].search([])
+    #                 affaire_dict={}
+    #                 for affaire in affaires:
+    #                     name = '%s %s %s'%(affaire.name, affaire.nom, affaire.chantier_adresse)
+    #                     ratio = fuzz.ratio(chantier, name)
+    #                     affaire_dict[ratio] = (affaire, affaire.name)
+    #                 key_sorted = sorted(affaire_dict, reverse=True)
+    #                 for key in key_sorted:
+    #                     affaire = affaire_dict[key][0]
+    #                     obj.is_affaire_id = affaire.id
+    #                     break
+    #                 #**********************************************************
+
+    #                 for key in dict:
+    #                     x = "%s : %s"%(key.ljust(15), dict[key])
+    #                     res.append(x)
+
+    #                 if montants:
+    #                     res.append("Montants trouvés avec 1 décimale en fin de ligne : ")
+    #                     for m in montants:
+    #                         x = "%s : %s (%s)"%(m[0], m[1], m[2])
+    #                         res.append("- %s"%x)
+
+    #                 res.append('\n' + '-'*160)
+    #                 for line in lines:
+    #                     if len(line):
+    #                         res.append(line)
+    #                 obj.is_import_pdf_resultat = '\n'.join(res)
+
+
+    #                 if montants:
+    #                     obj.order_line.unlink()
+
+    #                     #** Ajout d'une note sur la premiere ligne ****************
+    #                     note = []
+    #                     for key in dict:
+    #                         note.append("%s : %s"%(key, dict[key]))
+    #                     note = "\n".join(note)
+    #                     sequence = 10
+    #                     vals={
+    #                         "order_id"       : obj.id,
+    #                         "sequence"       : 10,
+    #                         "name"           : note,
+    #                         "product_qty"    : 0,
+    #                         "display_type"   : "line_note",
+    #                     }
+    #                     order_line = self.env['purchase.order.line'].create(vals)
+    #                     #**********************************************************
+
+    #                     #** Ajout des lignes de la commande ***********************
+    #                     for m in montants:
+    #                         sequence+=10
+
+    #                         filtre=[
+    #                             ("name"  ,"=", 'divers'),  
+    #                         ]
+    #                         if re.search('nacelle', m[0], re.IGNORECASE):
+    #                             filtre=[
+    #                                 ("name"  ,"=", 'Nacelle'), 
+    #                             ]
+    #                         if re.search('transport', m[0], re.IGNORECASE):
+    #                             filtre=[
+    #                                 ("default_code"  ,"=", 'TCHANTIER'),  
+    #                             ]
+    #                         products = self.env['product.product'].search(filtre)
+    #                         product = False
+    #                         for p in products:
+    #                             product = p
+    #                             break 
+    #                         if p:
+    #                             vals={
+    #                                 "order_id"       : obj.id,
+    #                                 "product_id"     : product.id,
+    #                                 "sequence"       : sequence,
+    #                                 "name"           : m[0],
+    #                                 "product_qty"    : 1,
+    #                                 "price_unit"     : m[2],
+    #                                 "product_uom"    : product.uom_id.id,
+    #                             }
+    #                             order_line = self.env['purchase.order.line'].create(vals)
+    #                     #**********************************************************
 
 
 
