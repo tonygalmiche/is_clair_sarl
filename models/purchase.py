@@ -466,11 +466,16 @@ class purchase_order(models.Model):
                                 ("name"  ,"=", 'Contribution verte'),  
                             ]
                         products = self.env['product.product'].search(filtre)
+                        if len(products)==0:
+                            filtre=[
+                                ("name"  ,"=", 'divers'),  
+                            ]
+                            products = self.env['product.product'].search(filtre)
                         product = False
                         for p in products:
                             product = p
                             break 
-                        if p:
+                        if product:
                             vals={
                                 "order_id"       : obj.id,
                                 "product_id"     : product.id,
