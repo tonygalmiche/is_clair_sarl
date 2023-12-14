@@ -90,51 +90,44 @@
                                             </tr>
                                         </t>
                                     </t>
-
-
                                     <tr>
                                         <td class="text-right"><b>Total HT : </b></td>
                                         <td class="text-right"><span t-field="o.amount_untaxed"/></td>
                                     </tr>
-
-
-
-                                    <!-- Affichage des taxes -->
-                                    <t t-set="tax_totals" t-value="json.loads(o.tax_totals_json)"/>
-                                    <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
-                                        <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
-                                        <t t-foreach="tax_totals['groups_by_subtotal'][subtotal_to_show]" t-as="amount_by_group">
-                                            <tr>
-                                                <t t-if="len(tax_totals['groups_by_subtotal'][subtotal_to_show]) > 1">
-                                                    <td  class="text-right">
-                                                        <span t-esc="amount_by_group['tax_group_name']"/>
-                                                        <span class="text-nowrap"> on
-                                                            <t t-esc="amount_by_group['formatted_tax_group_base_amount']"/>
-                                                        </span> : 
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <span class="text-nowrap" t-esc="amount_by_group['formatted_tax_group_amount']"/>
-                                                    </td>
-                                                </t>
-                                                <t t-else="">
-                                                    <td class="text-right"><span class="text-nowrap" t-esc="amount_by_group['tax_group_name']"/> : </td>
-                                                    <td class="text-right">
-                                                        <span class="text-nowrap" t-esc="amount_by_group['formatted_tax_group_amount']" />
-                                                    </td>
-                                                </t>
-                                            </tr>
+                                    <t t-if="o.amount_total>o.amount_untaxed">
+                                        <!-- Affichage des taxes -->
+                                        <t t-set="tax_totals" t-value="json.loads(o.tax_totals_json)"/>
+                                        <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
+                                            <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
+                                            <t t-foreach="tax_totals['groups_by_subtotal'][subtotal_to_show]" t-as="amount_by_group">
+                                                <tr>
+                                                    <t t-if="len(tax_totals['groups_by_subtotal'][subtotal_to_show]) > 1">
+                                                        <td  class="text-right">
+                                                            <span t-esc="amount_by_group['tax_group_name']"/>
+                                                            <span class="text-nowrap"> on
+                                                                <t t-esc="amount_by_group['formatted_tax_group_base_amount']"/>
+                                                            </span> : 
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span class="text-nowrap" t-esc="amount_by_group['formatted_tax_group_amount']"/>
+                                                        </td>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <td class="text-right"><span class="text-nowrap" t-esc="amount_by_group['tax_group_name']"/> : </td>
+                                                        <td class="text-right">
+                                                            <span class="text-nowrap" t-esc="amount_by_group['formatted_tax_group_amount']" />
+                                                        </td>
+                                                    </t>
+                                                </tr>
+                                            </t>
                                         </t>
+                                        <tr>
+                                            <td class="text-right"><strong>TTC : </strong></td>
+                                            <td class="text-right">
+                                                <span t-field="o.amount_residual"/>
+                                            </td>
+                                        </tr>
                                     </t>
-
-
-
-
-                                    <tr>
-                                        <td class="text-right"><strong>TTC : </strong></td>
-                                        <td class="text-right">
-                                            <span t-field="o.amount_residual"/>
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </t>
