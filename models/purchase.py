@@ -238,7 +238,7 @@ class purchase_order(models.Model):
                 #**************************************************************
 
                 #** Recherche de l'adresse du chantier ************************
-                affaire=[]
+                chantier=[]
                 if test:
                     lig=0
                     for line in lines:
@@ -246,36 +246,71 @@ class purchase_order(models.Model):
                         if x:
                             lig=1
                         if lig>1 and lig<=6:
-                            #print(line)
                             v = line[0:160].strip()
-                            affaire.append(v)
+                            chantier.append(v)
                         if lig>=6:
                             break
                         if lig:
                             lig+=1
-                if affaire:
-                    dict["Chantier"] = affaire = ' '.join(affaire)
+                if chantier:
+                    dict["Chantier"] = ' '.join(chantier)
+                #**************************************************************
+
+                #** Code postal du chantier ***********************************
+                chantier_zip=False
+                if chantier:
+                    adresse = dict["Chantier"]
+                    x = re.findall("[0-9]{5}", adresse)
+                    if x:
+                        chantier_zip = x[0]
+                #**************************************************************
+
+                #** N°BDC (Code Affaire) ***************************************
+                affaire=False
+                if test:
+                    for line in lines:
+                        x = re.findall("N°BDC", line) 
+                        if x:
+                            v = line.strip()[0:30].strip()
+                            v = v.split(' : ')
+                            if len(v)==2:
+                                bdc = v[1].strip()
+                                x = re.findall("[0-9]{2}\.[0-9]{4}", bdc)
+                                if x:
+                                    bdc=x[0]
+
+                                    affaires = self.env['is.affaire'].search([('name','=',bdc)])
+                                    if affaires:
+                                        affaire=affaires[0]
+                                dict["N°BDC"] = bdc
+                            break
                 #**************************************************************
 
                 #** Recherche de l'affaire ************************************
-                if test and affaire:
+                if test and not affaire:
                     chantier = dict["Chantier"]
-                    affaires = self.env['is.affaire'].search([],order="adresse_chantier")
+
+                    filtre=[]
+                    if chantier_zip:
+                        filtre=[('zip','=',chantier_zip)]
+
+                    affaires = self.env['is.affaire'].search(filtre,order="adresse_chantier")
                     affaire_dict={}
                     for affaire in affaires:
                         adresse = affaire.adresse_chantier.replace('\n',' ').strip()
-                        #adresse = "%s %s"%(affaire.zip,affaire.city)
                         if adresse!='':
                             ratio = fuzz.ratio(chantier, adresse)
                             affaire_dict[ratio] = (affaire, affaire.name)
-                            #print(ratio,adresse)
                     key_sorted = sorted(affaire_dict, reverse=True)
 
                     for key in key_sorted:
                         affaire = affaire_dict[key][0]
-                        obj.is_affaire_id = affaire.id
-                        #print(key,affaire.adresse_chantier.replace('\n',' ').strip())
                         break
+                #**************************************************************
+
+                #** Affaire ***************************************************
+                if affaire:
+                    obj.is_affaire_id = affaire.id
                 #**************************************************************
 
                 #** Recherche Acheteur ****************************************
@@ -290,19 +325,7 @@ class purchase_order(models.Model):
                             break
                 #**************************************************************
 
-                #** N°BDC *****************************************************
-                if test:
-                    for line in lines:
-                        x = re.findall("N°BDC", line) 
-                        if x:
-                            v = line.strip()[0:30].strip()
-                            v = v.split(' : ')
-                            if len(v)==2:
-                                dict["N°BDC"] = v[1].strip()
-                            break
-                #**************************************************************
-
-
+ 
                 #** Lignes avec des Quantités ou des montants *****************
                 if test:
                     debut=fin=False
@@ -542,7 +565,6 @@ class purchase_order(models.Model):
     #                                     description = line[0:50].strip()
     #                                     if len(description)==0:
     #                                         description = nacelle
-    #                                     #print("'%s' => '%s'"%(description, v), len(description))
     #                                     #montants.append("%s : %s (%s)"%(description,l.strip(),v))
     #                                     montants.append([description,l.strip(),v])
     #                        #**************************************************
