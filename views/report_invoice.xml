@@ -221,6 +221,9 @@
                     <div class="clearfix">
                         <div id="total" class="row">
                             <div class="col-6">
+                                <p t-if="o.fiscal_position_id">
+                                    <b><span t-field="o.fiscal_position_id.note"/></b>
+                                </p>
                                 <p t-if="o.invoice_date_due">
                                     <strong>Règlement au <span t-field="o.invoice_date_due"/></strong>
                                 </p>
@@ -279,9 +282,8 @@
                         </div>
                     </div>
 
-             
-
                     <div style="page-break-before:always"/>
+
                     <h3>Conditions générales de vente</h3>
                     <p t-if="res_company.is_clause_de_reserve">
                         <h4>Clause de réserve de propriété et de transfert des risques</h4>
