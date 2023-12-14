@@ -124,7 +124,7 @@ class is_sale_order_section(models.Model):
 class sale_order(models.Model):
     _inherit = "sale.order"
 
-    @api.depends('order_line')
+    @api.depends('order_line','is_section_ids', 'is_section_ids.facturable_pourcent')
     def _compute_facturable(self):
         for obj in self:
             is_a_facturer=0
@@ -135,9 +135,6 @@ class sale_order(models.Model):
             obj.is_a_facturer=is_a_facturer
             obj.is_deja_facture=is_deja_facture
 
-
-
-
     is_import_excel_ids     = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Devis .xlsx à importer')
     is_import_alerte        = fields.Text('Alertes importation')
     is_taches_associees_ids = fields.One2many('purchase.order', 'is_sale_order_id', 'Tâches associées')
@@ -146,26 +143,14 @@ class sale_order(models.Model):
     is_invoice_ids          = fields.One2many('account.move', 'is_order_id', 'Factures', readonly=True) #, domain=[('state','=','posted')])
     is_a_facturer           = fields.Float("A Facturer"      , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     is_deja_facture         = fields.Float("Déjà Facturé"    , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    #is_reste_a_facturer     = fields.Float("Reste à facturer", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-
-
-
-
-
-    # is_facturable          = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    # is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    # is_a_facturer          = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-
-
-
-
-
-
     is_affichage_pdf        = fields.Selection([
         ('standard'       , 'Standard'),
         ('masquer_montant', 'Masquer le détail des montants'),
         ('total_section'  , 'Afficher uniquement le total des sections'),
     ], 'Affichage PDF', default='standard', required=True)
+
+    is_date_facture   = fields.Date("Date de la facture à générer")
+    is_numero_facture = fields.Char("Numéro de la facture à générer")
 
     def import_fichier_xlsx(self):
         for obj in self:
@@ -451,16 +436,18 @@ class sale_order(models.Model):
 
             #** Création entête facture ***************************************
             vals={
-                'invoice_date'       : datetime.date.today(),
+                'name'               : obj.is_numero_facture,
+                'invoice_date'       : obj.is_date_facture or datetime.date.today(),
                 'partner_id'         : obj.partner_id.id,
                 'is_order_id'        : obj.id,
                 'fiscal_position_id' : obj.fiscal_position_id.id,
                 'move_type'          : 'out_invoice',
                 'invoice_line_ids'   : invoice_line_ids,
-                #'is_a_facturer'      : is_a_facturer,
             }
             move=self.env['account.move'].create(vals)
             move.action_post()
+            obj.is_date_facture = False
+            obj.is_numero_facture = False
 
     #         #** Ajout des factures réalisées ***********************************
     #         filtre=[
