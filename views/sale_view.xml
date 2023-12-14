@@ -137,7 +137,9 @@
                                 <field name="section"/>
                                 <field name="montant" sum="Total"/>
                                 <field name="facturable_pourcent"/>
-                                <field name="facturable" sum="Total"/>
+                                <field name="facturable"   sum="Total"/>
+                                <field name="deja_facture" sum="Total"/>
+                                <field name="a_facturer"   sum="Total"/>
                                 <button 
                                     name="option_section_action" 
                                     type="object" icon="fa-refresh" 
@@ -147,9 +149,7 @@
 
                             </tree>
                         </field>
-                    </group>
-
-
+                    </group>        
                     <group string="Factures">
                         <field name="is_a_facturer"/>
                         <field name="is_date_facture"    attrs="{'invisible':[('is_a_facturer','=',0)]}"/>

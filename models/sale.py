@@ -59,7 +59,10 @@ class is_sale_order_section(models.Model):
     line_ids    = fields.One2many('sale.order.line', 'is_section_id', 'Lignes')
     currency_id = fields.Many2one(related='order_id.currency_id')
     montant     = fields.Monetary("Montant HT", currency_field='currency_id', store=False, readonly=True, compute='_compute_montant')
-    facturable  = fields.Float("Facturable", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+
+    facturable   = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    deja_facture = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    a_facturer   = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
 
 
     def _compute_montant(self):
@@ -72,10 +75,16 @@ class is_sale_order_section(models.Model):
 
     def _compute_facturable(self):
         for obj in self:
-            facturable = 0
+            facturable   = 0
+            deja_facture = 0
+            a_facturer   = 0
             for line in obj.line_ids:
                 facturable+=line.is_facturable
-            obj.facturable = facturable
+                deja_facture+=line.is_deja_facture
+                a_facturer+=line.is_a_facturer
+            obj.facturable   = facturable
+            obj.deja_facture = deja_facture
+            obj.a_facturer   = a_facturer
 
 
     def write(self, vals):
