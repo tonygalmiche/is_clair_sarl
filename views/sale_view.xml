@@ -137,6 +137,7 @@
                                 <field name="section"/>
                                 <field name="montant" sum="Total"/>
                                 <field name="facturable_pourcent"/>
+                                <field name="facturable" sum="Total"/>
                                 <button 
                                     name="option_section_action" 
                                     type="object" icon="fa-refresh" 

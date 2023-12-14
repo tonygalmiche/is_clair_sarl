@@ -59,6 +59,8 @@ class is_sale_order_section(models.Model):
     line_ids    = fields.One2many('sale.order.line', 'is_section_id', 'Lignes')
     currency_id = fields.Many2one(related='order_id.currency_id')
     montant     = fields.Monetary("Montant HT", currency_field='currency_id', store=False, readonly=True, compute='_compute_montant')
+    facturable  = fields.Float("Facturable", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+
 
     def _compute_montant(self):
         for obj in self:
@@ -66,6 +68,14 @@ class is_sale_order_section(models.Model):
             for line in obj.line_ids:
                 montant+=line.price_subtotal
             obj.montant = montant
+
+
+    def _compute_facturable(self):
+        for obj in self:
+            facturable = 0
+            for line in obj.line_ids:
+                facturable+=line.is_facturable
+            obj.facturable = facturable
 
 
     def write(self, vals):
