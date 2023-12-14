@@ -143,7 +143,7 @@
 
                     <!-- Affichage détaillé de la facture -->
                     <t t-if="o.is_order_id.is_affichage_pdf!='total_section'">
-                        <table class="table table-sm o_main_table" name="invoice_line_table">
+                        <table class="table table-sm o_main_table" name="invoice_line_table" style="border:1px solid black">
                             <thead>
                                 <tr>
                                     <th name="th_description" class="text-center"> <span>Désignation</span></th>
@@ -211,6 +211,10 @@
                                         </t>
                                     </t>
                                 </t>
+
+                                <tr style="height:1px"><td colspan="99"></td></tr>
+
+
                             </tbody>
                         </table>
                     </t>
