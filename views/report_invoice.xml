@@ -35,7 +35,7 @@
                                         <t t-if="l.option!=True">
                                             <t t-set="total" t-value="total + l.montant"/>
                                             <tr>
-                                                <td class="text-left"><span t-field="l.section"/></td>
+                                                <td style="width:80%" class="text-left"><span t-field="l.section"/></td>
                                                 <td class="text-right"><span t-if="l.montant" t-field="l.montant"/></td>
                                             </tr>
                                         </t>
@@ -66,7 +66,7 @@
                                                 </t>
                                             </t>
                                             <tr>
-                                                <td class="text-left">
+                                                <td style="width:80%" class="text-left">
                                                     <span t-field="l.section"/> (<span t-field="l.facturable_pourcent"/>%)
                                                 </td>
                                                 <td class="text-right"><span  t-if="total_section" t-esc="total_section" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
@@ -75,7 +75,6 @@
                                     </t>
                                     <tr>
                                         <td class="text-right"><b>Total HT : </b></td>
-                                        <!-- <td class="text-right"><span t-field="o.amount_untaxed"/></td> -->
                                         <td class="text-right"><span t-field="o.is_facture"/></td>
                                     </tr>
 
@@ -90,7 +89,7 @@
                                             </tr>
                                         </t>
                                     </t>
-                                    <tr>
+                                    <tr t-if="o.amount_untaxed!=o.is_facture">
                                         <td class="text-right"><b>Total HT : </b></td>
                                         <td class="text-right"><span t-field="o.amount_untaxed"/></td>
                                     </tr>
