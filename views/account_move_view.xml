@@ -125,6 +125,9 @@
                 <field name="is_export_compta_id" optional="show"/>
                 <field name="is_courrier_id"      optional="show"/>
             </field>
+            <!-- <field name="state" position="after">
+                <field name="active" optional="hide"/>
+            </field> -->
         </field>
     </record>
     <record id="is_view_in_invoice_tree" model="ir.ui.view">
