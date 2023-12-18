@@ -394,7 +394,7 @@ class sale_order(models.Model):
                 vals={
                     'sequence'  : sequence,
                     'product_id': product.id,
-                    'name'      : "%s (Facture %s)"%(invoice.is_situation,invoice.name),
+                    'name'      : "Situation %s (Facture %s)"%(invoice.is_situation,invoice.name),
                     'quantity'  : -1*sens,
                     'price_unit': invoice.is_a_facturer,
                     'tax_ids'   : tax_ids,
