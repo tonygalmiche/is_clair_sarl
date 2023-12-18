@@ -321,6 +321,13 @@ class sale_order(models.Model):
             if obj.is_a_facturer==0:
                 raise ValidationError("Il n'y a rien à facturer")
 
+            move_type = 'out_invoice'
+            sens = 1
+            if obj.is_a_facturer<0:
+                move_type = 'out_refund'
+                sens=-1
+
+
             #** Création des lignes *******************************************
             total_ht=0
             invoice_line_ids=[]
@@ -349,8 +356,8 @@ class sale_order(models.Model):
                         'sequence'  : line.sequence,
                         'product_id': line.product_id.id,
                         'name'      : line.name,
-                        'quantity'  : quantity,
-                        'is_facturable_pourcent': line.is_facturable_pourcent,
+                        'quantity'  : sens*quantity,
+                        'is_facturable_pourcent': sens*line.is_facturable_pourcent,
                         'price_unit'            : line.price_unit,
                         'is_sale_line_id'       : line.id,
                         'tax_ids'               : tax_ids,
@@ -388,7 +395,7 @@ class sale_order(models.Model):
                     'sequence'  : sequence,
                     'product_id': product.id,
                     'name'      : "%s (Facture %s)"%(invoice.is_situation,invoice.name),
-                    'quantity'  : -1,
+                    'quantity'  : -1*sens,
                     'price_unit': invoice.is_a_facturer,
                     'tax_ids'   : tax_ids,
                 }
@@ -413,7 +420,7 @@ class sale_order(models.Model):
                     'sequence'  : sequence,
                     'product_id': product.id,
                     'name'      : name,
-                    'quantity'  : -1*compte_prorata/100,
+                    'quantity'  : -sens*compte_prorata/100,
                     'price_unit': is_a_facturer,
                     'tax_ids'   : tax_ids,
                 }
@@ -437,20 +444,23 @@ class sale_order(models.Model):
                     'sequence'  : sequence,
                     'product_id': product.id,
                     'name'      : name,
-                    'quantity'  : -1*retenue_garantie/100,
+                    'quantity'  : -sens*retenue_garantie/100,
                     'price_unit': is_a_facturer,
                     'tax_ids'   : tax_ids,
                 }
                 invoice_line_ids.append(vals)
 
             #** Création entête facture ***************************************
+                
+
+
             vals={
                 'name'               : obj.is_numero_facture,
                 'invoice_date'       : obj.is_date_facture or datetime.date.today(),
                 'partner_id'         : obj.partner_id.id,
                 'is_order_id'        : obj.id,
                 'fiscal_position_id' : obj.fiscal_position_id.id,
-                'move_type'          : 'out_invoice',
+                'move_type'          : move_type,
                 'invoice_line_ids'   : invoice_line_ids,
             }
             move=self.env['account.move'].create(vals)
