@@ -328,6 +328,8 @@ class purchase_order(models.Model):
  
                 #** Lignes avec des Quantités ou des montants *****************
                 if test:
+
+
                     debut=fin=False
                     debut_libelle = fin_libelle = False
                     libelles = []
@@ -381,7 +383,6 @@ class purchase_order(models.Model):
                                 list.pop(0) # Supprime le premier element (la quantité)
                                 l = ' '.join(list)
 
-
                             #** Autres libellés *******************************
                             x = re.findall("Total période", line)
                             if montant and x:
@@ -394,7 +395,10 @@ class purchase_order(models.Model):
                             if montant and x:
                                 l=x[0].strip()
                                 qte = qte or 1
-
+                            x = re.findall("Forfait transport Retour", line)
+                            if montant and x:
+                                l=x[0].strip()
+                                qte = qte or 1
                             if l:
                                 l=l.strip()
                                 if l!='' and l!='Total période':
@@ -442,43 +446,7 @@ class purchase_order(models.Model):
                     for line in order_lines:
                         libelle = line[1]
                         sequence+=10
-                        # filtre=[
-                        #     ("name"  ,"=", 'divers'),  
-                        # ]
-                        # if re.search('nacelle', libelle, re.IGNORECASE):
-                        #     filtre=[
-                        #         ("name"  ,"=", 'Nacelle'), 
-                        #     ]
-                        # if re.search('chariot telesc', libelle, re.IGNORECASE):
-                        #     filtre=[
-                        #         ("name"  ,"=", 'chariot télescopique'), 
-                        #     ]
-                        # if re.search('benne', libelle, re.IGNORECASE):
-                        #     filtre=[
-                        #         ("name"  ,"=", 'Location Benne'), 
-                        #     ]
-                        # if re.search('transport', libelle, re.IGNORECASE):
-                        #     filtre=[
-                        #         ("default_code"  ,"=", 'TCHANTIER'),  
-                        #     ]
-                        # if re.search('Contribution verte', libelle, re.IGNORECASE):
-                        #     filtre=[
-                        #         ("name"  ,"=", 'Contribution verte'),  
-                        #     ]
-                        # products = self.env['product.product'].search(filtre)
-                        # if len(products)==0:
-                        #     filtre=[
-                        #         ("name"  ,"=", 'divers'),  
-                        #     ]
-                        #     products = self.env['product.product'].search(filtre)
-                        # product = False
-                        # for p in products:
-                        #     product = p
-                        #     break 
-
                         product = obj.get_loxam_product(libelle)
-
-
                         if product:
                             vals={
                                 "order_id"       : obj.id,
@@ -496,13 +464,15 @@ class purchase_order(models.Model):
     def get_loxam_product(self, libelle):
         for obj in self:
             dict={
+                'Gaz'	                            : 'GAZ',
                 'CHARIOT TELESC'                    : 'CHARIOT',
                 'PLATEFORME'                        : 'PLATEFORME',
                 'NACELLE'                           : 'NACELLE',
                 'BENNE DE REPRISE POUR CHARIOT'     : 'GODET',
                 'Constu modulaire R/R'              :  'BUNGALOW',
-                'Forfait transport Aller'           : 'TCHANTIER',
-                'Forfait transport Retour'          : 'TCHANTIER',
+                'Forfait transport'                 : 'TCHANTIER',
+                #'Forfait transport Aller'           : 'TCHANTIER',
+                #'Forfait transport Retour'          : 'TCHANTIER',
                 'MAJORATION TRANSPORT ALLER ZONE A' : 'TCHANTIER',
                 'MAJORATION TRANSPORT RETOUR ZONE A': 'TCHANTIER',
                 'Kilometres supplémentaires'        : 'TCHANTIER',
@@ -511,8 +481,9 @@ class purchase_order(models.Model):
                 'Prestation forfait recharge elec'  : 'RECHAELEC',
                 'Garantie dommages'                 : 'ASSURANCE',
                 'Remise'                            : 'REMISE',
-                'Gaz'	                            : 'GAZ',
             }
+
+
             product = False
             for key in dict:
                 if re.search(key, libelle, re.IGNORECASE):
