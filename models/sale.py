@@ -396,7 +396,8 @@ class sale_order(models.Model):
                     'product_id': product.id,
                     'name'      : "Situation %s (Facture %s)"%(invoice.is_situation,invoice.name),
                     'quantity'  : -1*sens,
-                    'price_unit': invoice.is_a_facturer,
+                    #'price_unit': invoice.is_a_facturer,
+                    'price_unit': invoice.amount_untaxed,
                     'tax_ids'   : tax_ids,
                 }
                 total_ht-=invoice.amount_untaxed_signed

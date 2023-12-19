@@ -9,7 +9,7 @@
 
                     <!-- Entête de la facture -->
                     <h2><span>Affaire n°</span><span t-field="o.is_affaire_id.name"/><span> : </span><span t-field="o.is_affaire_id.nom"/></h2>
-                    <h2><span>Votre commande : </span><span t-field="o.is_order_id.client_order_ref"/></h2>
+                    <h2 t-if="o.is_order_id.client_order_ref"><span>Votre commande : </span><span t-field="o.is_order_id.client_order_ref"/></h2>
                     <h2>
                         <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">FACTURE N°</span>
                         <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Facture brouillon</span>
