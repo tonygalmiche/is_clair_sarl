@@ -160,6 +160,8 @@ class sale_order(models.Model):
 
     is_date_facture   = fields.Date("Date de la facture à générer")
     is_numero_facture = fields.Char("Numéro de la facture à générer")
+    is_situation      = fields.Char("Situation facture à générer")
+
 
     def import_fichier_xlsx(self):
         for obj in self:
@@ -454,6 +456,7 @@ class sale_order(models.Model):
             #** Création entête facture ***************************************
             vals={
                 'name'               : obj.is_numero_facture,
+                'is_situation'       : obj.is_situation,
                 'invoice_date'       : obj.is_date_facture or datetime.date.today(),
                 'partner_id'         : obj.partner_id.id,
                 'is_order_id'        : obj.id,
@@ -463,6 +466,6 @@ class sale_order(models.Model):
             }
             move=self.env['account.move'].create(vals)
             move.action_post()
-            obj.is_date_facture = False
-            obj.is_numero_facture = False
+            #obj.is_date_facture = False
+            #obj.is_numero_facture = False
 
