@@ -328,8 +328,6 @@ class purchase_order(models.Model):
  
                 #** Lignes avec des Quantités ou des montants *****************
                 if test:
-
-
                     debut=fin=False
                     debut_libelle = fin_libelle = False
                     libelles = []
@@ -399,10 +397,21 @@ class purchase_order(models.Model):
                             if montant and x:
                                 l=x[0].strip()
                                 qte = qte or 1
+
+                            #** Elimination des intitulés indésirables ********
+                            indesirable=False
                             if l:
                                 l=l.strip()
-                                if l!='' and l!='Total période':
-                                    libelles.append(l.strip())
+                                if l=='' or l=='Total période':
+                                    indesirable=True
+                                x = re.findall("Ventes Prix Unitaire", l)
+                                if x:
+                                    indesirable=True
+                                x = re.findall("Étude BVA - Viséo CI", l)
+                                if x:
+                                    indesirable=True
+                            if l and not indesirable:
+                                libelles.append(l.strip())
 
                             #** Test si nouvelle ligne ************************
                             new = False
