@@ -329,7 +329,7 @@ class sale_order(models.Model):
 
 
             #** Création des lignes *******************************************
-            total_ht=0
+            total_cumul_ht=0
             invoice_line_ids=[]
             sequence=0
             is_a_facturer = 0
@@ -363,7 +363,7 @@ class sale_order(models.Model):
                         'tax_ids'               : tax_ids,
                         "is_a_facturer"         : line.is_a_facturer,
                     }
-                    total_ht+=quantity*line.price_unit
+                    total_cumul_ht+=sens*quantity*line.price_unit
                     is_a_facturer+=line.is_a_facturer
                 invoice_line_ids.append(vals)
                 sequence=line.sequence
@@ -400,7 +400,6 @@ class sale_order(models.Model):
                     'price_unit': invoice.amount_untaxed,
                     'tax_ids'   : tax_ids,
                 }
-                total_ht-=invoice.amount_untaxed_signed
                 invoice_line_ids.append(vals)
 
             #** Ajout Compte Prorata ******************************************
@@ -422,7 +421,8 @@ class sale_order(models.Model):
                     'product_id': product.id,
                     'name'      : name,
                     'quantity'  : -sens*compte_prorata/100,
-                    'price_unit': is_a_facturer,
+                    #'price_unit': is_a_facturer,
+                    'price_unit': round(total_cumul_ht,2), # Le prorata est calculé sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
                     'tax_ids'   : tax_ids,
                 }
                 invoice_line_ids.append(vals)
@@ -446,15 +446,12 @@ class sale_order(models.Model):
                     'product_id': product.id,
                     'name'      : name,
                     'quantity'  : -sens*retenue_garantie/100,
-                    'price_unit': is_a_facturer,
+                    'price_unit': round(total_cumul_ht,2),
                     'tax_ids'   : tax_ids,
                 }
                 invoice_line_ids.append(vals)
 
             #** Création entête facture ***************************************
-                
-
-
             vals={
                 'name'               : obj.is_numero_facture,
                 'invoice_date'       : obj.is_date_facture or datetime.date.today(),
@@ -469,42 +466,3 @@ class sale_order(models.Model):
             obj.is_date_facture = False
             obj.is_numero_facture = False
 
-    #         #** Ajout des factures réalisées ***********************************
-    #         filtre=[
-    #             ('is_contrat_id','=',obj.id),
-    #             ('date_invoice','<=',datetime.date.today()),
-    #             ('state','not in',['cancel']),
-    #             ('id','!=',invoice_id),
-    #         ]
-    #         factures = self.env['account.invoice'].search(filtre,order='date_invoice')
-    #         for facture in  factures:
-    #             vals={
-    #                 'invoice_id'   : invoice_id,
-    #                 'product_id'   : 2,
-    #                 'name'         : facture.number,
-    #                 'quantity'     : 1,
-    #                 #'price_unit'   : -facture.amount_untaxed,
-    #                 'price_unit'   : 0,
-    #                 'account_id'   : 622, #701100
-    #                 'is_invoice_id': facture.id,
-    #             }
-    #             invoice_line=self.env['account.invoice.line'].create(vals)
-    #             line_res = invoice_line.uptate_onchange_product_id()
-    #             vals={
-    #                 'name'      : facture.number,
-    #                 #'price_unit': -facture.amount_untaxed,
-    #                 'price_unit'   : -facture.is_montant_hors_revision,
-    #             }
-    #             invoice_line.write(vals)
-    #         #*******************************************************************
-
-    #         #** Recalcul de la TVA et validation de la facture *****************
-    #         res_validate = invoice.update_tva_account_action()
-    #         res_validate = invoice.compute_taxes()
-    #         try:
-    #             res_validate = invoice.action_invoice_open()
-    #         except:
-    #             continue
-    #         #*******************************************************************
-
-    #         obj.compute_restant_ht()
