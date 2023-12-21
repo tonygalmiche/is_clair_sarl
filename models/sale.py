@@ -476,11 +476,12 @@ class sale_order(models.Model):
                 'invoice_date'       : obj.is_date_facture or datetime.date.today(),
                 'partner_id'         : obj.partner_id.id,
                 'is_order_id'        : obj.id,
-                'fiscal_position_id' : obj.fiscal_position_id.id,
+                #'fiscal_position_id' : obj.fiscal_position_id.id,
                 'move_type'          : move_type,
                 'invoice_line_ids'   : invoice_line_ids,
             }
             move=self.env['account.move'].create(vals)
+            move._onchange_partner_id()
             move.action_post()
             #obj.is_date_facture = False
             #obj.is_numero_facture = False
