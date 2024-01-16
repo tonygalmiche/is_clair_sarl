@@ -17,17 +17,20 @@ class sale_order_line(models.Model):
     def _compute_facturable(self):
         cr,uid,context,su = self.env.args
         for obj in self:
-
             is_deja_facture=0
             if not isinstance(obj.id, models.NewId):
                 SQL="""
-                    SELECT sum(aml.is_a_facturer)
+                    SELECT am.move_type,sum(aml.is_a_facturer)
                     FROM account_move_line aml join account_move am on aml.move_id=am.id
                     WHERE aml.is_sale_line_id=%s and am.state!='cancel'
+                    GROUP BY am.move_type
                 """
                 cr.execute(SQL,[obj.id])
                 for row in cr.fetchall():
-                    is_deja_facture = row[0] or 0
+                    sens=1
+                    if row[0]=='out_refund':
+                        sens=-1
+                    is_deja_facture += sens*(row[1] or 0)
             is_facturable = obj.price_subtotal*obj.is_facturable_pourcent/100
             is_a_facturer = is_facturable - is_deja_facture
             obj.is_facturable   = is_facturable
@@ -415,7 +418,7 @@ class sale_order(models.Model):
                     'name'      : "Situation %s (Facture %s)"%(invoice.is_situation,invoice.name),
                     'quantity'  : -1*sens,
                     #'price_unit': invoice.is_a_facturer,
-                    'price_unit': invoice.amount_untaxed,
+                    'price_unit': invoice.amount_untaxed_signed,
                     'tax_ids'   : tax_ids,
                 }
                 invoice_line_ids.append(vals)
