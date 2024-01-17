@@ -76,3 +76,5 @@ access_is_import_salaire,access_is_import_salaire,model_is_import_salaire,sales_
 access_is_affaire_salaire,access_is_affaire_salaire,model_is_affaire_salaire,base.group_user,1,1,1,1
 
 access_is_purchase_order_line,access_is_purchase_order_line,model_is_purchase_order_line,base.group_user,1,0,0,0
+
+access_is_affaire_remise,access_is_affaire_remise,model_is_affaire_remise,base.group_user,1,1,1,1

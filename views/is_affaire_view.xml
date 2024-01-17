@@ -295,9 +295,19 @@
                     <notebook>
                         <page string="Facturation">
                             <group>
-                                <field name="compte_prorata"/>
-                                <field name="retenue_garantie"/>    
+                                <field name="compte_prorata"   readonly="1"/>
+                                <field name="retenue_garantie" readonly="1"/>
                             </group>
+
+                            <field name="remise_ids" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="remise"/>
+                                </tree>
+                            </field>
+
+
+
                         </page>
                         <page string="Budget">
                             <field name="budget_famille_ids" nolabel="1">

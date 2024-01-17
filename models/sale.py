@@ -423,54 +423,77 @@ class sale_order(models.Model):
                 }
                 invoice_line_ids.append(vals)
 
-            #** Ajout Compte Prorata ******************************************
-            if obj.is_affaire_id.compte_prorata>0:
-                compte_prorata = obj.is_affaire_id.compte_prorata
-                products = self.env['product.product'].search([("default_code","=",'COMPTE_PRORATA')])
-                if not len(products):
-                    raise ValidationError("Article 'COMPTE_PRORATA' non trouvé")
-                product=products[0]
-                taxes = product.taxes_id
-                taxes = obj.fiscal_position_id.map_tax(taxes)
-                tax_ids=[]
-                for tax in taxes:
-                    tax_ids.append(tax.id)
-                sequence+=10
-                name="Compte prorata %s%%"%compte_prorata
-                vals={
-                    'sequence'  : sequence,
-                    'product_id': product.id,
-                    'name'      : name,
-                    'quantity'  : -sens*compte_prorata/100,
-                    #'price_unit': is_a_facturer,
-                    'price_unit': round(total_cumul_ht,2), # Le prorata est calculé sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
-                    'tax_ids'   : tax_ids,
-                }
-                invoice_line_ids.append(vals)
 
-            #** Ajout Retenue de garantie *************************************
-            if obj.is_affaire_id.retenue_garantie>0:
-                retenue_garantie = obj.is_affaire_id.retenue_garantie
-                products = self.env['product.product'].search([("default_code","=",'RETENUE_GARANTIE')])
-                if not len(products):
-                    raise ValidationError("Article 'RETENUE_GARANTIE' non trouvé")
-                product=products[0]
-                taxes = product.taxes_id
-                taxes = obj.fiscal_position_id.map_tax(taxes)
-                tax_ids=[]
-                for tax in taxes:
-                    tax_ids.append(tax.id)
-                sequence+=10
-                name="Retenue de garantie %s%%"%retenue_garantie
-                vals={
-                    'sequence'  : sequence,
-                    'product_id': product.id,
-                    'name'      : name,
-                    'quantity'  : -sens*retenue_garantie/100,
-                    'price_unit': round(total_cumul_ht,2),
-                    'tax_ids'   : tax_ids,
-                }
-                invoice_line_ids.append(vals)
+            #** Ajout des remises *********************************************
+            for line in obj.is_affaire_id.remise_ids:
+                if line.remise>0:
+                    product=line.product_id
+                    taxes = product.taxes_id
+                    taxes = obj.fiscal_position_id.map_tax(taxes)
+                    tax_ids=[]
+                    for tax in taxes:
+                        tax_ids.append(tax.id)
+                    sequence+=10
+                    name="%s %s%%"%(product.name,line.remise)
+                    vals={
+                        'sequence'  : sequence,
+                        'product_id': product.id,
+                        'name'      : name,
+                        'quantity'  : -sens*line.remise/100,
+                        'price_unit': round(total_cumul_ht,2), # La remise est calculée sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
+                        'tax_ids'   : tax_ids,
+                    }
+                    invoice_line_ids.append(vals)
+            #******************************************************************
+
+
+            # #** Ajout Compte Prorata ******************************************
+            # if obj.is_affaire_id.compte_prorata>0:
+            #     compte_prorata = obj.is_affaire_id.compte_prorata
+            #     products = self.env['product.product'].search([("default_code","=",'COMPTE_PRORATA')])
+            #     if not len(products):
+            #         raise ValidationError("Article 'COMPTE_PRORATA' non trouvé")
+            #     product=products[0]
+            #     taxes = product.taxes_id
+            #     taxes = obj.fiscal_position_id.map_tax(taxes)
+            #     tax_ids=[]
+            #     for tax in taxes:
+            #         tax_ids.append(tax.id)
+            #     sequence+=10
+            #     name="Compte prorata %s%%"%compte_prorata
+            #     vals={
+            #         'sequence'  : sequence,
+            #         'product_id': product.id,
+            #         'name'      : name,
+            #         'quantity'  : -sens*compte_prorata/100,
+            #         'price_unit': round(total_cumul_ht,2), # Le prorata est calculé sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
+            #         'tax_ids'   : tax_ids,
+            #     }
+            #     invoice_line_ids.append(vals)
+
+            # #** Ajout Retenue de garantie *************************************
+            # if obj.is_affaire_id.retenue_garantie>0:
+            #     retenue_garantie = obj.is_affaire_id.retenue_garantie
+            #     products = self.env['product.product'].search([("default_code","=",'RETENUE_GARANTIE')])
+            #     if not len(products):
+            #         raise ValidationError("Article 'RETENUE_GARANTIE' non trouvé")
+            #     product=products[0]
+            #     taxes = product.taxes_id
+            #     taxes = obj.fiscal_position_id.map_tax(taxes)
+            #     tax_ids=[]
+            #     for tax in taxes:
+            #         tax_ids.append(tax.id)
+            #     sequence+=10
+            #     name="Retenue de garantie %s%%"%retenue_garantie
+            #     vals={
+            #         'sequence'  : sequence,
+            #         'product_id': product.id,
+            #         'name'      : name,
+            #         'quantity'  : -sens*retenue_garantie/100,
+            #         'price_unit': round(total_cumul_ht,2),
+            #         'tax_ids'   : tax_ids,
+            #     }
+            #     invoice_line_ids.append(vals)
 
             #** Création entête facture ***************************************
             vals={

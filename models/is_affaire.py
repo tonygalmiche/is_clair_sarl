@@ -98,6 +98,16 @@ class IsAffaireSalaire(models.Model):
             }
 
 
+
+class IsAffaireRemise(models.Model):
+    _name='is.affaire.remise'
+    _description = "IsAffaireRemise"
+
+    affaire_id = fields.Many2one('is.affaire', 'Affaire', required=True, ondelete='cascade')
+    product_id = fields.Many2one('product.product', 'Remise facturation', required=True, domain=[('is_famille_id.name','=','Facturation')])
+    remise     = fields.Float("Remise (%)", digits=(14,2), required=True)
+
+
 class IsAffaire(models.Model):
     _name='is.affaire'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
@@ -129,6 +139,12 @@ class IsAffaire(models.Model):
     retenue_garantie    = fields.Float("Retenue de garantie (%)", digits=(14,2))
     salaire_ids         = fields.One2many('is.affaire.salaire', 'affaire_id', 'Salaires')
     montant_salaire     = fields.Float("Montant salaire", digits=(14,2), store=True, readonly=True, compute='_compute_montant_salaire')
+
+    remise_ids         = fields.One2many('is.affaire.remise', 'affaire_id', 'Remises')
+
+
+
+
 
 
     @api.depends('street','street2','city','zip')
