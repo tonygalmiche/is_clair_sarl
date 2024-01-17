@@ -288,21 +288,19 @@ class purchase_order(models.Model):
 
                 #** Recherche de l'affaire ************************************
                 if test and not affaire:
-                    chantier = dict["Chantier"]
-
+                    chantier = dict["Chantier"].upper()
                     filtre=[]
                     if chantier_zip:
                         filtre=[('zip','=',chantier_zip)]
-
                     affaires = self.env['is.affaire'].search(filtre,order="adresse_chantier")
                     affaire_dict={}
-                    for affaire in affaires:
-                        adresse = affaire.adresse_chantier.replace('\n',' ').strip()
+                    for line in affaires:
+                        adresse = line.adresse_chantier.replace('\n',' ').strip().upper()
                         if adresse!='':
                             ratio = fuzz.ratio(chantier, adresse)
-                            affaire_dict[ratio] = (affaire, affaire.name)
+                            affaire_dict[ratio] = (line, line.name)
+                            #print(ratio,chantier, adresse)
                     key_sorted = sorted(affaire_dict, reverse=True)
-
                     for key in key_sorted:
                         affaire = affaire_dict[key][0]
                         break
