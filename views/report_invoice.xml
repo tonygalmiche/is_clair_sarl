@@ -75,7 +75,7 @@
                                     </t>
                                     <tr>
                                         <td class="text-right"><b>Total HT : </b></td>
-                                        <td class="text-right"><span t-field="o.is_facture"/></td>
+                                        <td class="text-right"><b><span t-field="o.is_facture"/></b></td>
                                     </tr>
 
                                     <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
