@@ -508,6 +508,7 @@ class sale_order(models.Model):
             }
             move=self.env['account.move'].create(vals)
             move._onchange_partner_id()
+            move._onchange_invoice_date()
             move.action_post()
             #obj.is_date_facture = False
             #obj.is_numero_facture = False
