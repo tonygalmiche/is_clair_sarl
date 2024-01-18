@@ -213,8 +213,9 @@
                 <field name="move_id"/>
                 <field name="partner_id"/>
                 <field name="product_id"/>
+                <field name="is_famille_id" optional="hide"/>
                 <field name="name"/>
-                <field name="is_affaire_id" class="white_space_normal"/>
+                <field name="is_affaire_id" class="white_space_normal" optional="hide"/>
                 <field name="account_id"/>
                 <field name="quantity" sum="Total"/>
                 <field name="product_uom_category_id" invisible="1"/>

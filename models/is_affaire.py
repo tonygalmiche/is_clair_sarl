@@ -69,6 +69,81 @@ class IsAffaireAnalyse(models.Model):
     ecart_budget_fac = fields.Float("Ecart Budget/Fac", digits=(14,2))
 
 
+    def liste_achat_famille_commande_action(self):
+        for obj in self:
+            return {
+                "name": "Lignes des commandes ",
+                "view_mode": "tree,form",
+                "res_model": "purchase.order.line",
+                "domain": [
+                    ("order_id.is_affaire_id","=",obj.affaire_id.id),
+                    ("product_id.is_famille_id","=",obj.famille_id.id),
+                    ("order_id.state","=","purchase"),
+                ],
+                "type": "ir.actions.act_window",
+            }
+
+
+    def liste_achat_fournisseur_commande_action(self):
+        for obj in self:
+            return {
+                "name": "Lignes des commandes ",
+                "view_mode": "tree,form",
+                "res_model": "purchase.order.line",
+                "domain": [
+                    ("order_id.is_affaire_id","=",obj.affaire_id.id),
+                    ("order_id.partner_id","=",obj.fournisseur_id.id),
+                    ("order_id.state","=","purchase"),
+                ],
+                "type": "ir.actions.act_window",
+            }
+
+
+    def liste_achat_famille_facture_action(self):
+        for obj in self:
+            tree_id = self.env.ref('is_clair_sarl.is_account_move_line_tree_view').id
+            form_id = self.env.ref('is_clair_sarl.is_account_move_line_form_view').id
+            return {
+                "name": "Lignes des factures ",
+                "view_mode": "tree,form",
+                "res_model": "account.move.line",
+                "domain": [
+                    ("is_affaire_id","=",obj.affaire_id.id),
+                    ("is_famille_id","=",obj.famille_id.id),
+                    ("exclude_from_invoice_tab","=",False),
+                    ("journal_id","=",2),
+                    ("move_id.state","=","posted"),
+                ],
+                "type": "ir.actions.act_window",
+                "views"    : [[tree_id, "tree"],[form_id, "form"]],
+            }
+
+
+    def liste_achat_fournisseur_facture_action(self):
+        for obj in self:
+            tree_id = self.env.ref('is_clair_sarl.is_account_move_line_tree_view').id
+            form_id = self.env.ref('is_clair_sarl.is_account_move_line_form_view').id
+            return {
+                "name": "Lignes des factures ",
+                "view_mode": "tree,form",
+                "res_model": "account.move.line",
+                "domain": [
+                    ("is_affaire_id","=",obj.affaire_id.id),
+                    ("move_id.partner_id","=",obj.fournisseur_id.id),
+                    ("exclude_from_invoice_tab","=",False),
+                    ("journal_id","=",2),
+                    ("move_id.state","=","posted"),
+                ],
+                "type": "ir.actions.act_window",
+                "views"    : [[tree_id, "tree"],[form_id, "form"]],
+            }
+
+
+
+
+
+
+
 class IsAffaireBudgetFamille(models.Model):
     _name='is.affaire.budget.famille'
     _description = "Budget affaire par famille"

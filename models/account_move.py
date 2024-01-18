@@ -98,8 +98,9 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
-    is_affaire_id   = fields.Many2one('is.affaire', 'Affaire')
-    is_sale_line_id = fields.Many2one('sale.order.line', 'Ligne de commande', index=True)
+    is_affaire_id          = fields.Many2one('is.affaire', 'Affaire')
+    is_sale_line_id        = fields.Many2one('sale.order.line', 'Ligne de commande', index=True)
     is_qt_commande         = fields.Float("Qt Commande"       , digits=(14,2), related='is_sale_line_id.product_uom_qty')
     is_facturable_pourcent = fields.Float("% facturable"      , digits=(14,2))
     is_a_facturer          = fields.Float("A Facturer"        , digits=(14,2), help="Montant à facturer sur cette facture")
+    is_famille_id          = fields.Many2one('is.famille', related='product_id.is_famille_id')

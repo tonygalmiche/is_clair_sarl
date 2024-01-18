@@ -169,7 +169,11 @@
                 <field name="famille_id"     optional="hide"/>
                 <field name="budget"      sum="Total"/>
                 <field name="montant_cde" sum="Total"/>
+                <button name="liste_achat_famille_commande_action"     type="object" icon="fa-list" title="Lignes des commandes" attrs="{'invisible': [('famille_id', '=', False)]}"/>
+                <button name="liste_achat_fournisseur_commande_action" type="object" icon="fa-list" title="Lignes des commandes" attrs="{'invisible': [('fournisseur_id', '=', False)]}"/>
                 <field name="montant_fac" sum="Total"/>
+                <button name="liste_achat_famille_facture_action"      type="object" icon="fa-list" title="Lignes des factures"  attrs="{'invisible': [('famille_id', '=', False)]}"/>
+                <button name="liste_achat_fournisseur_facture_action"  type="object" icon="fa-list" title="Lignes des factures"  attrs="{'invisible': [('fournisseur_id', '=', False)]}"/>
                 <field name="ecart"       sum="Total"/>
                 <field name="ecart_pourcent"/>
                 <field name="ecart_budget_cde" sum="Total"/>
