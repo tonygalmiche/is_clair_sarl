@@ -22,6 +22,7 @@ class IsFamille(models.Model):
     is_lambda               = fields.Boolean("Lambda ʎ (W/m.K)")
     is_lg_mini_forfait      = fields.Boolean("Longueur mini forfait coupe")
     is_forfait_coupe_id     = fields.Boolean("Forfait coupe")
+    is_conditionnement      = fields.Boolean("Conditionnement")
     is_ordre_tri            = fields.Boolean("Ordre de tri")
     is_sous_article_ids     = fields.Boolean("Sous-articles")
     colisage                = fields.Boolean("Accès au colisage dans les commandes")
@@ -66,6 +67,7 @@ class product_template(models.Model):
     is_resistance_thermique = fields.Float("Résistance thermique (R)", digits=(14,2))
     is_lambda               = fields.Float("Lambda ʎ (W/m.K)"        , digits=(14,3))
     is_lg_mini_forfait      = fields.Integer("Longueur mini forfait coupe")
+    is_conditionnement      = fields.Char("Conditionnement")
     is_forfait_coupe_id     = fields.Many2one('product.product', 'Forfait coupe')
     is_ordre_tri            = fields.Integer("Ordre de tri")
     is_sous_article_ids     = fields.One2many('is.sous.article', 'product_tmpl_id', 'Sous-articles')
@@ -80,6 +82,7 @@ class product_template(models.Model):
     is_resistance_thermique_vsb = fields.Boolean("Résistance thermique (R) vsb"   , store=False, readonly=True, compute='_compute_vsb')
     is_lambda_vsb               = fields.Boolean("Lambda ʎ (W/m.K) vsb"           , store=False, readonly=True, compute='_compute_vsb')
     is_lg_mini_forfait_vsb      = fields.Boolean("Longueur mini forfait coupe vsb", store=False, readonly=True, compute='_compute_vsb')
+    is_conditionnement_vsb      = fields.Boolean("Conditionnement vsb"            , store=False, readonly=True, compute='_compute_vsb')
     is_forfait_coupe_id_vsb     = fields.Boolean("Forfait coupe vsb"              , store=False, readonly=True, compute='_compute_vsb')
     is_ordre_tri_vsb            = fields.Boolean("Ordre de tri vsb"               , store=False, readonly=True, compute='_compute_vsb')
     is_sous_article_ids_vsb     = fields.Boolean("Sous-articles vsb"              , store=False, readonly=True, compute='_compute_vsb')
@@ -153,6 +156,11 @@ class product_template(models.Model):
             if obj.is_famille_id.is_lg_mini_forfait:
                 vsb=True
             obj.is_lg_mini_forfait_vsb = vsb
+
+            vsb=False
+            if obj.is_famille_id.is_conditionnement:
+                vsb=True
+            obj.is_conditionnement_vsb = vsb
 
             vsb=False
             if obj.is_famille_id.is_forfait_coupe_id:
