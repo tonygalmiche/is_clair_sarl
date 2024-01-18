@@ -59,6 +59,7 @@ class IsAffaireAnalyse(models.Model):
     affaire_id       = fields.Many2one('is.affaire', 'Affaire', required=True, ondelete='cascade')
     fournisseur_id   = fields.Many2one('res.partner' , 'Fournisseur')
     famille_id       = fields.Many2one('is.famille', 'Famille')
+    intitule         = fields.Char('Intitulé')
     budget           = fields.Float("Budget"          , digits=(14,2))
     montant_cde      = fields.Float("Montant Commandé", digits=(14,2))
     montant_fac      = fields.Float("Montant Facturé" , digits=(14,2))
@@ -212,6 +213,21 @@ class IsAffaire(models.Model):
                 res = self.env['is.affaire.budget.famille'].create(vals)
 
 
+    def ajout_salaire(self):
+        for obj in self:
+            vals={
+                "affaire_id"    : obj.id,
+                "intitule"      : "0-SALAIRES",
+                "montant_cde"   : obj.montant_salaire,
+                "montant_fac"   : obj.montant_salaire,
+                "ecart"         : 0,
+                "ecart_pourcent": 0,
+            }
+            res = self.env['is.affaire.analyse'].sudo().create(vals)
+
+
+
+
     def analyse_par_fournisseur_action(self):
         cr,uid,context,su = self.env.args
         for obj in self:
@@ -224,6 +240,8 @@ class IsAffaire(models.Model):
             """
             cr.execute(SQL,[obj.id])
             for row in cr.fetchall():
+                partner_id = row[0]
+                partner = self.env['res.partner'].browse(partner_id)
                 montant_cde = row[1] or 0
                 SQL="""
                     SELECT sum(aml.price_subtotal)
@@ -245,29 +263,40 @@ class IsAffaire(models.Model):
                     ecart_pourcent = 100*ecart/montant_fac
                 vals={
                     "affaire_id"    : obj.id,
-                    "fournisseur_id": row[0],
+                    "intitule"      : partner.name,
+                    "fournisseur_id": partner_id,
                     "montant_cde"   : montant_cde,
                     "montant_fac"   : montant_fac,
                     "ecart"         : ecart,
                     "ecart_pourcent": ecart_pourcent,
                 }
                 res = self.env['is.affaire.analyse'].sudo().create(vals)
-            return obj.is_affaire_analyse_action()
+            obj.ajout_salaire()
+            return obj.is_affaire_analyse_action("Analyse par fournisseur")
 
 
     def analyse_par_famille_action(self):
         cr,uid,context,su = self.env.args
         for obj in self:
             obj.analyse_ids.sudo().unlink()
-            familles = self.env['is.famille'].search([])
+            lines = self.env['is.famille'].search([])
+            familles=[]
+            for line in lines:
+                familles.append(line)
+            familles.append(None)
             for famille in familles:
+                intitule=""
+                famille_id = None
                 #** Budget ****************************************************
                 budget=0
-                filtre=[('affaire_id', '=', obj.id),('famille_id', '=', famille.id)]
-                lines = self.env['is.affaire.budget.famille'].search(filtre)
-                budget=0
-                for line in lines:
-                    budget=line.budget
+                if famille:
+                    famille_id = famille.id
+                    intitule   = famille.name
+                    filtre=[('affaire_id', '=', obj.id),('famille_id', '=', famille_id)]
+                    lines = self.env['is.affaire.budget.famille'].search(filtre)
+                    budget=0
+                    for line in lines:
+                        budget=line.budget
                 #**************************************************************
 
                 #** Montant Cde ***********************************************
@@ -277,16 +306,21 @@ class IsAffaire(models.Model):
                     FROM purchase_order po join purchase_order_line pol on po.id=pol.order_id
                                         join product_product pp on pol.product_id=pp.id
                                         join product_template pt on pp.product_tmpl_id=pt.id
-                    WHERE po.is_affaire_id=%s and pt.is_famille_id=%s and  po.state='purchase'
-                    GROUP BY pt.is_famille_id
-                """
-                cr.execute(SQL,[obj.id, famille.id])
+                    WHERE po.is_affaire_id=%s and  po.state='purchase'
+                """%obj.id
+                if famille_id:
+                    SQL+=" and pt.is_famille_id=%s "%famille_id
+                else:
+                    SQL+=" and pt.is_famille_id is null " 
+                SQL+="GROUP BY pt.is_famille_id"
+                cr.execute(SQL)
+                #cr.execute(SQL,[obj.id, famille_id])
                 for row in cr.fetchall():
                     montant_cde = row[1] or 0
                 ecart_budget_cde = budget-montant_cde
                 #**************************************************************
 
-                #** Montant Cde ***********************************************
+                #** Montant Fac ***********************************************
                 SQL="""
                     SELECT sum(aml.price_subtotal)
                     FROM account_move_line aml join account_move am on aml.move_id=am.id
@@ -296,10 +330,13 @@ class IsAffaire(models.Model):
                         aml.is_affaire_id=%s and 
                         aml.exclude_from_invoice_tab='f' and 
                         aml.journal_id=2 and 
-                        am.state='posted' and
-                        pt.is_famille_id=%s
-                """
-                cr.execute(SQL,[obj.id, famille.id])
+                        am.state='posted'
+                """%obj.id
+                if famille_id:
+                    SQL+=" and pt.is_famille_id=%s "%famille_id
+                else:
+                    SQL+=" and pt.is_famille_id is null " 
+                cr.execute(SQL)
                 montant_fac=ecart=ecart_pourcent=0
                 for row2 in cr.fetchall():
                     montant_fac = row2[0] or 0
@@ -312,7 +349,8 @@ class IsAffaire(models.Model):
                 if budget!=0 or montant_cde!=0 or montant_fac!=0:
                     vals={
                         "affaire_id": obj.id,
-                        "famille_id": famille.id,
+                        "intitule": intitule,
+                        "famille_id": famille_id,
                         "budget"    : budget,
                         "montant_cde"     : montant_cde,
                         "montant_fac"   : montant_fac,
@@ -322,7 +360,8 @@ class IsAffaire(models.Model):
                         "ecart_budget_fac": ecart_budget_fac,
                     }
                     res = self.env['is.affaire.analyse'].sudo().create(vals)
-            return obj.is_affaire_analyse_action()
+            obj.ajout_salaire()
+            return obj.is_affaire_analyse_action("Analyse par famille")
 
 
     def import_budget_famille_action(self):
@@ -350,10 +389,10 @@ class IsAffaire(models.Model):
 
 
 
-    def is_affaire_analyse_action(self):
+    def is_affaire_analyse_action(self,name):
         for obj in self:
             return {
-                "name": "Analyse par fournisseur %s"%(obj.name),
+                "name": name,
                 "view_mode": "tree,form,pivot,graph",
                 "res_model": "is.affaire.analyse",
                 "res_id"   : obj.id,

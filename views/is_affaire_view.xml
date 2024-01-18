@@ -145,6 +145,7 @@
                     <group>
                         <group>
                             <field name="affaire_id"/>
+                            <field name="intitule"/>
                             <field name="fournisseur_id"/>
                             <field name="famille_id"/>
                             <field name="montant_cde"/>
@@ -163,8 +164,9 @@
         <field name="type">tree</field>
         <field name="arch" type="xml">
             <tree default_order="montant_cde desc">
-                <field name="fournisseur_id"/>
-                <field name="famille_id"/>
+                <field name="intitule"/>
+                <field name="fournisseur_id" optional="hide"/>
+                <field name="famille_id"     optional="hide"/>
                 <field name="budget"      sum="Total"/>
                 <field name="montant_cde" sum="Total"/>
                 <field name="montant_fac" sum="Total"/>
@@ -180,6 +182,7 @@
         <field name="model">is.affaire.analyse</field>
         <field name="arch" type="xml">
             <search>
+                <field name="intitule" />
                 <field name="fournisseur_id" />
                 <field name="famille_id"/>
             </search>
@@ -192,7 +195,7 @@
         <field name="model">is.affaire.analyse</field>
          <field name="arch" type="xml">
              <pivot string="pivot" sample="1">
-                 <field name="fournisseur_id" type="row"/>
+                 <field name="intitule" type="row"/>
                  <field name="montant_cde" type="measure"/>
                  <field name="montant_fac" type="measure"/>
                  <field name="ecart" type="measure"/>
@@ -204,8 +207,8 @@
          <field name="name">is_affaire_analyse_action_graph</field>
         <field name="model">is.affaire.analyse</field>
          <field name="arch" type="xml">
-             <graph string="graph" type="line" sample="1">
-                 <field name="fournisseur_id"/>
+             <graph string="graph" type="bar" order="desc" sample="1">
+                 <field name="intitule"/>
                  <field name="montant_cde" type="measure"/>
                  <field name="montant_fac" type="measure"/>
              </graph>
