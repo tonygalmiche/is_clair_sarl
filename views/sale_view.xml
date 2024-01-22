@@ -69,7 +69,8 @@
                 <field name="price_subtotal" readonly="1"/>
             </xpath>
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/form/group/group/field[@name='analytic_tag_ids']" position="before">
-                <field name="is_section_id" readonly="1"/>
+                <field name="order_id" readonly="1"/>
+                <field name="is_section_id"/>
                 <field name="is_facturable_pourcent"/>
                 <field name="is_facturable"/>
                 <field name="is_deja_facture"/>
@@ -91,13 +92,13 @@
             <xpath expr="//page[@name='order_lines']" position="after">
                 <page string="Import devis xlsx">
                     <group string="Fichier à importer">
-                        <field name="is_import_excel_ids" widget="many2many_binary" nolabel="1" attrs="{'readonly':[('is_invoice_ids','!=',[])]}"/>
+                        <field name="is_import_excel_ids" widget="many2many_binary" nolabel="1" attrs="{'readonly':[('state','not in',['draft','sent'])]}"/>
                     </group>
                     <group>
                         <button 
                             name="import_fichier_xlsx" 
                             string="Importer le devis" type="object" 
-                            attrs="{'invisible':[('is_invoice_ids','!=',[])]}"
+                            attrs="{'invisible':[('state','not in',['draft','sent'])]}"
                         />
                     </group>
                     <group string="Alertes importation" attrs="{'invisible':[('is_import_alerte','=',False)]}" >

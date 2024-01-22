@@ -13,6 +13,16 @@ _logger = logging.getLogger(__name__)
 class sale_order_line(models.Model):
     _inherit = "sale.order.line"
 
+    order_id               = fields.Many2one('sale.order', string='Order Reference', required=False, ondelete='cascade', index=True, copy=False)
+    is_section_id          = fields.Many2one('is.sale.order.section', 'Section', index=True, domain="[('order_id','=',order_id)]")
+    is_facturable_pourcent = fields.Float("% facturable", digits=(14,2), copy=False)
+    is_facturable          = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    is_a_facturer          = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    is_prix_achat          = fields.Float("Prix d'achat", digits=(14,4))
+    is_masquer_ligne       = fields.Boolean("Masquer",default=False,help="Masquer la ligne sur le PDF de la commande")
+
+
     @api.depends('is_facturable_pourcent','price_unit','product_uom_qty')
     def _compute_facturable(self):
         cr,uid,context,su = self.env.args
@@ -38,14 +48,11 @@ class sale_order_line(models.Model):
             obj.is_a_facturer   = is_a_facturer
 
 
-    order_id               = fields.Many2one('sale.order', string='Order Reference', required=False, ondelete='cascade', index=True, copy=False)
-    is_section_id          = fields.Many2one('is.sale.order.section', 'Section', index=True)
-    is_facturable_pourcent = fields.Float("% facturable", digits=(14,2), copy=False)
-    is_facturable          = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    is_a_facturer          = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    is_prix_achat          = fields.Float("Prix d'achat", digits=(14,4))
-    is_masquer_ligne       = fields.Boolean("Masquer",default=False,help="Masquer la ligne sur le PDF de la commande")
+    def unlink(self):
+        for obj in self:
+            if obj.is_deja_facture>0:
+                raise ValidationError("Il n'est pas possible de supprimer une ligne déjà facturée")
+        super(sale_order_line, self).unlink()
 
 
 class is_sale_order_section(models.Model):
@@ -66,6 +73,14 @@ class is_sale_order_section(models.Model):
     facturable   = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     deja_facture = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     a_facturer   = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+
+
+    def unlink(self):
+        for obj in self:
+            if obj.deja_facture>0:
+                raise ValidationError("Il n'est pas possible de supprimer une section contenant des lignes déjà facturées")
+            obj.line_ids.unlink()
+        super(is_sale_order_section, self).unlink()
 
 
     def _compute_montant(self):
@@ -104,6 +119,11 @@ class is_sale_order_section(models.Model):
                     if line.is_section_id==obj:
                         line.sequence = vals["sequence"]*10000+x
                     x+=10
+        if 'section' in vals:
+            for obj in self:
+                for line in obj.line_ids:
+                    if line.display_type=='line_section':
+                        line.name = obj.section
         return res
 
 
@@ -184,8 +204,8 @@ class sale_order(models.Model):
 
     def import_fichier_xlsx(self):
         for obj in self:
-            obj.order_line.unlink()
-            obj.is_section_ids.unlink()
+            #obj.order_line.unlink()
+            #obj.is_section_ids.unlink()
             sequence=0
             alertes=[]
             section_id=False
