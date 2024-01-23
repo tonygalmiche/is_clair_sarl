@@ -293,19 +293,29 @@ class IsAffaire(models.Model):
             obj.achat_facture = val
 
 
+    # def _update_vente_facture(self):
+    #     cr,uid,context,su = self.env.args
+    #     for obj in self:
+    #         val=0
+    #         if isinstance(obj.id, int):
+    #             SQL="""
+    #                 SELECT sum(aml.price_subtotal)
+    #                 FROM account_move_line aml join account_move am on aml.move_id=am.id
+    #                 WHERE aml.is_affaire_id=%s and aml.exclude_from_invoice_tab='f' and aml.journal_id=1 and am.state='posted'
+    #             """
+    #             cr.execute(SQL,[obj.id])
+    #             for row in cr.fetchall():
+    #                 val = row[0]
+    #         obj.vente_facture = val
+
+
     def _update_vente_facture(self):
-        cr,uid,context,su = self.env.args
         for obj in self:
             val=0
-            if isinstance(obj.id, int):
-                SQL="""
-                    SELECT sum(aml.price_subtotal)
-                    FROM account_move_line aml join account_move am on aml.move_id=am.id
-                    WHERE aml.is_affaire_id=%s and aml.exclude_from_invoice_tab='f' and aml.journal_id=1 and am.state='posted'
-                """
-                cr.execute(SQL,[obj.id])
-                for row in cr.fetchall():
-                    val = row[0]
+            filtre=[('state','=','posted'), ('is_affaire_id','=',obj.id),('journal_id','=', 1)]
+            invoices = self.env['account.move'].search(filtre)
+            for invoice in invoices:
+                val+=invoice.amount_untaxed_signed
             obj.vente_facture = val
 
 
@@ -573,20 +583,32 @@ class IsAffaire(models.Model):
 
     def liste_vente_facture_action(self):
         for obj in self:
-            tree_id = self.env.ref('is_clair_sarl.is_account_move_line_tree_view').id
-            form_id = self.env.ref('is_clair_sarl.is_account_move_line_form_view').id
+            #tree_id = self.env.ref('is_clair_sarl.is_account_move_line_tree_view').id
+            #form_id = self.env.ref('is_clair_sarl.is_account_move_line_form_view').id
             return {
-                "name": "Lignes de factures ",
+                "name": "Factures ",
                 "view_mode": "tree,form",
-                "res_model": "account.move.line",
+                "res_model": "account.move",
                 "domain": [
                     ("is_affaire_id","=",obj.id),
-                    ("exclude_from_invoice_tab","=",False),
+                    #("exclude_from_invoice_tab","=",False),
                     ("journal_id","=",1),
                 ],
                 "type": "ir.actions.act_window",
-                "views"    : [[tree_id, "tree"],[form_id, "form"]],
+                #"views"    : [[tree_id, "tree"],[form_id, "form"]],
             }
+            # return {
+            #     "name": "Lignes de factures ",
+            #     "view_mode": "tree,form",
+            #     "res_model": "account.move.line",
+            #     "domain": [
+            #         ("move_id.is_affaire_id","=",obj.id),
+            #         ("exclude_from_invoice_tab","=",False),
+            #         ("journal_id","=",1),
+            #     ],
+            #     "type": "ir.actions.act_window",
+            #     "views"    : [[tree_id, "tree"],[form_id, "form"]],
+            # }
 
 
     def liste_commandes_action(self):
