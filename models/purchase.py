@@ -34,12 +34,14 @@ class purchase_order(models.Model):
     is_date                = fields.Date('Date')
     is_delai_mois_id       = fields.Many2one('is.mois.trimestre', 'Délai (Mois / Trimestre)')
     is_delai_annee         = fields.Char('Délai (Année)')
-    is_delai               = fields.Char("Délai prévisionnel", store=True, readonly=True, compute='_compute_is_delai', help="Délai prévisionnel de l'affaire")
+    #is_delai               = fields.Char("Délai prévisionnel", store=True, readonly=True, compute='_compute_is_delai', help="Délai prévisionnel de l'affaire")
+    is_delai               = fields.Char("Délai prévisionnel", help="Délai prévisionnel de l'affaire")
     is_date_livraison      = fields.Date('Date de livraison')
     is_lieu_livraison      = fields.Selection([
-        ('notre_adresse', 'A notre adresse'),
-        ('chantier'     , 'Livraison sur chantier référence'),
-        ('enlevement'   , 'Enlèvement'),
+        ('notre_adresse'      , 'A notre adresse'),
+        ('chantier'           , 'Livraison sur chantier référence'),
+        ('enlevement'         , 'Enlèvement'),
+        ('livraison_sur_ordre', 'Livraison sur ordre'),
     ], 'Lieu de livraison')
     is_condition_tarifaire = fields.Text('Conditions tarifaire', related='partner_id.is_condition_tarifaire')
     is_repere_ids          = fields.One2many('is.purchase.order.repere', 'order_id', 'Repère de plan')
@@ -58,12 +60,12 @@ class purchase_order(models.Model):
                 obj.is_contact_chantier_id = obj.is_affaire_id.contact_chantier_id.id
 
 
-    @api.depends('is_delai_mois_id','is_delai_annee')
-    def _compute_is_delai(self):
-        for obj in self:
-            t=[(obj.is_delai_mois_id.name or ''), (obj.is_delai_annee or '')]
-            x = " ".join(t)
-            obj.is_delai=x
+    # @api.depends('is_delai_mois_id','is_delai_annee')
+    # def _compute_is_delai(self):
+    #     for obj in self:
+    #         t=[(obj.is_delai_mois_id.name or ''), (obj.is_delai_annee or '')]
+    #         x = " ".join(t)
+    #         obj.is_delai=x
 
 
     def write(self, vals):
@@ -191,7 +193,7 @@ class purchase_order(models.Model):
                     'order_id'    : obj.id,
                     'sequence'    : sequence,
                     'product_id'  : line.product_id.id,
-                    'name'        : line.product_id.name_get()[0][1],
+                    'name'        : line.description or line.product_id.name_get()[0][1],
                     'product_qty' : 0,
                 }
                 self.env['purchase.order.line'].create(vals)

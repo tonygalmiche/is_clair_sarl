@@ -7,10 +7,11 @@ class IsModeleCommandeLigne(models.Model):
     _description = "Lignes des modèles de commandes"
     _order='modele_id,sequence'
 
-    modele_id  = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
-    sequence   = fields.Integer('Séquence')
-    product_id = fields.Many2one('product.product', 'Article', required=True)
-    qt_cde     = fields.Float(string='Qt commandée', help="quantité commandée au moment de l'initialisation", readonly=True)
+    modele_id   = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
+    sequence    = fields.Integer('Séquence')
+    product_id  = fields.Many2one('product.product', 'Article', required=True)
+    description = fields.Text('Description')
+    qt_cde      = fields.Float(string='Qt commandée', help="quantité commandée au moment de l'initialisation", readonly=True)
 
 
 class IsModeleCommande(models.Model):

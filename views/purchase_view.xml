@@ -41,13 +41,13 @@
             </field>
             <field name="date_order" position="before">
                 <field name="is_date"/>
-                <label for="is_delai"/>
+                <!-- <label for="is_delai"/>
                 <div class="d-flex">
                     <field name="is_delai_mois_id" placeholder="Mois / Trimestre"/>
                     <span class="o_form_label mx-3"> </span>
                     <field name="is_delai_annee"   placeholder="Année"/>
-                </div>
-                <field name="is_delai" invisible="1"/>
+                </div> -->
+                <field name="is_delai"/>
                 <field name="is_date_livraison"/>
                 <field name="is_lieu_livraison"/>
             </field>
