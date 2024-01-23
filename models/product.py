@@ -104,7 +104,7 @@ class product_template(models.Model):
             SQL="""
                 SELECT is_date, max(id)
                 FROM is_purchase_order_line
-                WHERE product_tmpl_id=%s
+                WHERE product_tmpl_id=%s and price_unit>0
                 GROUP BY is_date
             """
             cr.execute(SQL,[obj.id])
