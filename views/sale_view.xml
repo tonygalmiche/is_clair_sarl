@@ -16,6 +16,13 @@
 
 
     <!-- sale.order  -->
+    <record id="actualiser_total_facture_action_server" model="ir.actions.server">
+        <field name="name">Actualiser total facturé</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">records._compute_is_total_facture()</field>
+    </record>
     <record id="view_sale_order_form_inherit" model="ir.ui.view">
         <field name="name">sale.order.form.inherit</field>
         <field name="model">sale.order</field>

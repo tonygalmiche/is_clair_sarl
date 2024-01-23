@@ -26,8 +26,15 @@
         parent="is_affaire_top_menu" 
     />
     <menuitem 
-        id="is_import_salaire_menu" 
+        id="is_affaire_suivi_marge_menu" 
         sequence="20" 
+        name="Suivi marge affaires"
+        action="is_affaire_suivi_marge_action" 
+        parent="is_affaire_top_menu" 
+    />
+    <menuitem 
+        id="is_import_salaire_menu" 
+        sequence="30" 
         name="Importation des salaires dans les affaires"
         action="is_import_salaire_action" 
         parent="is_affaire_top_menu" 

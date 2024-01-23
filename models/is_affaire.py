@@ -2,6 +2,8 @@
 from odoo import api, fields, models
 from random import randint
 import re
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class IsNatureTravaux(models.Model):
@@ -139,18 +141,32 @@ class IsAffaireAnalyse(models.Model):
             }
 
 
-
-
-
-
-
 class IsAffaireBudgetFamille(models.Model):
     _name='is.affaire.budget.famille'
     _description = "Budget affaire par famille"
 
     affaire_id = fields.Many2one('is.affaire', 'Affaire', required=True, ondelete='cascade')
-    famille_id = fields.Many2one('is.famille', 'Famille', required=True)
+    famille_id = fields.Many2one('is.famille', 'Famille', required=False)
     budget     = fields.Float("Budget", digits=(14,2))
+    facture    = fields.Float("Montant facturé", digits=(14,2), readonly=True)
+    reste      = fields.Float("Reste au budget", digits=(14,2), readonly=True, store=True, compute='_compute_reste')
+    solder     = fields.Boolean("Solder", default=False, help="Indiquez ce budget comme soldé, si vous pensez qu'il n'y aura plus de dépenses")
+    gain       = fields.Float("Gain/Perte budget", digits=(14,2), readonly=True, store=True, compute='_compute_reste')
+
+
+    @api.depends('budget','facture','solder')
+    def _compute_reste(self):
+        for obj in self:
+            gain=0
+            reste = obj.budget - obj.facture
+            if reste<0:
+                gain=reste
+                reste=0
+            else:
+                if obj.solder:
+                    gain = reste
+            obj.reste = reste
+            obj.gain = gain
 
 
 class IsAffaireSalaire(models.Model):
@@ -194,8 +210,6 @@ class IsAffaire(models.Model):
     nom                 = fields.Char("Nom de l'affaire")
     date_creation       = fields.Date("Date de création", default=lambda *a: fields.Date.today())
     client_id           = fields.Many2one('res.partner' , 'Client')
-    # chantier_id         = fields.Many2one('res.partner' , 'Adresse du chantier')
-    # chantier_adresse    = fields.Text('Adresse complète du chantier', related='chantier_id.is_adresse')
     street              = fields.Char("Rue")
     street2             = fields.Char("Rue 2")
     zip                 = fields.Char("CP")
@@ -205,8 +219,6 @@ class IsAffaire(models.Model):
     type_travaux_ids    = fields.Many2many('is.type.travaux'  , 'is_affaire_type_travaux_rel'  , 'affaire_id', 'type_id'       , string="Type des travaux")
     specificite_ids     = fields.Many2many('is.specificite'   , 'is_affaire_specificite_rel'   , 'affaire_id', 'specificite_id', string="Spécificités")
     commentaire         = fields.Text("Commentaire")
-    achat_facture       = fields.Float("Achats facturés" , digits=(14,2), store=False, readonly=True, compute='_compute_achat_facture')
-    vente_facture       = fields.Float("Ventes facturées", digits=(14,2), store=False, readonly=True, compute='_compute_vente_facture')
     contact_chantier_id = fields.Many2one('res.users' , 'Contact chantier')
     analyse_ids         = fields.One2many('is.affaire.analyse'       , 'affaire_id', 'Analyse de commandes')
     budget_famille_ids  = fields.One2many('is.affaire.budget.famille', 'affaire_id', 'Budget par famille')
@@ -214,13 +226,87 @@ class IsAffaire(models.Model):
     compte_prorata      = fields.Float("Compte prorata (%)", digits=(14,2))
     retenue_garantie    = fields.Float("Retenue de garantie (%)", digits=(14,2))
     salaire_ids         = fields.One2many('is.affaire.salaire', 'affaire_id', 'Salaires')
-    montant_salaire     = fields.Float("Montant salaire", digits=(14,2), store=True, readonly=True, compute='_compute_montant_salaire')
+    remise_ids          = fields.One2many('is.affaire.remise', 'affaire_id', 'Remises')
 
-    remise_ids         = fields.One2many('is.affaire.remise', 'affaire_id', 'Remises')
+    montant_salaire      = fields.Float("Montant salaire"     , digits=(14,2), store=True , readonly=True, compute='_compute_montant_salaire')
+    montant_offre        = fields.Float("Montant offre"       , digits=(14,2), readonly=True, help="Total des commandes clients liées à cette affaire")
+    vente_facture        = fields.Float("Ventes facturées"    , digits=(14,2), readonly=True, default=0)
+    achat_facture        = fields.Float("Achats facturés"     , digits=(14,2), readonly=True, default=0)
+    marge_brute          = fields.Float("Marge brute"         , digits=(14,2), readonly=True, default=0)
+    montant_budget_achat = fields.Float("Montant budget achat", digits=(14,2), readonly=True, default=0)
+    gain_perte_budget    = fields.Float("Gain/Perte budget"   , digits=(14,2), readonly=True, default=0)
+    marge_previsionnelle = fields.Float("Marge prévisionnelle", digits=(14,2), readonly=True, default=0)
 
 
+    def actualiser_marge_affaire_cron(self):
+        self.env['is.affaire'].search([], order="name,id").actualiser_marge()
 
 
+    @api.depends('name')
+    def actualiser_marge(self):
+        for obj in self:
+            _logger.info("actualiser_marge : %s (%s)"%(obj.name, obj.id))
+            obj._update_gain_perte_budget()
+            obj._update_montant_offre()
+            obj._update_vente_facture()
+            obj._update_achat_facture()
+            obj._update_budget_famille(analyse=False)
+            marge_brute = obj.vente_facture - obj.achat_facture - obj.montant_salaire
+            obj.marge_brute = marge_brute
+            obj.marge_previsionnelle = obj.montant_offre - obj.montant_budget_achat + obj.gain_perte_budget
+
+
+    def _update_gain_perte_budget(self):
+        for obj in self:
+            budget = 0
+            gain = 0
+            for line in obj.budget_famille_ids:
+                gain+=line.gain
+                budget+=line.budget
+            obj.montant_budget_achat = budget
+            obj.gain_perte_budget = gain
+
+
+    def _update_montant_offre(self):
+        for obj in self:
+            val = 0
+            filtre=[('is_affaire_id', '=', obj.id),('state', '!=', 'cancel')]
+            orders = self.env['sale.order'].search(filtre)
+            for order in orders:
+                val+=order.amount_untaxed
+            obj.montant_offre = val
+
+
+    def _update_achat_facture(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            val=0
+            if isinstance(obj.id, int):
+                SQL="""
+                    SELECT sum(aml.price_subtotal)
+                    FROM account_move_line aml join account_move am on aml.move_id=am.id
+                    WHERE aml.is_affaire_id=%s and aml.exclude_from_invoice_tab='f' and aml.journal_id=2 and am.state='posted'
+                """
+                cr.execute(SQL,[obj.id])
+                for row in cr.fetchall():
+                    val = row[0]
+            obj.achat_facture = val
+
+
+    def _update_vente_facture(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            val=0
+            if isinstance(obj.id, int):
+                SQL="""
+                    SELECT sum(aml.price_subtotal)
+                    FROM account_move_line aml join account_move am on aml.move_id=am.id
+                    WHERE aml.is_affaire_id=%s and aml.exclude_from_invoice_tab='f' and aml.journal_id=1 and am.state='posted'
+                """
+                cr.execute(SQL,[obj.id])
+                for row in cr.fetchall():
+                    val = row[0]
+            obj.vente_facture = val
 
 
     @api.depends('street','street2','city','zip')
@@ -240,41 +326,6 @@ class IsAffaire(models.Model):
             for line in obj.salaire_ids:
                 montant+=line.montant
             obj.montant_salaire = montant
-
-
-    @api.depends('name')
-    def _compute_achat_facture(self):
-        cr,uid,context,su = self.env.args
-        for obj in self:
-            val=0
-            if isinstance(obj.id, int):
-                SQL="""
-                    SELECT sum(aml.price_subtotal)
-                    FROM account_move_line aml join account_move am on aml.move_id=am.id
-                    WHERE aml.is_affaire_id=%s and aml.exclude_from_invoice_tab='f' and aml.journal_id=2 and am.state='posted'
-                """
-                cr.execute(SQL,[obj.id])
-                for row in cr.fetchall():
-                    val = row[0]
-            obj.achat_facture = val
-
-
-    @api.depends('name')
-    def _compute_vente_facture(self):
-        cr,uid,context,su = self.env.args
-        for obj in self:
-            val=0
-            if isinstance(obj.id, int):
-                SQL="""
-                    SELECT sum(aml.price_subtotal)
-                    FROM account_move_line aml join account_move am on aml.move_id=am.id
-                    WHERE aml.is_affaire_id=%s and aml.exclude_from_invoice_tab='f' and aml.journal_id=1 and am.state='posted'
-                """
-                cr.execute(SQL,[obj.id])
-                for row in cr.fetchall():
-                    val = row[0]
-            obj.vente_facture = val
-
 
 
     def ajout_famille_action(self):
@@ -350,10 +401,11 @@ class IsAffaire(models.Model):
             return obj.is_affaire_analyse_action("Analyse par fournisseur")
 
 
-    def analyse_par_famille_action(self):
+    def _update_budget_famille(self, analyse=False):
         cr,uid,context,su = self.env.args
         for obj in self:
-            obj.analyse_ids.sudo().unlink()
+            if analyse:
+                obj.analyse_ids.sudo().unlink()
             lines = self.env['is.famille'].search([])
             familles=[]
             for line in lines:
@@ -363,6 +415,7 @@ class IsAffaire(models.Model):
                 intitule=""
                 famille_id = None
                 #** Budget ****************************************************
+                budget_famille = False
                 budget=0
                 if famille:
                     famille_id = famille.id
@@ -372,6 +425,7 @@ class IsAffaire(models.Model):
                     budget=0
                     for line in lines:
                         budget=line.budget
+                        budget_famille = line
                 #**************************************************************
 
                 #** Montant Cde ***********************************************
@@ -421,21 +475,41 @@ class IsAffaire(models.Model):
                 ecart_budget_fac = budget-montant_fac
                 #**************************************************************
 
-                if budget!=0 or montant_cde!=0 or montant_fac!=0:
-                    vals={
-                        "affaire_id": obj.id,
-                        "intitule": intitule,
-                        "famille_id": famille_id,
-                        "budget"    : budget,
-                        "montant_cde"     : montant_cde,
-                        "montant_fac"   : montant_fac,
-                        "ecart"         : ecart,
-                        "ecart_pourcent": ecart_pourcent,
-                        "ecart_budget_cde": ecart_budget_cde,
-                        "ecart_budget_fac": ecart_budget_fac,
-                    }
-                    res = self.env['is.affaire.analyse'].sudo().create(vals)
-            obj.ajout_salaire()
+
+                #** Ajout du budget si il n'existe pas ************************
+                if not budget_famille and montant_fac>0:
+                    if famille:
+                        vals={
+                            'affaire_id': obj.id,
+                            'famille_id': famille.id,
+                        }
+                        budget_famille = self.env['is.affaire.budget.famille'].sudo().create(vals)
+                if budget_famille:
+                    budget_famille.facture = montant_fac
+                #**************************************************************
+
+                if analyse:
+                    if budget!=0 or montant_cde!=0 or montant_fac!=0:
+                        vals={
+                            "affaire_id": obj.id,
+                            "intitule": intitule,
+                            "famille_id": famille_id,
+                            "budget"    : budget,
+                            "montant_cde"     : montant_cde,
+                            "montant_fac"   : montant_fac,
+                            "ecart"         : ecart,
+                            "ecart_pourcent": ecart_pourcent,
+                            "ecart_budget_cde": ecart_budget_cde,
+                            "ecart_budget_fac": ecart_budget_fac,
+                        }
+                        res = self.env['is.affaire.analyse'].sudo().create(vals)
+            if analyse:
+                obj.ajout_salaire()
+
+
+    def analyse_par_famille_action(self):
+        for obj in self:
+            obj._update_budget_famille(analyse=True)
             return obj.is_affaire_analyse_action("Analyse par famille")
 
 
@@ -513,6 +587,24 @@ class IsAffaire(models.Model):
                 "type": "ir.actions.act_window",
                 "views"    : [[tree_id, "tree"],[form_id, "form"]],
             }
+
+
+    def liste_commandes_action(self):
+        for obj in self:
+            #tree_id = self.env.ref('is_clair_sarl.is_account_move_line_tree_view').id
+            #form_id = self.env.ref('is_clair_sarl.is_account_move_line_form_view').id
+            return {
+                "name": "Offres ",
+                "view_mode": "tree,form",
+                "res_model": "sale.order",
+                "domain": [
+                    ("is_affaire_id","=",obj.id),
+                ],
+                "type": "ir.actions.act_window",
+                #"views"    : [[tree_id, "tree"],[form_id, "form"]],
+            }
+
+
 
 
     def name_get(self):

@@ -175,7 +175,7 @@ class sale_order(models.Model):
             for invoice in obj.is_invoice_ids:
                 if invoice.state=='posted':
                     is_total_facture+=invoice.amount_untaxed_signed
-            is_reste_a_facturer = obj.amount_total - is_total_facture
+            is_reste_a_facturer = obj.amount_untaxed - is_total_facture
             obj.is_total_facture    = is_total_facture
             obj.is_reste_a_facturer = is_reste_a_facturer
 
