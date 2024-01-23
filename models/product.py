@@ -49,6 +49,14 @@ class IsSousArticle(models.Model):
     quantite        = fields.Float("Quantité", default=1)
 
 
+class product_product(models.Model):
+    _inherit = "product.product"
+
+    def evolution_prix_achat_action(self):
+        for obj in self:
+            return obj.product_tmpl_id.evolution_prix_achat_action()
+
+
 class product_template(models.Model):
     _inherit = "product.template"
     _order="name"
@@ -89,6 +97,31 @@ class product_template(models.Model):
 
     is_fournisseur_id = fields.Many2one('res.partner', 'Fournisseur par défaut', store=True, readonly=True, compute='_compute_is_fournisseur_id')
 
+
+    def evolution_prix_achat_action(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            SQL="""
+                SELECT is_date, max(id)
+                FROM is_purchase_order_line
+                WHERE product_tmpl_id=%s
+                GROUP BY is_date
+            """
+            cr.execute(SQL,[obj.id])
+            ids=[]
+            for row in cr.fetchall():
+                ids.append(row[1])
+            graph_id = self.env.ref('is_clair_sarl.is_purchase_order_line_price_unit_graph').id
+            return {
+                "name": "Achats ",
+                "view_mode": "graph,tree,form,pivot",
+                "res_model": "is.purchase.order.line",
+                "domain": [
+                    ("id","in",ids),
+                ],
+                "type": "ir.actions.act_window",
+                "views"    : [[graph_id, "graph"], [False, "tree"], [False, "form"], [False, "pivot"]],
+            }
 
 
 

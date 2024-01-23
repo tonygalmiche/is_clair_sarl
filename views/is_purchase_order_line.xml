@@ -8,10 +8,11 @@
                 <sheet>
                     <group>
                         <field name="order_id"/>
+                        <field name="is_date"/>
                         <field name="partner_id"/>
                         <field name="is_affaire_id"/>
                         <field name="is_date_livraison"/>
-                        <field name="product_id"/>
+                        <field name="product_tmpl_id"/>
                         <field name="description"/>
                         <field name="product_qty"/>
                         <field name="product_uom"/>
@@ -32,11 +33,12 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="order_id"           optional="show" widget="many2one_clickable" />
+                <field name="is_date"            optional="show" />
                 <field name="partner_id"         optional="show" widget="many2one_clickable" />
-                <field name="is_affaire_id"      optional="show" widget="many2one_clickable" class="white_space_normal"/>
+                <field name="is_affaire_id"      optional="hide" widget="many2one_clickable" class="white_space_normal"/>
                 <field name="is_date_livraison"  optional="show"/>
-                <field name="product_id"         optional="show" widget="many2one_clickable" class="white_space_normal"/>
-                <field name="description"        optional="show"/>
+                <field name="product_tmpl_id"    optional="show" widget="many2one_clickable" class="white_space_normal"/>
+                <field name="description"        optional="hide"/>
                 <field name="product_qty"        optional="show"/>
                 <field name="product_uom"        optional="show"/>
                 <field name="price_unit"         optional="show"/>
@@ -56,7 +58,7 @@
                 <field name="order_id"/>
                 <field name="partner_id"/>
                 <field name="is_affaire_id"/>
-                <field name="product_id"/>
+                <field name="product_tmpl_id"/>
                 <field name="description"/>
                 <field name="is_famille_id"/>
                 <field name="is_sous_famille_id"/>
@@ -86,7 +88,18 @@
         </field>
     </record>
 
-    <!-- <graph string="graph" type="line" sample="1"> -->
+    <record id="is_purchase_order_line_price_unit_graph" model="ir.ui.view">
+        <field name="name">is_purchase_order_line_price_unit_graph</field>
+        <field name="model">is.purchase.order.line</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="is_date" interval="day"/>
+                <field name="price_unit" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
 
 
     <record  id="is_purchase_order_line_action" model="ir.actions.act_window">

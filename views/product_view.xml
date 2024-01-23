@@ -143,6 +143,17 @@
                     }
                 </style>
             </xpath>
+
+
+            <!-- <header>
+                <button string="Print Labels" type="object" name="action_open_label_layout"/>
+            </header>
+ -->
+            <button name="action_open_label_layout" position="replace">
+                <button string="Evolution du prix d'achat" type="object" name="evolution_prix_achat_action"/>
+            </button>
+
+
            <div name="options" position="inside" >
                 <span class="d-inline-block">
                     <field name="is_tache"/>
