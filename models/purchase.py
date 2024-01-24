@@ -51,6 +51,7 @@ class purchase_order(models.Model):
 
     is_import_pdf_ids      = fields.Many2many('ir.attachment' , 'purchase_order_is_import_pdf_ids_rel', 'order_id', 'attachment_id', 'PDF à importer')
     is_import_pdf_resultat = fields.Text("Résultat de l'importation", readonly=1)
+    is_eco_contribution    = fields.Float("Montant Eco-contribution", digits=(14,2), help='Si ce montant est renseigné, cela ajoutera automatiquement une ligne sur la commande')
 
 
     @api.onchange('is_affaire_id')
@@ -71,8 +72,38 @@ class purchase_order(models.Model):
     def write(self, vals):
         res = super(purchase_order, self).write(vals)
         self.update_reperes()
+        self.ajout_eco_contribution()
         return res
 
+
+    def ajout_eco_contribution(self):
+        for obj in self:
+            if obj.is_eco_contribution>0:
+                products = self.env['product.product'].search([('default_code','=','ECOCON')])
+                for product in products:
+                    sequence = 0
+                    order_line=False
+                    for line in obj.order_line:
+                        print(line, line.sequence)
+                        if line.sequence>sequence:
+                            sequence=line.sequence
+                        if line.product_id == product:
+                            order_line = line
+                    sequence+=10
+                    if not order_line:
+                        vals={
+                            'order_id': obj.id,
+                            'product_id': product.id,
+                            'name': product.name_get()[0][1],
+                            'product_qty': 1,
+                            'price_unit':obj.is_eco_contribution,
+                            'sequence': sequence,
+                        }
+                        res=self.env['purchase.order.line'].create(vals)
+                    else:
+                        order_line.sequence=sequence
+                        order_line.price_unit = obj.is_eco_contribution
+                
 
     def update_reperes(self):
         cr,uid,context,su = self.env.args

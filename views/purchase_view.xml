@@ -50,6 +50,7 @@
                 <field name="is_delai"/>
                 <field name="is_date_livraison"/>
                 <field name="is_lieu_livraison"/>
+                <field name="is_eco_contribution"/>
             </field>
 
             <field name="origin" position="after">
