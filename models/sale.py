@@ -202,6 +202,21 @@ class sale_order(models.Model):
     is_reste_a_facturer = fields.Float("Reste à facturer", digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
 
 
+    def voir_commande_action(self):
+        for obj in self:
+            return {
+                "name": "Commande",
+                "view_mode": "form",
+                "res_model": "sale.order",
+                "res_id"   : obj.id,
+                "type": "ir.actions.act_window",
+            }
+
+
+
+
+
+
     def import_fichier_xlsx(self):
         for obj in self:
             #obj.order_line.unlink()

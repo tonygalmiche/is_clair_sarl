@@ -40,7 +40,7 @@ class ResPartner(models.Model):
     is_modele_commande_id  = fields.Many2one('is.modele.commande' , 'Modèle de commande')
     is_adresse             = fields.Text("Adresse complète", store=True, readonly=True, compute='_compute_is_adresse')
     is_affaire_ids         = fields.One2many('is.affaire', 'client_id', 'Affaires')
-
+    is_sale_order_ids      = fields.One2many('sale.order', 'partner_id', 'Commandes client')
 
 
     @api.depends('name', 'street','street2','city','zip')

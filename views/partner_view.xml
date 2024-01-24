@@ -138,6 +138,9 @@
                     .o_form_label{
                         white-space: nowrap;
                     }
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
+                    }
                 </style>
             </xpath>
             <xpath expr="//field[@name='vat']" position="after">
@@ -165,7 +168,7 @@
 
             <page name="internal_notes" position="after">
                 <page string="Affaires">
-                    <field name="is_affaire_ids" nolabel="1">
+                    <field name="is_affaire_ids" nolabel="1" readonly="1">
                         <tree>
                             <field name="display_name"        optional="hide" class="white_space_normal" string="Nom complet" />
                             <field name="name"                optional="show"/>
@@ -180,6 +183,20 @@
                             <field name="achat_facture"       optional="show" sum="Total"/>
                             <field name="vente_facture"       optional="show" sum="Total"/>
                             <field name="montant_salaire"     optional="show" sum="Total"/>
+                        </tree>
+                    </field>
+                </page>
+                <page string="Commandes client">
+                    <field name="is_sale_order_ids" nolabel="1" readonly="1">
+                        <tree>
+                            <button name="voir_commande_action" type="object" icon="fa-search-plus" title="Commande"/>
+                            <field name="name"  optional="show"/>
+                            <field name="date_order"/>
+                            <field name="amount_untaxed"      widget="monetary" optional="show" sum="Total"/>
+                            <field name="is_total_facture"    widget="monetary" optional="show" sum="Total"/>
+                            <field name="is_reste_a_facturer" widget="monetary" optional="show" sum="Total"/>
+                            <field name="invoice_status" decoration-success="invoice_status == 'invoiced'" decoration-info="invoice_status == 'to invoice'" decoration-warning="invoice_status == 'upselling'" widget="badge" optional="show"/>
+                            <field name="state"/>
                         </tree>
                     </field>
                 </page>
