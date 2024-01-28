@@ -31,16 +31,17 @@ class IsOrigine(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    is_statut_id           = fields.Many2one('is.statut' , 'Statut')
-    is_profil_id           = fields.Many2one('is.profil' , 'Profil')
-    is_origine_id          = fields.Many2one('is.origine', 'Origine DP')
-    is_condition_tarifaire = fields.Text('Conditions tarifaire', help="Informations sur les conditions tarifaires affichées sur la commande")
-    is_banque_id           = fields.Many2one('account.journal', 'Banque par défaut', domain=[('type','=','bank')])
-    is_compte_auxiliaire   = fields.Char('Compte auxiliaire', help="Code du fournisseur ou client pour l'export en compta")
-    is_modele_commande_id  = fields.Many2one('is.modele.commande' , 'Modèle de commande')
-    is_adresse             = fields.Text("Adresse complète", store=True, readonly=True, compute='_compute_is_adresse')
-    is_affaire_ids         = fields.One2many('is.affaire', 'client_id', 'Affaires')
-    is_sale_order_ids      = fields.One2many('sale.order', 'partner_id', 'Commandes client')
+    is_statut_id                = fields.Many2one('is.statut' , 'Statut')
+    is_profil_id                = fields.Many2one('is.profil' , 'Profil')
+    is_origine_id               = fields.Many2one('is.origine', 'Origine DP')
+    is_condition_tarifaire      = fields.Text('Conditions tarifaire', help="Informations sur les conditions tarifaires affichées sur la commande")
+    is_banque_id                = fields.Many2one('account.journal', 'Banque par défaut', domain=[('type','=','bank')])
+    is_compte_auxiliaire        = fields.Char('Compte auxiliaire fournisseur', help="Code du fournisseur pour l'export en compta")
+    is_compte_auxiliaire_client = fields.Char('Compte auxiliaire client'     , help="Code du client pour l'export en compta")
+    is_modele_commande_id       = fields.Many2one('is.modele.commande' , 'Modèle de commande')
+    is_adresse                  = fields.Text("Adresse complète", store=True, readonly=True, compute='_compute_is_adresse')
+    is_affaire_ids              = fields.One2many('is.affaire', 'client_id', 'Affaires')
+    is_sale_order_ids           = fields.One2many('sale.order', 'partner_id', 'Commandes client')
 
 
     @api.depends('name', 'street','street2','city','zip')

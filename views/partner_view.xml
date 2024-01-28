@@ -212,6 +212,7 @@
         <field name="inherit_id" ref="account.view_partner_property_form" />
         <field name="arch" type="xml">
             <field name="property_account_payable_id" position="after">
+                <field name="is_compte_auxiliaire_client"/>
                 <field name="is_compte_auxiliaire"/>
             </field>
         </field>
@@ -231,7 +232,8 @@
                 <field name="is_statut_id"           optional="show"/>
                 <field name="is_profil_id"           optional="show"/>
                 <field name="is_origine_id"          optional="show"/>
-                <field name="is_compte_auxiliaire"   optional="show"/>
+                <field name="is_compte_auxiliaire_client" optional="show"/>
+                <field name="is_compte_auxiliaire"        optional="show"/>
                 <field name="is_condition_tarifaire" optional="hide"/>
                 <field name="is_banque_id"           optional="hide"/>
             </field>

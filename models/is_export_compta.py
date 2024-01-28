@@ -54,31 +54,6 @@ class IsExportCompta(models.Model):
             for invoice in invoices:
                 invoice.is_export_compta_id=False
             obj.ligne_ids.unlink()
-            # sql="""
-            #     SELECT  
-            #         aj.code code_journal,
-            #         am.invoice_date date,
-            #         am.ref num_piece,
-            #         am.name num_facture,
-            #         aa.code num_compte,
-            #         aml.name libelle,
-            #         aml.debit,
-            #         aml.credit,
-            #         rp.is_compte_auxiliaire,
-            #         am.partner_id,
-            #         am.id invoice_id
-            #     FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
-            #                                inner join account_account aa             on aml.account_id=aa.id
-            #                                left outer join res_partner rp            on aml.partner_id=rp.id
-            #                                inner join account_journal aj             on aml.journal_id=aj.id
-
-            #     WHERE 
-            #          am.is_export_compta_id is null and
-            #          am.invoice_date<=%s and aj.code=%s in ('VE','AC') and
-            #          am.state='posted'
-            #     ORDER BY am.invoice_date, am.name, aml.sequence
-            # """
-
             sql="""
                 SELECT  
                     aj.code code_journal,
@@ -86,6 +61,7 @@ class IsExportCompta(models.Model):
                     am.ref num_piece,
                     am.name num_facture,
                     aa.code num_compte,
+                    rp.is_compte_auxiliaire_client,
                     rp.is_compte_auxiliaire,
                     am.partner_id,
                     am.id invoice_id,
@@ -95,7 +71,6 @@ class IsExportCompta(models.Model):
                                            inner join account_account aa             on aml.account_id=aa.id
                                            left outer join res_partner rp            on aml.partner_id=rp.id
                                            inner join account_journal aj             on aml.journal_id=aj.id
-
                 WHERE 
                      am.is_export_compta_id is null and
                      am.invoice_date<=%s and aj.code=%s and
@@ -106,14 +81,12 @@ class IsExportCompta(models.Model):
                     am.ref,
                     am.name,
                     aa.code,
+                    rp.is_compte_auxiliaire_client,
                     rp.is_compte_auxiliaire,
                     am.partner_id,
                     am.id
                 ORDER BY am.invoice_date, am.name
             """
-
-
-
             cr.execute(sql,[obj.date_fin,obj.journal])
             ct=0
             for row in cr.dictfetchall():
@@ -124,17 +97,17 @@ class IsExportCompta(models.Model):
                 invoice = self.env['account.move'].browse(invoice_id)
                 invoice.is_export_compta_id = obj.id
                 num_compte = row["num_compte"]
-                if num_compte[:3] in ['401','411']:
+                if num_compte[:3] in ['411']:
+                    if row["is_compte_auxiliaire_client"]:
+                        num_compte = row["is_compte_auxiliaire_client"]
+                if num_compte[:3] in ['401']:
                     if row["is_compte_auxiliaire"]:
                         num_compte = row["is_compte_auxiliaire"]
                 ct=ct+1
-
                 num_piece   = invoice.ref
                 num_facture = invoice.name
-
                 if obj.journal=="VE":
                     num_piece = num_facture
-
                 vals={
                     'export_compta_id': obj.id,
                     'ligne'           : ct,
@@ -172,17 +145,6 @@ class IsExportCompta(models.Model):
                 f.write(str(row.debit).replace('.',',')+';')
                 f.write(str(row.credit).replace('.',','))
                 f.write('\r\n')
-
-
-                # f.write(row.ecriture_num+'\t')
-                # f.write(row.ecriture_date.strftime('%Y%m%d')+'\t')
-                # f.write((row.compte_num or '')+'\t')
-                # f.write((row.comp_aux_num or '')+'\t')
-                # f.write(row.piece_ref+'\t')
-                # f.write(row.piece_date.strftime('%Y%m%d')+'\t')
-                # f.write(row.ecriture_lib+'\t')
-                # f.write(str(row.debit).replace('.','.')+'\t')
-                # f.write(str(row.credit).replace('.','.')+'\t')
             f.close()
             r = open(dest,'rb').read()
             r=base64.b64encode(r)
