@@ -370,6 +370,11 @@ class sale_order(models.Model):
             obj.is_import_alerte = alertes
 
 
+    def _get_product_account_id(self, product, fiscal_position):
+        accounts = product.product_tmpl_id.get_product_accounts(fiscal_pos=fiscal_position)
+        return accounts['income']
+
+
     def generer_facture_action(self):
         cr,uid,context,su = self.env.args
         for obj in self:
@@ -402,7 +407,7 @@ class sale_order(models.Model):
                     #    quantity=line.product_uom_qty*line.is_a_facturer/line.price_subtotal
 
                     quantity=line.product_uom_qty*line.is_facturable_pourcent/100
-
+                    account_id = self._get_product_account_id(line.product_id, obj.fiscal_position_id)
                     taxes = line.product_id.taxes_id
                     taxes = obj.fiscal_position_id.map_tax(taxes)
                     tax_ids=[]
@@ -411,6 +416,7 @@ class sale_order(models.Model):
                     vals={
                         'sequence'  : line.sequence,
                         'product_id': line.product_id.id,
+                        'account_id': account_id,
                         'name'      : line.name,
                         'quantity'  : sens*quantity,
                         'is_facturable_pourcent': sens*line.is_facturable_pourcent,
@@ -441,6 +447,7 @@ class sale_order(models.Model):
             product=products[0]
             invoices = self.env['account.move'].search([('is_order_id','=',obj.id),('state','=','posted')],order="id")
             for invoice in invoices:
+                account_id = self._get_product_account_id(product, obj.fiscal_position_id)
                 taxes = product.taxes_id
                 taxes = obj.fiscal_position_id.map_tax(taxes)
                 tax_ids=[]
@@ -450,9 +457,9 @@ class sale_order(models.Model):
                 vals={
                     'sequence'  : sequence,
                     'product_id': product.id,
+                    'account_id': account_id,
                     'name'      : "Situation %s (Facture %s)"%(invoice.is_situation,invoice.name),
                     'quantity'  : -1*sens,
-                    #'price_unit': invoice.is_a_facturer,
                     'price_unit': invoice.amount_untaxed_signed,
                     'tax_ids'   : tax_ids,
                 }
@@ -463,6 +470,7 @@ class sale_order(models.Model):
             for line in obj.is_affaire_id.remise_ids:
                 if line.remise>0:
                     product=line.product_id
+                    account_id = self._get_product_account_id(product, obj.fiscal_position_id)
                     taxes = product.taxes_id
                     taxes = obj.fiscal_position_id.map_tax(taxes)
                     tax_ids=[]
@@ -473,6 +481,7 @@ class sale_order(models.Model):
                     vals={
                         'sequence'  : sequence,
                         'product_id': product.id,
+                        'account_id': account_id,
                         'name'      : name,
                         'quantity'  : -sens*line.remise/100,
                         'price_unit': round(total_cumul_ht,2), # La remise est calculée sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata

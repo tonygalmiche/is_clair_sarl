@@ -93,8 +93,15 @@ class AccountMove(models.Model):
                 for line in obj.invoice_line_ids:
                     if not line.is_affaire_id:
                         line.is_affaire_id = obj.is_affaire_id.id
-                        print(obj.name,line)
 
+
+    def initialiser_compte_vente_action(self):
+        for obj in self:
+            for line in obj.invoice_line_ids:
+                if line.product_id:
+                    accounts = line.product_id.product_tmpl_id.get_product_accounts(fiscal_pos=obj.fiscal_position_id)
+                    account_id = accounts['income'].id
+                    line.account_id = account_id
 
 
 class AccountMoveLine(models.Model):
