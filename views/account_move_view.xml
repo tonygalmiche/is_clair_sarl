@@ -159,6 +159,12 @@
             <field name="activity_ids" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
+
+            <tree position="attributes">
+                <attribute name="default_order">name</attribute>
+            </tree>
+
+
         </field>
     </record>
     <record id="is_view_account_invoice_filter" model="ir.ui.view">
