@@ -4,6 +4,8 @@ from odoo import models,fields,api
 
 class AccountMove(models.Model):
     _inherit = "account.move"
+    _order='name desc'
+
 
     is_order_id         = fields.Many2one('sale.order', 'Commande')
     #is_affaire_id       = fields.Many2one('is.affaire', 'Affaire', related='is_order_id.is_affaire_id')
