@@ -21,7 +21,7 @@
                         <span t-if="o.name != '/'" t-field="o.name"/>
                         <span> du </span><span t-field="o.invoice_date"/>
                     </h2>
-                    <div t-if="o.is_situation" class="situation"><span>Situation </span> <span t-field="o.is_situation"/></div>
+                    <h2 t-if="o.is_situation" class="situation"><span>Situation </span> <span t-field="o.is_situation"/></h2>
                     
 
                     <!-- Affichage simplifié (total des sections) -->
@@ -66,7 +66,7 @@
                                                     </t>
                                                 </t>
                                             </t>
-                                            <tr>
+                                            <tr t-if="l.facturable_pourcent">
                                                 <td style="width:80%" class="text-left">
                                                     <span t-field="l.section"/> (<span t-field="l.facturable_pourcent"/>%)
                                                 </td>
@@ -75,8 +75,8 @@
                                         </t>
                                     </t>
                                     <tr>
-                                        <td class="text-right"><b>Total HT : </b></td>
-                                        <td class="text-right"><b><span t-field="o.is_facture"/></b></td>
+                                        <td class="text-right" style="color:#C7B90F"><b>Total HT réalisé : </b></td>
+                                        <td class="text-right" style="color:#C7B90F"><b><span t-field="o.is_facture"/></b></td>
                                     </tr>
 
                                     <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
@@ -92,7 +92,7 @@
                                         </t>
                                     </t>
                                     <tr t-if="o.amount_untaxed!=o.is_facture">
-                                        <td class="text-right"><b>Total HT : </b></td>
+                                        <td class="text-right"><b>Reste dû HT : </b></td>
                                         <td class="text-right"><span t-field="o.amount_untaxed"/></td>
                                     </tr>
                                     <t t-if="o.amount_total>o.amount_untaxed">
@@ -124,8 +124,8 @@
                                         </t>
                                         <tr>
                                             <td class="text-right"><strong>TTC : </strong></td>
-                                            <td class="text-right">
-                                                <span t-field="o.amount_residual"/>
+                                            <td class="text-right" style="background-color:black;color:white">
+                                                <strong><span t-field="o.amount_residual"/></strong>
                                             </td>
                                         </tr>
                                     </t>
@@ -196,7 +196,7 @@
                                         <t t-if="not line_last">
                                             <tr class="is-subtotal text-right">
                                                 <td colspan="99">
-                                                    <strong class="mr16">Sous-total : </strong>
+                                                    <strong class="mr16">Montant marché : </strong>
                                                     <span
                                                         t-esc="current_subtotal"
                                                         t-options='{"widget": "monetary", "display_currency": o.currency_id}'

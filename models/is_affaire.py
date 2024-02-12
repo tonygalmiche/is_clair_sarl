@@ -210,6 +210,7 @@ class IsAffaire(models.Model):
     nom                 = fields.Char("Nom de l'affaire")
     date_creation       = fields.Date("Date de création", default=lambda *a: fields.Date.today())
     client_id           = fields.Many2one('res.partner' , 'Client')
+    maitre_oeuvre_id    = fields.Many2one('res.partner' , "Maitre d'œuvre")
     street              = fields.Char("Rue")
     street2             = fields.Char("Rue 2")
     zip                 = fields.Char("CP")

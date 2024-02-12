@@ -155,10 +155,9 @@
                                                         />
                                                     </td>
                                                     <td name="td_priceunit" class="text-right" width="10%" style="white-space: nowrap;">
-                                                        <t t-if="line.price_unit">
+                                                        <t t-if="line.price_unit and doc.is_affichage_pdf=='standard'">
                                                             <span 
                                                                 t-field="line.price_unit" 
-                                                                t-if="doc.is_affichage_pdf=='standard'"
                                                                 t-options="{'widget': 'float', 'precision': 2}"
                                                             /> €
                                                         </t>
@@ -260,10 +259,9 @@
                                                             />
                                                         </td>
                                                         <td name="td_priceunit" class="text-right" width="10%" style="white-space: nowrap;">
-                                                            <t t-if="line.price_unit">
+                                                            <t t-if="line.price_unit and doc.is_affichage_pdf=='standard'">
                                                                 <span 
                                                                     t-field="line.price_unit" 
-                                                                    t-if="doc.is_affichage_pdf=='standard'"
                                                                     t-options="{'widget': 'float', 'precision': 2}"
                                                                 /> €
                                                             </t>
