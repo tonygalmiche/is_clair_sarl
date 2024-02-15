@@ -140,9 +140,11 @@
                         <table class="table table-sm o_main_table" name="invoice_line_table" style="border:1px solid black">
                             <thead>
                                 <tr>
-                                    <th name="th_description" class="text-center"> <span>Désignation</span></th>
+                                    <th name="th_description" class="text-center"><span>Désignation</span></th>
                                     <th name="th_quantity"    class="text-center"><span>Quantité</span></th>
+                                    <th name="th_unite"       class="text-center"><span>U</span></th>
                                     <th name="th_priceunit"   class="text-center"><span>Prix U.</span></th>
+                                    <th name="th_priceunit"   class="text-center"><span>Montant Cde</span></th>
                                     <th name="th_quantity"    class="text-center"><span>% Réalisé</span></th>
                                     <th name="th_subtotal"    class="text-center"><span >Total HT</span></th>
                                 </tr>
@@ -161,9 +163,10 @@
                                                     <td name="account_invoice_line_name"><span t-field="line.name" t-options="{'widget': 'text'}"/></td>
                                                     <td class="text-right text-nowrap">
                                                         <span t-field="line.quantity" t-options="{'widget': 'float', 'precision': 2}"/>
-                                                        <span t-field="line.product_id.uom_id"/>
                                                     </td>
+                                                    <td class="text-left"><span t-field="line.is_sale_line_id.is_unite"/></td>
                                                     <td t-attf-class="text-nowrap text-right"><span t-field="line.price_unit" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                                                    <td t-attf-class="text-nowrap text-right"><span t-field="line.is_sale_line_id.price_subtotal" t-options="{'widget': 'float', 'precision': 2}"/></td>
                                                     <td t-attf-class="text-nowrap text-right"><span t-field="line.is_facturable_pourcent" t-options="{'widget': 'float', 'precision': 0}"/>%</td>
                                                     <td class="text-right">
                                                         <span class="text-nowrap" t-field="line.price_subtotal"/>
@@ -186,6 +189,8 @@
                                     <t t-if="line.display_type == 'line_note'">
                                         <tr>
                                             <td><span t-field="line.name" t-options="{'widget': 'text'}"/></td>   
+                                            <td />
+                                            <td />
                                             <td />
                                             <td />
                                             <td />

@@ -21,6 +21,7 @@ class sale_order_line(models.Model):
     is_a_facturer          = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     is_prix_achat          = fields.Float("Prix d'achat", digits=(14,4))
     is_masquer_ligne       = fields.Boolean("Masquer",default=False,help="Masquer la ligne sur le PDF de la commande")
+    is_unite               = fields.Char("Unité")
 
 
     @api.depends('is_facturable_pourcent','price_unit','product_uom_qty')
@@ -330,11 +331,15 @@ class sale_order(models.Model):
                                 is_prix_achat = float(cells[lig][9].value or 0)
                             except:
                                 is_prix_achat = 0
+                            unite=False
+                            if qty:
+                                unite    = cells[lig][1].value
                             vals={
                                 "order_id"       : not option and obj.id,
                                 "product_id"     : product.id,
                                 "sequence"       : sequence,
                                 "name"           : name,
+                                "is_unite"       : unite,
                                 "product_uom_qty": qty,
                                 "price_unit"     : price,
                                 "discount"       : discount,
