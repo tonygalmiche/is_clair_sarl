@@ -17,8 +17,10 @@ Module Odoo 15 pour CLAIR-SARL
         "account",
         "l10n_fr",
         "l10n_fr_fec",
+        "web",
     ],
     "data" : [
+        "security/res.groups.xml",
         "security/ir.model.access.csv",
         "views/is_affaire_view.xml",
         "views/is_import_clair_views.xml",
@@ -35,6 +37,7 @@ Module Odoo 15 pour CLAIR-SARL
         "views/is_purchase_order_line.xml",
         "views/res_company_view.xml",
         "views/report_invoice.xml",
+        "views/is_chantier.xml",
         "views/menu.xml",
         "report/purchase_quotation_templates.xml",
         "report/purchase_order_templates.xml",
@@ -44,21 +47,20 @@ Module Odoo 15 pour CLAIR-SARL
     'assets': {
         'web.assets_backend': [
             'is_clair_sarl/static/src/scss/styles.scss',
+            # 'is_clair_sarl/static/src/activity2/activity_controller.js',
+            # 'is_clair_sarl/static/src/activity2/activity_model.js',
+            # 'is_clair_sarl/static/src/activity2/activity_record.js',
+            # 'is_clair_sarl/static/src/activity2/activity_renderer.js',
+            # 'is_clair_sarl/static/src/activity2/activity_view.js',
         ],
         'web.assets_qweb': [
             'is_clair_sarl/static/src/xml/**/*',
+            # 'is_clair_sarl/static/src/activity2/activity_view.xml',
         ],
        'web.report_assets_common': [
             'is_clair_sarl/static/src/scss/report.scss',
         ]
     },
-
-
-
-
-
-
-
     "installable": True,
     "application": True,
     "license": "LGPL-3",

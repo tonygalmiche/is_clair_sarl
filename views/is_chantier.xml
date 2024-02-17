@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.chantier -->
+    <record id="is_chantier_seq" model="ir.sequence">
+        <field name="name">N°Chantier</field>
+        <field name="code">is.chantier</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_chantier_form" model="ir.ui.view">
+        <field name="name">is.chantier.form</field>
+        <field name="model">is.chantier</field>
+        <field name="arch" type="xml">
+            <form>
+                 <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="affaire_id"/>
+                        <field name="equipe_id"/>
+                        <field name="nature_travaux_id"/>
+                        <field name="date_debut"/>
+                        <field name="date_fin"/>
+                        <field name="commentaire"/>
+                     </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_chantier_tree" model="ir.ui.view">
+        <field name="name">is.chantier.tree</field>
+        <field name="model">is.chantier</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="affaire_id"/>
+                <field name="equipe_color" widget="color_picker"/>
+                <field name="equipe_id"/>
+                <field name="nature_travaux_id"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="commentaire" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_chantier_search" model="ir.ui.view">
+        <field name="name">is.chantier.search</field>
+        <field name="model">is.chantier</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="affaire_id"/>
+                <field name="equipe_id"/>
+                <field name="nature_travaux_id"/>
+                <field name="commentaire"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_chantier_action" model="ir.actions.act_window">
+        <field name="name">Chantiers</field>
+        <field name="res_model">is.chantier</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!-- Planning des chantiers -->
+    <!-- <record id="is_planning_chantier_view" model="ir.ui.view">
+        <field name="name">is_planning_chantier_view</field>
+        <field name="model">is.chantier</field>
+        <field name="arch" type="xml">
+            <activity2>
+                <templates>
+                </templates>
+            </activity2>
+        </field>
+    </record>
+    <record  id="is_planning_chantier_action" model="ir.actions.act_window">
+        <field name="name">Planning des chantiers</field>
+        <field name="res_model">is.chantier</field>
+        <field name="view_mode">activity2,tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+ -->
+
+
+    <!--is.equipe -->
+    <record id="is_equipe_form_view" model="ir.ui.view">
+        <field name="name">is_equipe_from_view</field>
+        <field name="model">is.equipe</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="color" required="True" widget="color_picker"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_equipe_tree_view">
+        <field name="name">is_equipe_tree_view</field>
+        <field name="model">is.equipe</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="color" required="True" widget="color_picker"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_equipe_search_view" model="ir.ui.view">
+        <field name="name">is_equipe_search_view</field>
+        <field name="model">is.equipe</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record id="is_equipe_action" model="ir.actions.act_window">
+        <field name="name">Equipes</field>
+        <field name="res_model">is.equipe</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+
+
+
+</odoo>

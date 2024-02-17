@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from . import ir_ui_view
 from . import res_company
 from . import is_affaire
 from . import is_import_clair
@@ -14,5 +15,6 @@ from . import account_payment
 from . import is_courrier_expedie
 from . import ir_attachment
 from . import is_purchase_order_line
+from . import is_chantier
 
 

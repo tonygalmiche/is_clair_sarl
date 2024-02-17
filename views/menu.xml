@@ -247,6 +247,60 @@
     />
 
 
+
+
+    <!-- Chantiers -->
+    <menuitem 
+        id="is_chantier_top_menu" 
+        sequence="136" 
+        name="Chantiers"
+    />
+    <menuitem
+        id="is_chantier_main_menu"
+        name="Chantiers"
+        parent="is_chantier_top_menu"
+        sequence="10"
+    />
+
+ 
+    <!-- <menuitem
+        id="is_planning_chantier_menu"
+        name="Planning des chantiers"
+        parent="is_chantier_top_menu"
+        sequence="10"
+        action="is_planning_chantier_action"
+    /> -->
+    <menuitem
+        id="is_chantier_menu"
+        name="Chantiers"
+        parent="is_chantier_top_menu"
+        sequence="20"
+        action="is_chantier_action"
+    />
+
+
+    <menuitem
+        id="is_chantier_table_menu"
+        name="Tables"
+        parent="is_chantier_top_menu"
+        sequence="90"
+    />
+    <menuitem
+        id="is_chantier_nature_travaux_menu"
+        name="Nature des travaux"
+        parent="is_chantier_table_menu"
+        sequence="10"
+        action="is_nature_travaux_action"
+    />
+    <menuitem
+        id="is_equipe_menu"
+        name="Equipes"
+        parent="is_chantier_table_menu"
+        sequence="20"
+        action="is_equipe_action"
+    />
+
+
     
 
 
