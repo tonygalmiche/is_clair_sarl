@@ -509,12 +509,12 @@ class purchase_order(models.Model):
                 'PLATEFORME'                        : 'PLATEFORME',
                 'NACELLE'                           : 'NACELLE',
                 'BENNE DE REPRISE POUR CHARIOT'     : 'GODET',
-                'Constu modulaire R/R'              :  'BUNGALOW',
+                'Constu modulaire R/R'              : 'BUNGALOW',
                 'Forfait transport'                 : 'TCHANTIER',
-                #'Forfait transport Aller'           : 'TCHANTIER',
-                #'Forfait transport Retour'          : 'TCHANTIER',
-                'MAJORATION TRANSPORT ALLER ZONE A' : 'TCHANTIER',
-                'MAJORATION TRANSPORT RETOUR ZONE A': 'TCHANTIER',
+                'MAJORATION TRANSPORT ALLER'        : 'TCHANTIER',
+                'MAJORATION TRANSPORT RETOUR'       : 'TCHANTIER',
+                'MAJORATION TRANSP ALLER'           : 'TCHANTIER',
+                'MAJORATION TRANSP RETOUR'          : 'TCHANTIER',
                 'Kilometres supplémentaires'        : 'TCHANTIER',
                 'CONTRIBUTION VERTE'                : 'ECOCON',
                 'Carburant gazole non routier'      : 'GNR',
@@ -524,7 +524,6 @@ class purchase_order(models.Model):
                 'CONST. MODULAIRE'                  : 'BUNGALOW',
                 'WC AUTONOME'                       : 'WC',
             }
-
             product = False
             for key in dict:
                 if re.search(key, libelle, re.IGNORECASE):
