@@ -25,36 +25,36 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
     }
 
     mounted() {
-        console.log("PlanningChantierRenderer : mounted",this);
+        //console.log("PlanningChantierRenderer : mounted",this);
         this.GetChantiers();
     }
-    willStart() {
-        console.log("PlanningChantierRenderer : willStart",this);
-    }
-    willRender() {
-        console.log("PlanningChantierRenderer : willRender",this);
-    }
-    rendered() {
-        console.log("PlanningChantierRenderer : rendered",this);
-    }
-     willUpdateProps() {
-        console.log("PlanningChantierRenderer : willUpdateProps",this);
-    }
-    willPatch() {
-        console.log("PlanningChantierRenderer : willPatch",this);
-    }
-    patched() {
-        console.log("PlanningChantierRenderer : patched",this);
-    }
-    willUnmount() {
-        console.log("PlanningChantierRenderer : willUnmount",this);
-    }
-    willDestroy() {
-        console.log("PlanningChantierRenderer : willDestroy",this);
-    }
-    onError() {
-        console.log("PlanningChantierRenderer : onError",this);
-    }
+    // willStart() {
+    //     console.log("PlanningChantierRenderer : willStart",this);
+    // }
+    // willRender() {
+    //     console.log("PlanningChantierRenderer : willRender",this);
+    // }
+    // rendered() {
+    //     console.log("PlanningChantierRenderer : rendered",this);
+    // }
+    //  willUpdateProps() {
+    //     console.log("PlanningChantierRenderer : willUpdateProps",this);
+    // }
+    // willPatch() {
+    //     console.log("PlanningChantierRenderer : willPatch",this);
+    // }
+    // patched() {
+    //     console.log("PlanningChantierRenderer : patched",this);
+    // }
+    // willUnmount() {
+    //     console.log("PlanningChantierRenderer : willUnmount",this);
+    // }
+    // willDestroy() {
+    //     console.log("PlanningChantierRenderer : willDestroy",this);
+    // }
+    // onError() {
+    //     console.log("PlanningChantierRenderer : onError",this);
+    // }
 
 
     // Click pour colorier une ligne
@@ -89,47 +89,72 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
 
     //Alonger la durée du chantier par glissé/déposé
     tdMouseDown(ev) {
-        var partnerid=ev.target.parentElement.attributes.partnerid;
-        if (partnerid!==undefined){
-            this.state.partnerid=partnerid.value;
+        var chantierid=ev.target.parentElement.attributes.chantierid;
+
+        console.log("tdMouseDown", ev.target.parentElement, chantierid);
+
+        if (chantierid!==undefined){
+            this.state.chantierid=chantierid.value;
         }
         var jour=ev.target.attributes.jour;
         if (jour!==undefined){
             this.state.jour=jour.value;
         }
+        var color=ev.target.attributes.color;
+        if (color!==undefined){
+            this.state.color=color.value;
+        }
+
+        // if (jour!==undefined && chantierid!==undefined){
+        //     this.state.dict[chantierid.value]["jours"][jour.value].cursor="default";
+        // }
+
+
+
+
+
         console.log('TrMouseDown : parentElement=',ev.target.parentElement);
     }
     tdMouseMove(ev) {
-        if (this.state.partnerid>0){
+        if (this.state.chantierid>0){
             const jour=ev.target.attributes.jour;
             if (jour!==undefined){
-
-                if(jour.value>this.state.jour){
-                    for (let i = this.state.jour; i <= jour.value; i++) {
-                        const style="background-color:red";
-                        //this.state.styles[this.state.partnerid][i].style=style;
-
-                        //console.log("this.state.chantiers=",this.state.chantiers);
-                        //console.log("this.state.partnerid=",this.state.partnerid);
-
-
-                        this.state.dict[this.state.partnerid]["jours"][i].style=style;
-                        //this.state.jour=jour.value;
+                if(parseInt(jour.value)>parseInt(this.state.jour)){
+                    for (let i = parseInt(this.state.jour); i <= parseInt(jour.value); i++) {
+                        this.state.dict[this.state.chantierid]["jours"][i].color=this.state.color;
+                        var cursor="move";
+                        if (i==jour.value){
+                            cursor="col-resize";
+                        }
+                        this.state.dict[this.state.chantierid]["jours"][i].cursor=cursor;
+                        this.state.dict[this.state.chantierid].fin = parseInt(jour.value)+1;
+                        const duree = this.state.dict[this.state.chantierid].fin - this.state.dict[this.state.chantierid].debut + 1;
+                        this.state.dict[this.state.chantierid].duree = duree
+                        this.state.jour = jour.value;
                     }
-        
                 }
-
             }
         }
     }
     tdMouseUp(ev) {
         console.log('TrMouseUp',ev);
-        this.state.partnerid=0;
+        if (this.state.chantierid>0){
+            const chantier = this.state.dict[this.state.chantierid];
+            const duree = chantier.duree;
+            if (duree>1) {
+                this.writeChantier(this.state.chantierid,duree);
+            }
+            console.log("fin, duree =",this.state.dict[this.state.chantierid].fin,duree);
+        }
+        this.state.chantierid=0;
         this.state.jour=0;
+
+
+
     }
 
     tbodyMouseLeave(ev) {
-        this.state.partnerid=0;
+        this.state.chantierid=0;
         this.state.jour=0;
     }
 
@@ -188,6 +213,31 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
     }
 
 
+    async writeChantier(chantierid,duree){
+        console.log("writeChantier : chantierid,duree=",chantierid,duree)
+        var self=this;
+        var vals={
+            "duree": parseInt(duree),
+        }
+        var prom = rpc.query({
+            model: 'is.chantier',
+            method: 'write',
+            args: [[parseInt(chantierid)], vals],
+        });
+
+
+
+        // rpc.query({
+        //     model: 'is.chantier',
+        //     method: 'get_vue_owl_99',
+        //     kwargs: {
+        //         domain: [],
+        //     }
+        // }).then(function (result) {
+        //     console.log("testRpcMethod : result=",result);
+        //     self.state.partners = result.partners;
+        // });
+    }
 
 
 

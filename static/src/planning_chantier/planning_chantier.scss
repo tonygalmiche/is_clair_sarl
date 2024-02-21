@@ -13,7 +13,7 @@
     border-top: 1px solid gray;
 }
 
-.planning_chantier th,.planning_chantier td {
+.planning_chantier th {
     border: 1px solid gray;
     // border-top: 1px solid gray;
     // border-top: 1px solid gray;
@@ -38,6 +38,11 @@
     width: 98%;
     display: block;
     overflow-y: scroll;
+
+    // table-layout: fixed;
+    // display: table;
+
+
 }
   
 .planning_chantier thead {
@@ -47,10 +52,21 @@
 }
 
 .planning_chantier td {
-    border: 1px solid gray;
-    padding-left:5pt;
-    padding-right:2pt;
+    border:none;
+    border-top: 1px solid gray;
+    padding:0;
+    // padding-right:2pt;
 }
+
+
+
+
+
+
+
+
+
+
 
 .planning_chantier th {
     border: 1px solid gray;
@@ -58,3 +74,11 @@
     padding-right:2pt;
 }
 
+
+// .planning_chantier .col1 {
+//     overflow: hidden;
+//     word-break:break-all;
+//     min-width: 7em;
+//     white-space: nowrap;
+//     width: 100px;
+// }

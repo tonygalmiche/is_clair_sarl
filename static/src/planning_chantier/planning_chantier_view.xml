@@ -7,24 +7,31 @@
 
         <div style="background-color:LightGreen">
             Reste à faire : <br />
-            - Mettre le nom de l'affaire ou le commnentaire dans le tableau des chantiers <br />
-            - Mettre la bonne durée et la bonne date de début des chantiers <br />
+            - Mettre la bonne date de début des chantiers <br />
             - Mettre en entête les mois et semaines <br />
             - Afficher 24 semaines et pouvoir choisir le nombre de semaines à afficher <br />
             - Boutons pour semaine précédente et suivante <br />
-            - Pouvoir déplacer, allonger et réduire la durée d'un chantier <br />
-            - Mettre les bonnes couleurs des chantiers<br />
+            - Pouvoir déplacer et réduire la durée d'un chantier <br />
+            - Mettre à jour le chantier dans Odoo après allongement ou déplacement <br />
             - Hauteur et largeur du planning automatiquement au plus large<br />
             - Rendre modifiable uniquement pour le groupe autorisé<br />
             - Afficher les jours de fermeture<br />
-            - Dans la vue formulaire d'un chantier ajouter la durée en jours et relier les champs date_debut,date_fin et duree entre eux lors de modifications <br />
         </div>
 
-        <table class="unselectable" style="height:400px;width:1570px">
+        color : <t t-esc="state.color"/> : chantierid : <t t-esc="state.chantierid"/> : jour : <t t-esc="state.jour"/>
+
+        <table class="unselectable" style="height:400px;width:100%">
             <thead>
                 <tr><th colspan="100">Mettre ici une autre ligne en entête fixée</th></tr>
                 <tr>
-                    <th>Action</th><th>id</th><th>name</th>
+                    <th>Action</th>
+                    <!-- <th>id</th> -->
+                    <th>Chantier</th>
+                    <th>Equipe</th>
+                    <th>Travaux</th>
+                    <!-- <th>Début</th> -->
+                    <!-- <th>Fin</th> -->
+                    <!-- <th>Durée</th> -->
                     <!-- <t t-foreach="Object.values(state.jours or {})" t-as="jour" t-key="jour.key">
                         <th 
                             style="width:15pt;text-align:center;font-size: 7pt;"
@@ -43,9 +50,9 @@
                             t-att-click="-1" 
                             t-att-style="chantier.trstyle"
                             t-att-memstyle="chantier.trstyle"
-                            t-att-partnerid="chantier.id"
+                            t-att-chantierid="chantier.id"
                         >
-                        <th style="width:80px;">
+                        <th style="width:10px;white-space: nowrap;">
                             <span 
                                 class="fa fa-trash link"
                                 alt="Masquer chantier"
@@ -60,16 +67,25 @@
                                 t-att-id="chantier.id"
                                 style="margin-left:0.5em;cursor: pointer;"
                             />
-                            <span 
+                            <!-- <span 
                                 class="fa fa-edit link"
                                 alt="Modifier chantier"
                                 t-on-click="ModifierChantierClick" 
                                 t-att-id="chantier.id"
                                 style="margin-left:0.5em;cursor: pointer;"
-                            />
+                            /> -->
                         </th>
-                        <th style="width:50px;"><t t-esc="chantier.id"/></th>
-                        <th style="width:200px;white-space: nowrap;"><t t-esc="chantier.name"/></th>
+                        <!-- <th style="width:10px;white-space: nowrap;"><t t-esc="chantier.id"/></th> -->
+                        <th style="width:200px;white-space: nowrap;">
+                            <span t-att-title="chantier.name">
+                                <t t-esc="chantier.short_name"/>
+                            </span>
+                        </th>
+                        <th style="width:100px;white-space: nowrap;"><t t-esc="chantier.equipe"/></th>
+                        <th style="width:100px;white-space: nowrap;"><t t-esc="chantier.travaux"/></th>
+                        <!-- <th style="width:30px;white-space: nowrap;"><t t-esc="chantier.debut"/></th> -->
+                        <!-- <th style="width:30px;white-space: nowrap;"><t t-esc="chantier.fin"/></th> -->
+                        <!-- <th style="width:30px;white-space: nowrap;"><t t-esc="chantier.duree"/></th> -->
 
                         <t t-foreach="Object.values(chantier.jours or {})" t-as="jour" t-key="jour.key">
                             <td 
@@ -77,9 +93,14 @@
                                 t-on-mousedown="tdMouseDown" 
                                 t-on-mousemove="tdMouseMove" 
                                 t-on-mouseup="tdMouseUp" 
-                                t-att-style="jour.style"
                                 t-att-jour="jour.key"
+                                t-att-style="'cursor:' + jour.cursor + ';background-color:'+jour.color + ';border-left:'+jour.border"
+                                t-att-color="jour.color"
                             >
+
+                            <!-- jour["border] = "1px solid gray" -->
+<!--  -->
+
                             </td>
                         </t>
                     </tr>
@@ -88,75 +109,5 @@
         </table> 
 
 
-
-<!--         
-
-        <table class="unselectable" style="height:250px;width:1570px">
-            <thead>
-                <tr><th colspan="100">Mettre ici une autre ligne en enetête fixée</th></tr>
-                <tr>
-                    <th>Action</th><th>id</th><th>name</th>
-                    <t t-foreach="Object.values(state.jours or {})" t-as="jour" t-key="jour.key">
-                        <th 
-                            style="width:15pt;text-align:center;font-size: 7pt;"
-                        >
-                        </th>
-                    </t>
-                </tr>
-            </thead>
-            <tbody  t-on-mouseleave="tbodyMouseLeave">
-                <t t-foreach="state.additionalPartner or []" t-as="partner" t-key="partner.id">
-                        <tr 
-                            t-on-mouseenter="TrMouseEnter" 
-                            t-on-mouseleave="TrMouseLeave" 
-                            t-on-click="TrClick" 
-                            t-att-click="-1" 
-                            t-att-style="partner.trstyle"
-                            t-att-memstyle="partner.trstyle"
-                            t-att-partnerid="partner.id"
-                        >
-                        <th style="width:80px;">
-                            <span 
-                                class="fa fa-trash link"
-                                alt="Supprimer"
-                                t-on-click="DeleteAdditionalPartnerClick" 
-                                t-att-id="partner.id"
-                                style="margin-left:0.5em;cursor: pointer;"
-                            />
-                            <span 
-                                class="fa fa-search-plus link"
-                                alt="Voir partner"
-                                t-on-click="VoirPartnerClick" 
-                                t-att-id="partner.id"
-                                style="margin-left:0.5em;cursor: pointer;"
-                            />
-                            <span 
-                                class="fa fa-edit link"
-                                alt="Modifier partner"
-                                t-on-click="ModifierPartnerClick" 
-                                t-att-id="partner.id"
-                                style="margin-left:0.5em;cursor: pointer;"
-                            />
-                        </th>
-                        <th style="width:50px;"><t t-esc="partner.id"/></th>
-                        <th style="width:200px;white-space: nowrap;"><t t-esc="partner.name"/></th>
-
-                        <t t-foreach="Object.values(state.jours or {})" t-as="jour" t-key="jour.key">
-                            <td 
-                                style="width:20px;text-align:center;font-size: 7pt;"
-
-                                t-on-mousedown="tdMouseDown" 
-                                t-on-mousemove="tdMouseMove" 
-                                t-on-mouseup="tdMouseUp" 
-    
-                                t-att-style="state.styles[partner.id][jour.key].style"
-                                t-att-jour="jour.key"
-                            >
-                            </td>
-                        </t>
-                    </tr>
-                </t>
-            </tbody>
-        </table> -->
     </div>
 </templates>
