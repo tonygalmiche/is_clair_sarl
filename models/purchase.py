@@ -517,12 +517,13 @@ class purchase_order(models.Model):
                 'MAJORATION TRANSPORT RETOUR ZONE A': 'TCHANTIER',
                 'Kilometres supplémentaires'        : 'TCHANTIER',
                 'CONTRIBUTION VERTE'                : 'ECOCON',
-                'Carburant gazole non routier'      : 'GAZOLE',
+                'Carburant gazole non routier'      : 'GNR',
                 'Prestation forfait recharge elec'  : 'RECHAELEC',
                 'Garantie dommages'                 : 'ASSURANCE',
                 'Remise'                            : 'REMISE',
+                'CONST. MODULAIRE'                  : 'BUNGALOW',
+                'WC AUTONOME'                       : 'WC',
             }
-
 
             product = False
             for key in dict:
