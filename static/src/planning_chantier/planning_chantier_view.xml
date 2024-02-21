@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <div t-name="is_clair_sarl.PlanningChantierTemplate" class="planning_chantier" owl="1">
+        <div class="buttons">
+            <button class="btn btn-primary" t-on-click="OKButtonClick">OK</button>
+        </div>
+
+        <div style="background-color:LightGreen">
+            Reste à faire : <br />
+            - Mettre le nom de l'affaire ou le commnentaire dans le tableau des chantiers <br />
+            - Mettre la bonne durée et la bonne date de début des chantiers <br />
+            - Mettre en entête les mois et semaines <br />
+            - Afficher 24 semaines et pouvoir choisir le nombre de semaines à afficher <br />
+            - Boutons pour semaine précédente et suivante <br />
+            - Pouvoir déplacer, allonger et réduire la durée d'un chantier <br />
+            - Mettre les bonnes couleurs des chantiers<br />
+            - Hauteur et largeur du planning automatiquement au plus large<br />
+            - Rendre modifiable uniquement pour le groupe autorisé<br />
+            - Afficher les jours de fermeture<br />
+            - Dans la vue formulaire d'un chantier ajouter la durée en jours et relier les champs date_debut,date_fin et duree entre eux lors de modifications <br />
+        </div>
+
+        <table class="unselectable" style="height:400px;width:1570px">
+            <thead>
+                <tr><th colspan="100">Mettre ici une autre ligne en entête fixée</th></tr>
+                <tr>
+                    <th>Action</th><th>id</th><th>name</th>
+                    <!-- <t t-foreach="Object.values(state.jours or {})" t-as="jour" t-key="jour.key">
+                        <th 
+                            style="width:15pt;text-align:center;font-size: 7pt;"
+                        >
+                        </th>
+                    </t> -->
+                </tr>
+            </thead>
+            <tbody  t-on-mouseleave="tbodyMouseLeave">
+                <!-- <t t-foreach="state.chantiers or []" t-as="chantier" t-key="chantier.id"> -->
+                <t t-foreach="Object.values(state.dict or {})" t-as="chantier" t-key="chantier.id">
+                        <tr 
+                            t-on-mouseenter="TrMouseEnter" 
+                            t-on-mouseleave="TrMouseLeave" 
+                            t-on-click="TrClick" 
+                            t-att-click="-1" 
+                            t-att-style="chantier.trstyle"
+                            t-att-memstyle="chantier.trstyle"
+                            t-att-partnerid="chantier.id"
+                        >
+                        <th style="width:80px;">
+                            <span 
+                                class="fa fa-trash link"
+                                alt="Masquer chantier"
+                                t-on-click="MasquerChantierClick" 
+                                t-att-id="chantier.id"
+                                style="margin-left:0.5em;cursor: pointer;"
+                            />
+                            <span 
+                                class="fa fa-search-plus link"
+                                alt="Voir chantier"
+                                t-on-click="VoirChantierClick" 
+                                t-att-id="chantier.id"
+                                style="margin-left:0.5em;cursor: pointer;"
+                            />
+                            <span 
+                                class="fa fa-edit link"
+                                alt="Modifier chantier"
+                                t-on-click="ModifierChantierClick" 
+                                t-att-id="chantier.id"
+                                style="margin-left:0.5em;cursor: pointer;"
+                            />
+                        </th>
+                        <th style="width:50px;"><t t-esc="chantier.id"/></th>
+                        <th style="width:200px;white-space: nowrap;"><t t-esc="chantier.name"/></th>
+
+                        <t t-foreach="Object.values(chantier.jours or {})" t-as="jour" t-key="jour.key">
+                            <td 
+                                style="width:20px;text-align:center;font-size: 7pt;"
+                                t-on-mousedown="tdMouseDown" 
+                                t-on-mousemove="tdMouseMove" 
+                                t-on-mouseup="tdMouseUp" 
+                                t-att-style="jour.style"
+                                t-att-jour="jour.key"
+                            >
+                            </td>
+                        </t>
+                    </tr>
+                </t>
+            </tbody>
+        </table> 
+
+
+
+<!--         
+
+        <table class="unselectable" style="height:250px;width:1570px">
+            <thead>
+                <tr><th colspan="100">Mettre ici une autre ligne en enetête fixée</th></tr>
+                <tr>
+                    <th>Action</th><th>id</th><th>name</th>
+                    <t t-foreach="Object.values(state.jours or {})" t-as="jour" t-key="jour.key">
+                        <th 
+                            style="width:15pt;text-align:center;font-size: 7pt;"
+                        >
+                        </th>
+                    </t>
+                </tr>
+            </thead>
+            <tbody  t-on-mouseleave="tbodyMouseLeave">
+                <t t-foreach="state.additionalPartner or []" t-as="partner" t-key="partner.id">
+                        <tr 
+                            t-on-mouseenter="TrMouseEnter" 
+                            t-on-mouseleave="TrMouseLeave" 
+                            t-on-click="TrClick" 
+                            t-att-click="-1" 
+                            t-att-style="partner.trstyle"
+                            t-att-memstyle="partner.trstyle"
+                            t-att-partnerid="partner.id"
+                        >
+                        <th style="width:80px;">
+                            <span 
+                                class="fa fa-trash link"
+                                alt="Supprimer"
+                                t-on-click="DeleteAdditionalPartnerClick" 
+                                t-att-id="partner.id"
+                                style="margin-left:0.5em;cursor: pointer;"
+                            />
+                            <span 
+                                class="fa fa-search-plus link"
+                                alt="Voir partner"
+                                t-on-click="VoirPartnerClick" 
+                                t-att-id="partner.id"
+                                style="margin-left:0.5em;cursor: pointer;"
+                            />
+                            <span 
+                                class="fa fa-edit link"
+                                alt="Modifier partner"
+                                t-on-click="ModifierPartnerClick" 
+                                t-att-id="partner.id"
+                                style="margin-left:0.5em;cursor: pointer;"
+                            />
+                        </th>
+                        <th style="width:50px;"><t t-esc="partner.id"/></th>
+                        <th style="width:200px;white-space: nowrap;"><t t-esc="partner.name"/></th>
+
+                        <t t-foreach="Object.values(state.jours or {})" t-as="jour" t-key="jour.key">
+                            <td 
+                                style="width:20px;text-align:center;font-size: 7pt;"
+
+                                t-on-mousedown="tdMouseDown" 
+                                t-on-mousemove="tdMouseMove" 
+                                t-on-mouseup="tdMouseUp" 
+    
+                                t-att-style="state.styles[partner.id][jour.key].style"
+                                t-att-jour="jour.key"
+                            >
+                            </td>
+                        </t>
+                    </tr>
+                </t>
+            </tbody>
+        </table> -->
+    </div>
+</templates>

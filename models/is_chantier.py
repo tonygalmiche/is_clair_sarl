@@ -44,14 +44,66 @@ class IsChantier(models.Model):
     @api.model
     def get_chantiers(self,domain):#, res_model, ):
         res=[]
-        chantiers=self.env['is.chantier'].search(domain, order="name", limit=10)
+        chantiers=self.env['is.chantier'].search(domain, order="name") #, limit=10)
+        trcolor=""
+        dict={}
         for chantier in chantiers:
+            if trcolor=="#ffffff":
+                trcolor="#f2f3f4"
+            else:
+                trcolor="#ffffff"
+            trstyle="background-color:%s"%(trcolor)
+
+            jours={}
+            for i in range(1, 2*31):
+                jour={
+                    "key": i,
+                    "style": "cursor:default;background-color:white",
+                }
+                if i>10 and i<20:
+                    jour["style"] = "cursor:move;background-color:Chartreuse"
+                if i==10 or i==20:
+                    jour["style"] = "cursor:col-resize;background-color:Chartreuse"
+                jours[i]=jour
             vals={
                 "id"      : chantier.id,
                 "name"    : chantier.name,
-                "chantier": chantier,
+                "trstyle" : trstyle,
+                "jours"   : jours,
             }
             res.append(vals)
+            dict[chantier.id]=vals
         #print('get_chantiers=',res)
-        return {"chantiers":res}
-        #return "toto et tutu"
+        return {
+            #"chantiers":res,
+            "dict"     : dict,
+        }
+    
+
+
+    # @api.model
+    # def get_vue_owl_99(self,domain):
+
+    #     print('get_vue_owl_99 : domain=',domain)
+
+    #     res=[]
+    #     partners=self.env['res.partner'].search(domain, order="name", limit=100)
+    #     trcolor=""
+    #     for partner in partners:
+
+    #         if trcolor=="#ffffff":
+    #             trcolor="#f2f3f4"
+    #         else:
+    #             trcolor="#ffffff"
+    #         trstyle="background-color:%s"%(trcolor)
+
+    #         vals={
+    #             "id"      : partner.id,
+    #             "name"    : partner.name,
+    #             "trstyle" : trstyle,
+    #         }
+    #         res.append(vals)
+    #     print('get_vue_owl_99 : res=',res)
+    #     return {"partners":res}
+
+

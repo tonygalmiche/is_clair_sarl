@@ -1,9 +1,9 @@
 from odoo import fields, models
 
-# class View(models.Model):
-#     _inherit = "ir.ui.view"
+class View(models.Model):
+    _inherit = "ir.ui.view"
 
-#     type = fields.Selection(selection_add=[
-#         ("activity2", "Copie vue activity pour Test"),
-#     ])
+    type = fields.Selection(selection_add=[
+        ("planning_chantier", "Planning chantier"),
+    ])
 

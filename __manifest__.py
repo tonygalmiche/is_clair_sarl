@@ -47,15 +47,16 @@ Module Odoo 15 pour CLAIR-SARL
     'assets': {
         'web.assets_backend': [
             'is_clair_sarl/static/src/scss/styles.scss',
-            # 'is_clair_sarl/static/src/activity2/activity_controller.js',
-            # 'is_clair_sarl/static/src/activity2/activity_model.js',
-            # 'is_clair_sarl/static/src/activity2/activity_record.js',
-            # 'is_clair_sarl/static/src/activity2/activity_renderer.js',
-            # 'is_clair_sarl/static/src/activity2/activity_view.js',
+            'is_clair_sarl/static/src/planning_chantier/planning_chantier.scss',
+            'is_clair_sarl/static/src/planning_chantier/planning_chantier_controller.js',
+            'is_clair_sarl/static/src/planning_chantier/planning_chantier_model.js',
+            'is_clair_sarl/static/src/planning_chantier/planning_chantier_record.js',
+            'is_clair_sarl/static/src/planning_chantier/planning_chantier_renderer.js',
+            'is_clair_sarl/static/src/planning_chantier/planning_chantier_view.js',
         ],
         'web.assets_qweb': [
             'is_clair_sarl/static/src/xml/**/*',
-            # 'is_clair_sarl/static/src/activity2/activity_view.xml',
+            'is_clair_sarl/static/src/planning_chantier/planning_chantier_view.xml',
         ],
        'web.report_assets_common': [
             'is_clair_sarl/static/src/scss/report.scss',

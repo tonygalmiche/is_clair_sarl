@@ -263,13 +263,13 @@
     />
 
  
-    <!-- <menuitem
+    <menuitem
         id="is_planning_chantier_menu"
         name="Planning des chantiers"
         parent="is_chantier_top_menu"
         sequence="10"
         action="is_planning_chantier_action"
-    /> -->
+    />
     <menuitem
         id="is_chantier_menu"
         name="Chantiers"
