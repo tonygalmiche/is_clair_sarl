@@ -1,47 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <div t-name="is_clair_sarl.PlanningChantierTemplate" class="planning_chantier" owl="1">
+
+<!--
+    <div style="background-color:LightGreen">
+        Reste à faire : <br />
+        - Pouvoir déplacer et réduire la durée d'un chantier <br />
+        - Mettre à jour le chantier dans Odoo après allongement ou déplacement <br />
+        - Rendre modifiable uniquement pour le groupe autorisé<br />
+        - Afficher les jours de fermeture<br />
+        - Afficher des alertes<br />
+    </div>
+ -->
+
+
+    <div t-name="is_clair_sarl.PlanningChantierTemplate" class="planning_chantier" owl="1" style="100vh;background-color:white">
         <div class="buttons">
-            <button class="btn btn-primary" t-on-click="OKButtonClick">OK</button>
-        </div>
-
-        <div style="background-color:LightGreen">
-            Reste à faire : <br />
-            - Mettre la bonne date de début des chantiers <br />
-            - Mettre en entête les mois et semaines <br />
-            - Afficher 24 semaines et pouvoir choisir le nombre de semaines à afficher <br />
-            - Boutons pour semaine précédente et suivante <br />
-            - Pouvoir déplacer et réduire la durée d'un chantier <br />
-            - Mettre à jour le chantier dans Odoo après allongement ou déplacement <br />
-            - Hauteur et largeur du planning automatiquement au plus large<br />
-            - Rendre modifiable uniquement pour le groupe autorisé<br />
-            - Afficher les jours de fermeture<br />
-        </div>
-
-        color : <t t-esc="state.color"/> : chantierid : <t t-esc="state.chantierid"/> : jour : <t t-esc="state.jour"/>
-
-        <table class="unselectable" style="height:400px;width:100%">
-            <thead>
-                <tr><th colspan="100">Mettre ici une autre ligne en entête fixée</th></tr>
+            <table style="border:0">
                 <tr>
-                    <th>Action</th>
-                    <!-- <th>id</th> -->
-                    <th>Chantier</th>
-                    <th>Equipe</th>
-                    <th>Travaux</th>
-                    <!-- <th>Début</th> -->
-                    <!-- <th>Fin</th> -->
-                    <!-- <th>Durée</th> -->
-                    <!-- <t t-foreach="Object.values(state.jours or {})" t-as="jour" t-key="jour.key">
-                        <th 
-                            style="width:15pt;text-align:center;font-size: 7pt;"
-                        >
+                    <td><button class="btn btn-primary" t-on-click="PrecedentClick">&lt;</button></td>
+                    <td><button class="btn btn-primary" t-on-click="OKButtonClick">Aujourd'hui</button></td>
+                    <td><button class="btn btn-primary" t-on-click="SuivantClick">&gt;</button></td>
+                    <td>
+                        <input 
+                            name="nb_semaines" 
+                            t-att-value="state.nb_semaines" 
+                            t-on-change="onChangeNbSemaines" 
+                            type="text" 
+                            class="form-control"
+                            placeholder="Nb semaines" 
+                            style="width:120px" 
+                        />
+                    </td>
+                    <td style="width:100px"><t t-esc="state.chantierid"/></td>
+                    <td style="width:100px"><t t-esc="state.jour"/></td>
+                    <td style="width:100px"><t t-esc="state.color"/></td>
+                    <td style="width:100px"><t t-esc="state.action"/></td>
+
+
+                    <!-- this.state.chantierid=chantierid.value;
+                }
+                var jour=ev.target.attributes.jour;
+                if (jour!==undefined){
+                    this.state.jour=jour.value;
+                }
+                var color=ev.target.attributes.color;
+                if (color!==undefined){
+                    this.state.color=color.value;
+         -->
+
+
+                </tr>
+            </table> 
+        </div>
+        <table class="unselectable" style="height:500pt;width:100%">
+            <thead>
+                <tr>
+                    <th colspan="4" style="height:15pt"><div>Planning</div></th>
+                    <t t-foreach="Object.values(state.mois or {})" t-as="mois" t-key="mois.key">
+                        <th style="height:15pt;width:15pt;font-size: 8pt;" t-att-colspan="mois.colspan">
+                            <div t-esc="mois.mois"/>
                         </th>
-                    </t> -->
+                    </t>
+                </tr>
+                <tr>
+                    <th colspan="4" style="height:15pt"><div>mis à jour le</div></th>
+                    <t t-foreach="Object.values(state.semaines or {})" t-as="semaine" t-key="semaine.key">
+                        <th style="height:15pt;width:15pt;font-size: 8pt;" t-att-colspan="semaine.colspan">
+                            <div t-esc="semaine.semaine"/>
+                        </th>
+                    </t>
+                </tr>
+                <tr>
+                    <th style="height:15pt"><div>Action</div></th>
+                    <th style="height:15pt"><div>Chantier</div></th>
+                    <th style="height:15pt"><div>Equipe</div></th>
+                    <th style="height:15pt"><div>Travaux</div></th>
+                    <t t-foreach="Object.values(state.semaines or {})" t-as="semaine" t-key="semaine.key">
+                        <th style="height:15pt;width:15pt;font-size: 8pt;text-align:left" t-att-colspan="semaine.colspan">
+                            <div t-esc="semaine.jour"/>
+                        </th>
+                    </t>
                 </tr>
             </thead>
             <tbody  t-on-mouseleave="tbodyMouseLeave">
-                <!-- <t t-foreach="state.chantiers or []" t-as="chantier" t-key="chantier.id"> -->
                 <t t-foreach="Object.values(state.dict or {})" t-as="chantier" t-key="chantier.id">
                         <tr 
                             t-on-mouseenter="TrMouseEnter" 
@@ -52,7 +93,7 @@
                             t-att-memstyle="chantier.trstyle"
                             t-att-chantierid="chantier.id"
                         >
-                        <th style="width:10px;white-space: nowrap;">
+                        <td style="width:10px;white-space: nowrap;">
                             <span 
                                 class="fa fa-trash link"
                                 alt="Masquer chantier"
@@ -67,26 +108,14 @@
                                 t-att-id="chantier.id"
                                 style="margin-left:0.5em;cursor: pointer;"
                             />
-                            <!-- <span 
-                                class="fa fa-edit link"
-                                alt="Modifier chantier"
-                                t-on-click="ModifierChantierClick" 
-                                t-att-id="chantier.id"
-                                style="margin-left:0.5em;cursor: pointer;"
-                            /> -->
-                        </th>
-                        <!-- <th style="width:10px;white-space: nowrap;"><t t-esc="chantier.id"/></th> -->
-                        <th style="width:200px;white-space: nowrap;">
+                        </td>
+                        <td style="width:200px;white-space: nowrap;">
                             <span t-att-title="chantier.name">
                                 <t t-esc="chantier.short_name"/>
                             </span>
-                        </th>
-                        <th style="width:100px;white-space: nowrap;"><t t-esc="chantier.equipe"/></th>
-                        <th style="width:100px;white-space: nowrap;"><t t-esc="chantier.travaux"/></th>
-                        <!-- <th style="width:30px;white-space: nowrap;"><t t-esc="chantier.debut"/></th> -->
-                        <!-- <th style="width:30px;white-space: nowrap;"><t t-esc="chantier.fin"/></th> -->
-                        <!-- <th style="width:30px;white-space: nowrap;"><t t-esc="chantier.duree"/></th> -->
-
+                        </td>
+                        <td style="width:100px;white-space: nowrap;"><t t-esc="chantier.equipe"/></td>
+                        <td style="width:100px;white-space: nowrap;"><t t-esc="chantier.travaux"/></td>
                         <t t-foreach="Object.values(chantier.jours or {})" t-as="jour" t-key="jour.key">
                             <td 
                                 style="width:20px;text-align:center;font-size: 7pt;"
@@ -97,10 +126,6 @@
                                 t-att-style="'cursor:' + jour.cursor + ';background-color:'+jour.color + ';border-left:'+jour.border"
                                 t-att-color="jour.color"
                             >
-
-                            <!-- jour["border] = "1px solid gray" -->
-<!--  -->
-
                             </td>
                         </t>
                     </tr>
@@ -109,5 +134,8 @@
         </table> 
 
 
+
     </div>
+
+
 </templates>

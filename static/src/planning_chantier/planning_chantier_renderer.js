@@ -19,42 +19,15 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         //useState permet de faire un lien entre la vue XML et l'Object Javascript
         //Chaque modification de l'objet this.state entraine une modification de l'interface utilisateur
         this.state = useState({
-            //dict:{},
-            //activity_types:[]
+            decale_planning: 0,
+            nb_semaines:16,
+            dict:{},
         });
     }
 
     mounted() {
-        //console.log("PlanningChantierRenderer : mounted",this);
         this.GetChantiers();
     }
-    // willStart() {
-    //     console.log("PlanningChantierRenderer : willStart",this);
-    // }
-    // willRender() {
-    //     console.log("PlanningChantierRenderer : willRender",this);
-    // }
-    // rendered() {
-    //     console.log("PlanningChantierRenderer : rendered",this);
-    // }
-    //  willUpdateProps() {
-    //     console.log("PlanningChantierRenderer : willUpdateProps",this);
-    // }
-    // willPatch() {
-    //     console.log("PlanningChantierRenderer : willPatch",this);
-    // }
-    // patched() {
-    //     console.log("PlanningChantierRenderer : patched",this);
-    // }
-    // willUnmount() {
-    //     console.log("PlanningChantierRenderer : willUnmount",this);
-    // }
-    // willDestroy() {
-    //     console.log("PlanningChantierRenderer : willDestroy",this);
-    // }
-    // onError() {
-    //     console.log("PlanningChantierRenderer : onError",this);
-    // }
 
 
     // Click pour colorier une ligne
@@ -89,73 +62,88 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
 
     //Alonger la durée du chantier par glissé/déposé
     tdMouseDown(ev) {
+        //On mémorise le chantier, le jour et la couleur lors du down de la souris
         var chantierid=ev.target.parentElement.attributes.chantierid;
-
-        console.log("tdMouseDown", ev.target.parentElement, chantierid);
-
-        if (chantierid!==undefined){
-            this.state.chantierid=chantierid.value;
-        }
         var jour=ev.target.attributes.jour;
-        if (jour!==undefined){
-            this.state.jour=jour.value;
-        }
         var color=ev.target.attributes.color;
-        if (color!==undefined){
-            this.state.color=color.value;
+        if (chantierid!==undefined && jour!==undefined && color!==undefined){
+            chantierid = parseInt(chantierid.value);
+            jour       = parseInt(jour.value);
+            color      = color.value;
+            if (this.state.dict[chantierid]!==undefined) {
+                if (this.state.dict[chantierid]["jours"]!==undefined) {
+                    if (this.state.dict[chantierid]["jours"][jour]!==undefined) {
+                        const cursor = this.state.dict[chantierid]["jours"][jour].cursor;
+                        if (cursor=="col-resize" || cursor=="move") {
+                            this.state.action=cursor;
+                            console.log("tdMouseDown", ev.target.parentElement, chantierid);
+                            this.state.chantierid=chantierid;
+                            this.state.jour=jour;
+                            this.state.color=color;
+                        }
+                    }
+                }
+            }
         }
-
-        // if (jour!==undefined && chantierid!==undefined){
-        //     this.state.dict[chantierid.value]["jours"][jour.value].cursor="default";
-        // }
-
-
-
-
-
-        console.log('TrMouseDown : parentElement=',ev.target.parentElement);
     }
     tdMouseMove(ev) {
-        if (this.state.chantierid>0){
-            const jour=ev.target.attributes.jour;
-            if (jour!==undefined){
-                if(parseInt(jour.value)>parseInt(this.state.jour)){
-                    for (let i = parseInt(this.state.jour); i <= parseInt(jour.value); i++) {
-                        this.state.dict[this.state.chantierid]["jours"][i].color=this.state.color;
-                        var cursor="move";
-                        if (i==jour.value){
-                            cursor="col-resize";
+        if (this.state.action=="col-resize"){
+            if (this.state.chantierid>0){
+                const jour=ev.target.attributes.jour;
+                if (jour!==undefined){
+                    //Si le jour est supérieur au jour mémorisé, il faut allonger la durée
+                    if(parseInt(jour.value)>parseInt(this.state.jour)){
+                        for (let i = parseInt(this.state.jour); i <= parseInt(jour.value); i++) {
+                            this.state.dict[this.state.chantierid]["jours"][i].color=this.state.color;
+                            var cursor="move";
+                            if (i==jour.value){
+                                cursor="col-resize";
+                            }
+                            this.state.dict[this.state.chantierid]["jours"][i].cursor=cursor;
+                            this.state.dict[this.state.chantierid].fin = parseInt(jour.value)+1;
+                            const duree = this.state.dict[this.state.chantierid].fin - this.state.dict[this.state.chantierid].debut + 1;
+                            this.state.dict[this.state.chantierid].duree = duree
+                            this.state.jour = jour.value;
                         }
-                        this.state.dict[this.state.chantierid]["jours"][i].cursor=cursor;
-                        this.state.dict[this.state.chantierid].fin = parseInt(jour.value)+1;
-                        const duree = this.state.dict[this.state.chantierid].fin - this.state.dict[this.state.chantierid].debut + 1;
-                        this.state.dict[this.state.chantierid].duree = duree
-                        this.state.jour = jour.value;
+                    }
+                    //Si le jour est inférieur au jour mémorisé, il faut réduire la durée
+                    if(parseInt(jour.value)<parseInt(this.state.jour)){
+                        this.state.dict[this.state.chantierid]["jours"][parseInt(jour.value)].cursor="col-resize";
+                        for (let i = (parseInt(this.state.jour)+1); i > parseInt(jour.value); i--) {
+                            this.state.dict[this.state.chantierid]["jours"][i].color="none";
+                            this.state.dict[this.state.chantierid]["jours"][i].cursor="default";
+                            this.state.dict[this.state.chantierid].fin = parseInt(jour.value)+1;
+                            const duree = this.state.dict[this.state.chantierid].fin - this.state.dict[this.state.chantierid].debut + 1;
+                            this.state.dict[this.state.chantierid].duree = duree
+                            this.state.jour = jour.value;
+                        }
                     }
                 }
             }
         }
     }
     tdMouseUp(ev) {
-        console.log('TrMouseUp',ev);
-        if (this.state.chantierid>0){
-            const chantier = this.state.dict[this.state.chantierid];
-            const duree = chantier.duree;
-            if (duree>1) {
-                this.writeChantier(this.state.chantierid,duree);
+        if (this.state.action=="col-resize"){
+            console.log('TrMouseUp',ev);
+            if (this.state.chantierid>0){
+                const chantier = this.state.dict[this.state.chantierid];
+                const duree = chantier.duree;
+                if (duree>1) {
+                    this.writeChantier(this.state.chantierid,duree);
+                }
+                console.log("fin, duree =",this.state.dict[this.state.chantierid].fin,duree);
             }
-            console.log("fin, duree =",this.state.dict[this.state.chantierid].fin,duree);
+            this.state.chantierid=0;
+            this.state.jour=0;
+            this.state.color="";
+            this.state.action="";
         }
-        this.state.chantierid=0;
-        this.state.jour=0;
-
-
-
     }
-
     tbodyMouseLeave(ev) {
         this.state.chantierid=0;
         this.state.jour=0;
+        this.state.color="";
+        this.state.action="";
     }
 
 
@@ -192,11 +180,23 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
     }
 
 
+    onChangeNbSemaines(ev){
+        this.state.nb_semaines = ev.target.value;
+        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
+    }
 
-    // Recherche des chantiers
+
+    PrecedentClick(ev) {
+        this.state.decale_planning = this.state.decale_planning-7;
+        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
+    }
+    SuivantClick(ev) {
+        this.state.decale_planning = this.state.decale_planning+7;
+        this.GetChantiers(this.state.decale_planning);
+    }
     OKButtonClick(ev) {
-        console.log("OKButtonClick",this)
-        this.GetChantiers();
+        this.state.decale_planning = 0;
+        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
     }
     async GetChantiers(s){
         var self=this;
@@ -204,10 +204,15 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             model: 'is.chantier',
             method: 'get_chantiers',
             kwargs: {
-                domain: this.props.domain,
+                domain         : this.props.domain,
+                decale_planning: this.state.decale_planning,
+                nb_semaines    : this.state.nb_semaines,
             }
         }).then(function (result) {
-            self.state.dict = result.dict;
+            self.state.dict     = result.dict;
+            self.state.mois     = result.mois;
+            self.state.semaines = result.semaines;
+            self.state.nb_semaines = result.nb_semaines;
             console.log("GetChantiers : this=",self)
         });
     }
@@ -224,74 +229,7 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             method: 'write',
             args: [[parseInt(chantierid)], vals],
         });
-
-
-
-        // rpc.query({
-        //     model: 'is.chantier',
-        //     method: 'get_vue_owl_99',
-        //     kwargs: {
-        //         domain: [],
-        //     }
-        // }).then(function (result) {
-        //     console.log("testRpcMethod : result=",result);
-        //     self.state.partners = result.partners;
-        // });
     }
-
-
-
-    // TestButtonClick(ev) {
-    //     console.log("TestButtonClick",ev)
-    //     this.testRpcWrite();
-    //     this.testRpcRead();
-    //     this.testRpcMethod();
-    // }
-
-    // async testRpcWrite(s){
-    //     var vals={
-    //         "name": "3IA Auxerre 2222",
-    //     }
-    //     var prom = rpc.query({
-    //         model: 'res.partner',
-    //         method: 'write',
-    //         args: [[108], vals],
-    //     });
-    //     console.log("testRpcWrite")
-    // }
-
-    // async testRpcRead(s){
-    //     rpc.query({
-    //         model: 'product.product',
-    //         method: 'search_read',
-    //         args: [[], ['id','name']],
-    //         kwargs: {
-    //             limit: 10,
-    //         }
-    //     }).then(function (products) {
-    //         console.log(products);
-    //     });
-    //     console.log("testRpcRead")
-    // }
-
-    // async testRpcMethod(s){
-    //     console.log("testRpcMethod : this=",this)
-
-    //     var self=this;
-    //     rpc.query({
-    //         model: 'res.partner',
-    //         method: 'get_vue_owl_99',
-    //         kwargs: {
-    //             domain: [],
-    //         }
-    //     }).then(function (result) {
-    //         console.log("testRpcMethod : result=",result);
-    //         self.state.partners = result.partners;
-    //     });
-    // }
-
-
-
 }
 
 PlanningChantierRenderer.components = {};

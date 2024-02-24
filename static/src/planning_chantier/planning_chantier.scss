@@ -9,17 +9,6 @@
     margin-bottom:5pt;
 }
 
-.planning_chantier table{
-    border-top: 1px solid gray;
-}
-
-.planning_chantier th {
-    border: 1px solid gray;
-    // border-top: 1px solid gray;
-    // border-top: 1px solid gray;
-    // border-top: 1px solid gray;
-}
-
 .planning_chantier .unselectable {
     -webkit-user-select: none;
     -webkit-touch-callout: none;
@@ -32,24 +21,83 @@
     margin-top:10pt;
 }
 
+
+
+
+// tbody {
+//     display:block;
+//     height:50px;
+//     overflow:auto;
+// }
+// thead, tbody tr {
+//     display:table;
+//     width:100%;
+// }
+// thead {
+//     width: calc( 100% - 1em )
+// }
+// table {
+//     width:400px;
+// }
+
+
+
+
 .planning_chantier table {
-    height: 85vh;
+    // height: 85vh;
     border-collapse: collapse;
+    //border-collapse: separate;
+
+    border: 1px solid black;
+
+
+    border-top: 1px solid black;
     width: 98%;
     display: block;
     overflow-y: scroll;
+    background-color:none;
 
     // table-layout: fixed;
     // display: table;
 
 
 }
-  
+
+
+
 .planning_chantier thead {
     position: sticky;
     top: 0;
-    background: #eee;
+    // background: #eee;
+    background-color:none;
 }
+
+
+// .planning_chantier table {
+//     table-layout:fixed;
+// }
+// .planning_chantier tbody {
+//     display:block;
+//     height:200px;
+//     overflow-y:scroll;
+// }
+// .planning_chantier thead, .planning_chantier tbody tr {
+//     display:table;
+//     width:100%;
+//     table-layout:fixed;
+// }
+// .planning_chantier thead {
+//     width: calc( 100% - 1em );
+//     display: table;
+// }
+
+
+  
+.planning_chantier tr {
+    background-color:none;
+}
+
+
 
 .planning_chantier td {
     border:none;
@@ -58,21 +106,29 @@
     // padding-right:2pt;
 }
 
-
-
-
-
-
-
-
-
-
-
 .planning_chantier th {
-    border: 1px solid gray;
-    padding-left:5pt;
-    padding-right:2pt;
+    text-align: center;
+    border: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    padding: 0;
+    margin: 0;
+    color:white;
 }
+
+.planning_chantier th div {
+    background-color:black;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+
+
+
+
 
 
 // .planning_chantier .col1 {
