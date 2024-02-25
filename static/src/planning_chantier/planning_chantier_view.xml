@@ -41,7 +41,7 @@
                 <tr>
                     <th colspan="4" style="height:15pt"><div>Planning</div></th>
                     <t t-foreach="Object.values(state.mois or {})" t-as="mois" t-key="mois.key">
-                        <th style="height:15pt;width:15pt;font-size: 8pt;" t-att-colspan="mois.colspan">
+                        <th style="height:15pt;font-size: 8pt;" t-att-colspan="mois.colspan">
                             <div t-esc="mois.mois"/>
                         </th>
                     </t>
@@ -49,7 +49,7 @@
                 <tr>
                     <th colspan="4" style="height:15pt"><div>mis à jour le</div></th>
                     <t t-foreach="Object.values(state.semaines or {})" t-as="semaine" t-key="semaine.key">
-                        <th style="height:15pt;width:15pt;font-size: 8pt;" t-att-colspan="semaine.colspan">
+                        <th style="height:15pt;font-size: 8pt;" t-att-colspan="semaine.colspan">
                             <div t-esc="semaine.semaine"/>
                         </th>
                     </t>
@@ -60,7 +60,7 @@
                     <th style="height:15pt"><div>Equipe</div></th>
                     <th style="height:15pt"><div>Travaux</div></th>
                     <t t-foreach="Object.values(state.semaines or {})" t-as="semaine" t-key="semaine.key">
-                        <th style="height:15pt;width:15pt;font-size: 8pt;text-align:left" t-att-colspan="semaine.colspan">
+                        <th style="height:15pt;font-size: 8pt;text-align:left" t-att-colspan="semaine.colspan">
                             <div style="padding-left:5px" t-esc="semaine.jour"/>
                         </th>
                     </t>
@@ -77,7 +77,7 @@
                             t-att-memstyle="chantier.trstyle"
                             t-att-chantierid="chantier.id"
                         >
-                        <td style="width:10px;white-space: nowrap;">
+                        <td style="width:15px;white-space: nowrap;text-align:left">
                             <!-- <span 
                                 class="fa fa-trash link"
                                 alt="Masquer chantier"
@@ -90,7 +90,7 @@
                                 alt="Voir chantier"
                                 t-on-click="VoirChantierClick" 
                                 t-att-id="chantier.id"
-                                style="margin-left:0.5em;cursor: pointer;"
+                                style="cursor: pointer;padding-right:5px"
                             />
                         </td>
                         <td style="width:200px;white-space: nowrap;">
