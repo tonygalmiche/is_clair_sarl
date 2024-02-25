@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
     <!--is.nature.travaux -->
     <record id="is_nature_travaux_form_view" model="ir.ui.view">
         <field name="name">is_nature_travaux_from_view</field>
@@ -134,7 +132,6 @@
     </record>
 
 
-
     <!--is.affaire.analyse -->
     <record id="is_affaire_analyse_form_view" model="ir.ui.view">
         <field name="name">is_affaire_analyse_from_view</field>
@@ -192,8 +189,6 @@
             </search>
         </field>
     </record>
-
-
     <record id="is_affaire_analyse_action_pivot" model="ir.ui.view">
          <field name="name">is_affaire_analyse_action_pivot</field>
         <field name="model">is.affaire.analyse</field>
@@ -206,7 +201,6 @@
              </pivot>
          </field>
     </record>
-
     <record id="is_affaire_analyse_action_graph" model="ir.ui.view">
          <field name="name">is_affaire_analyse_action_graph</field>
         <field name="model">is.affaire.analyse</field>
@@ -218,7 +212,6 @@
              </graph>
          </field>
     </record>
-
     <record id="is_affaire_analyse_action" model="ir.actions.act_window">
         <field name="name">Analyse par fournisseur</field>
         <field name="res_model">is.affaire.analyse</field>
@@ -247,6 +240,11 @@
         <field name="model">is.affaire</field>
         <field name="arch" type="xml">
             <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
                 <header>
                     <button
                         name="actualiser_marge"
@@ -263,14 +261,10 @@
                         type="object"
                         string="Analyse par famille"
                     />
+                    <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
                 </header>
                 <sheet>
-                    <style>
-                        .o_form_label{
-                            white-space: nowrap;
-                        }
-                    </style>
-                    <div class="oe_button_box" name="button_box">
+                     <div class="oe_button_box" name="button_box">
                         <button class="oe_stat_button" name="liste_commandes_action" type="object" icon="fa-bars">
                             <div class="o_stat_info">
                                 <span class="o_stat_value">
@@ -298,9 +292,9 @@
                     </div>
                     <group>
                         <group>
+                            <field name="type_affaire"/>
                             <field name="name"/>
                             <field name="nom"/>
-                            <!-- <field name="client_id"   widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" options="{&quot;always_reload&quot;: True}"/> -->
                             <field name="client_id"   widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer'}" options="{&quot;always_reload&quot;: True}"/>
                             <field name="maitre_oeuvre_id"/>
                             <span class="o_form_label o_td_label" name="address_name"><b>Adresse du chantier</b></span>
@@ -322,10 +316,6 @@
                     </group>
                     <notebook>
                         <page string="Facturation">
-                            <!-- <group>
-                                <field name="compte_prorata"   readonly="1"/>
-                                <field name="retenue_garantie" readonly="1"/>
-                            </group> -->
                             <field name="remise_ids" nolabel="1">
                                 <tree editable="bottom">
                                     <field name="product_id"/>
@@ -353,11 +343,6 @@
                                 string="Ajout de toutes les familles"
                                 attrs="{'invisible': [('budget_famille_ids', '!=', [])]}"
                             />
-                            <!-- <button
-                                name="import_budget_famille_action"
-                                type="object"
-                                string="Importation des budgets des commandes client"
-                            /> -->
                         </page>
                         <page string="Salaires">
                             <field name="salaire_ids" nolabel="1">
@@ -403,6 +388,7 @@
         <field name="type">tree</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="type_affaire"        optional="show"/>
                 <field name="display_name"        optional="hide" class="white_space_normal" string="Nom complet" />
                 <field name="name"                optional="show"/>
                 <field name="nom"                 optional="show" class="white_space_normal"/>
@@ -415,6 +401,7 @@
                 <field name="type_travaux_ids"    optional="hide" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                 <field name="specificite_ids"     optional="hide" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                 <field name="commentaire"         optional="hide"/>
+                <field name="state"               optional="show"/>
             </tree>
         </field>
     </record>
@@ -457,6 +444,8 @@
                 <field name="specificite_ids"/>
                 <field name="commentaire"/>
                 <field name="contact_chantier_id"/>
+                <field name="type_affaire"/>
+                <field name="state"/>
             </search>
         </field>
     </record>
@@ -466,18 +455,12 @@
         <field name="view_mode">tree,form,activity</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_tree_view"/>
     </record>
-
-
-
-
     <record model="ir.ui.view" id="is_affaire_suivi_marge_tree_view">
         <field name="name">is_affaire_suivi_marge_tree_view</field>
         <field name="model">is.affaire</field>
         <field name="type">tree</field>
         <field name="arch" type="xml">
-            <tree
-                decoration-danger="marge_brute&lt;0"
-            >
+            <tree>
                 <field name="display_name"        optional="hide" class="white_space_normal" string="Nom complet" />
                 <field name="name"                optional="show"/>
                 <field name="nom"                 optional="show" class="white_space_normal"/>
@@ -506,10 +489,8 @@
         <field name="res_model">is.affaire</field>
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
-        <field name="domain">[('name','!=',False)]</field>
+        <field name="domain">[('state','=','commande'),('type_affaire','=','chantier')]</field>
     </record>
-
-
 
 
     <!--is.import.salaire -->
@@ -523,7 +504,6 @@
                         white-space: nowrap;
                     }
                 </style>
-
                 <header>
                     <button
                         name="importation_salaire_action"
@@ -537,13 +517,11 @@
                         <field name="total" attrs="{'invisible': [('total', '==', 0)]}"/>
                         <field name="importation"/>
                     </group>
-
                     <group string="Résultat importation" attrs="{'invisible':[('resultat','=',False)]}" >
                         <div style="background:gainsboro;font-weight:normal;padding-left:5pt;font-family:courier, courier new, serif;">
                             <field name="resultat" nolabel="1"/>
                         </div>
                     </group>
-
                     <field name="salaire_ids" nolabel="1">
                         <tree limit="500" readonly="1">
                             <button name="view_affaire_action" type="object" icon="fa-search-plus" title="Voir affaire"/>
@@ -552,8 +530,6 @@
                             <field name="montant" sum="Total"/>
                         </tree>
                     </field>
-
-
                 </sheet>
             </form>
         </field>
@@ -583,8 +559,4 @@
         <field name="res_model">is.import.salaire</field>
         <field name="view_mode">tree,form</field>
     </record>
-
-
-
-
 </odoo>

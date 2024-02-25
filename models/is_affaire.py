@@ -208,7 +208,7 @@ class IsAffaire(models.Model):
 
     name                = fields.Char("N° d'Affaire", index=True, help="Sous la forme AA-XXXX")
     nom                 = fields.Char("Nom de l'affaire")
-    date_creation       = fields.Date("Date de création", default=lambda *a: fields.Date.today())
+    date_creation       = fields.Date("Date de création", default=lambda *a: fields.Date.today(), required=True)
     client_id           = fields.Many2one('res.partner' , 'Client')
     maitre_oeuvre_id    = fields.Many2one('res.partner' , "Maitre d'œuvre")
     street              = fields.Char("Rue")
@@ -228,7 +228,6 @@ class IsAffaire(models.Model):
     retenue_garantie    = fields.Float("Retenue de garantie (%)", digits=(14,2))
     salaire_ids         = fields.One2many('is.affaire.salaire', 'affaire_id', 'Salaires')
     remise_ids          = fields.One2many('is.affaire.remise', 'affaire_id', 'Remises')
-
     montant_salaire      = fields.Float("Montant salaire"     , digits=(14,2), store=True , readonly=True, compute='_compute_montant_salaire')
     montant_offre        = fields.Float("Montant offre"       , digits=(14,2), readonly=True, help="Total des commandes clients liées à cette affaire")
     vente_facture        = fields.Float("Ventes facturées"    , digits=(14,2), readonly=True, default=0)
@@ -237,6 +236,17 @@ class IsAffaire(models.Model):
     montant_budget_achat = fields.Float("Montant budget achat", digits=(14,2), readonly=True, default=0)
     gain_perte_budget    = fields.Float("Gain/Perte budget"   , digits=(14,2), readonly=True, default=0)
     marge_previsionnelle = fields.Float("Marge prévisionnelle", digits=(14,2), readonly=True, default=0)
+    type_affaire = fields.Selection([
+        ('chantier' , 'Chantier'),
+        ('entretien', 'Entretien'),
+        ('sav'      , 'SAV'),
+        ('interne'  , 'Interne'),
+    ], 'Type affaire', index=True, default="chantier", required=True)
+    state = fields.Selection([
+        ('offre'   , 'Offre'),
+        ('commande', 'Commande'),
+        ('terminee', 'Terminée'),
+    ], 'Etat', index=True, default="offre", required=True)
 
 
     def actualiser_marge_affaire_cron(self):
