@@ -54,6 +54,28 @@
             </tree>
         </field>
     </record>
+
+    <record model="ir.ui.view" id="is_chantier_calendar" >
+        <field name="name">is_chantier_calendar</field>
+        <field name="model">is.chantier</field>
+        <field name="arch" type="xml">
+            <calendar 
+                date_start="date_debut" 
+                date_stop="date_fin" 
+                color="equipe_id" 
+                mode="month"
+            >
+                <field name="equipe_id" filters="1" invisible="1"/>
+                <field name="name"/> 
+                <field name="affaire_id"/> 
+                <field name="nature_travaux_id"/> 
+                <field name="commentaire"/> 
+            </calendar>
+        </field>
+    </record>
+
+
+
     <record id="is_chantier_search" model="ir.ui.view">
         <field name="name">is.chantier.search</field>
         <field name="model">is.chantier</field>
@@ -70,7 +92,7 @@
     <record  id="is_chantier_action" model="ir.actions.act_window">
         <field name="name">Chantiers</field>
         <field name="res_model">is.chantier</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,planning_chantier,calendar</field>
     </record>
 
 
@@ -88,7 +110,7 @@
     <record  id="is_planning_chantier_action" model="ir.actions.act_window">
         <field name="name">Planning des chantiers</field>
         <field name="res_model">is.chantier</field>
-        <field name="view_mode">planning_chantier,tree,form</field>
+        <field name="view_mode">planning_chantier,calendar,tree,form</field>
         <field name="domain">[]</field>
     </record>
 
