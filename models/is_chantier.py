@@ -59,6 +59,21 @@ class IsChantier(models.Model):
         res = super(IsChantier, self).create(vals)
         return res
 
+
+
+    @api.model
+    def move_chantier(self,chantierid=False,debut=False,decale_planning=0):
+        if chantierid and debut:
+            chantiers = self.env['is.chantier'].search([('id', '=',chantierid)])
+            for chantier in chantiers:
+                now = date.today()
+                jour = now.isoweekday()
+                debut_planning = now - timedelta(days=(jour-1)) + timedelta(days=decale_planning)
+                date_debut = debut_planning + timedelta(days=debut)
+                chantier.date_debut = date_debut
+        return 'OK'
+
+
     @api.model
     def get_chantiers(self,domain,decale_planning=0, nb_semaines=16):#, res_model, ):
         try:

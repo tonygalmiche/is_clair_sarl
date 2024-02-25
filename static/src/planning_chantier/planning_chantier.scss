@@ -103,7 +103,8 @@
     border:none;
     border-top: 1px solid gray;
     padding:0;
-    // padding-right:2pt;
+    padding-left:5px;
+    padding-right:5px;
 }
 
 .planning_chantier th {
@@ -125,8 +126,12 @@
 
 
 
-
-
+.planning_chantier .buttons table{
+    border: 0;
+}
+.planning_chantier .buttons td{
+    border: 0;
+}
 
 
 

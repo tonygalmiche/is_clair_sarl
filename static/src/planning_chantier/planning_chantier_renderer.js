@@ -76,9 +76,8 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
                         const cursor = this.state.dict[chantierid]["jours"][jour].cursor;
                         if (cursor=="col-resize" || cursor=="move") {
                             this.state.action=cursor;
-                            console.log("tdMouseDown", ev.target.parentElement, chantierid);
                             this.state.chantierid=chantierid;
-                            this.state.jour=jour;
+                            this.state.jour=this.state.dict[chantierid].fin;
                             this.state.color=color;
                         }
                     }
@@ -87,6 +86,7 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         }
     }
     tdMouseMove(ev) {
+        //Redimensionnement d'un chantier (on change la durée)
         if (this.state.action=="col-resize"){
             if (this.state.chantierid>0){
                 const jour=ev.target.attributes.jour;
@@ -121,23 +121,62 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
                 }
             }
         }
+
+        //Déplacement d'un chantier (on change la date de début)
+        if (this.state.action=="move"){
+            if (this.state.chantierid>0){
+                var jour=ev.target.attributes.jour;
+                var chantier = this.state.dict[this.state.chantierid];
+                if (jour!==undefined){
+                    jour = parseInt(jour.value);
+                    //Si le jour est supérieur au jour mémorisé, il faut déplacer à droite
+                    if(jour>parseInt(this.state.jour)){
+                        for (let i = this.state.jour ; i<jour; i++) {
+                            this.state.dict[this.state.chantierid]["jours"][i].color=this.state.color;
+                            this.state.dict[this.state.chantierid]["jours"][i].cursor="move";
+                            if (this.state.dict[this.state.chantierid]["jours"][i-chantier.duree] !==undefined) {
+                                this.state.dict[this.state.chantierid]["jours"][i-chantier.duree].color="none";
+                                this.state.dict[this.state.chantierid]["jours"][i-chantier.duree].cursor="default";    
+                            }
+                        }
+                        this.state.debut = jour - chantier.duree;
+                    }
+                    //Si le jour est inférieur au jour mémorisé, il faut déplacer à gauche
+                    if(jour<parseInt(this.state.jour)){
+                        for (let i = jour ; i<this.state.jour; i++) {
+                            if (this.state.dict[this.state.chantierid]["jours"][i]!==undefined) {
+                                this.state.dict[this.state.chantierid]["jours"][i].color=this.state.color;
+                                this.state.dict[this.state.chantierid]["jours"][i].cursor="move";    
+                            }
+                            if (this.state.dict[this.state.chantierid]["jours"][i+chantier.duree]!==undefined) {
+                                this.state.dict[this.state.chantierid]["jours"][i+chantier.duree].color="none";
+                                this.state.dict[this.state.chantierid]["jours"][i+chantier.duree].cursor="default";
+                            }
+                        }
+                        this.state.debut = jour
+                    }
+                    this.state.jour = jour;
+                }
+            }
+        }
     }
     tdMouseUp(ev) {
         if (this.state.action=="col-resize"){
-            console.log('TrMouseUp',ev);
             if (this.state.chantierid>0){
                 const chantier = this.state.dict[this.state.chantierid];
                 const duree = chantier.duree;
                 if (duree>1) {
                     this.writeChantier(this.state.chantierid,duree);
                 }
-                console.log("fin, duree =",this.state.dict[this.state.chantierid].fin,duree);
             }
-            this.state.chantierid=0;
-            this.state.jour=0;
-            this.state.color="";
-            this.state.action="";
         }
+        if (this.state.action=="move"){
+            this.moveChantier(this.state.chantierid, this.state.debut, this.state.decale_planning);
+        }
+        this.state.chantierid=0;
+        this.state.jour=0;
+        this.state.color="";
+        this.state.action="";
     }
     tbodyMouseLeave(ev) {
         this.state.chantierid=0;
@@ -213,13 +252,10 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             self.state.mois     = result.mois;
             self.state.semaines = result.semaines;
             self.state.nb_semaines = result.nb_semaines;
-            console.log("GetChantiers : this=",self)
         });
     }
 
-
     async writeChantier(chantierid,duree){
-        console.log("writeChantier : chantierid,duree=",chantierid,duree)
         var self=this;
         var vals={
             "duree": parseInt(duree),
@@ -230,6 +266,26 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             args: [[parseInt(chantierid)], vals],
         });
     }
+
+    async moveChantier(chantierid, debut, decale_planning){
+        var self=this;
+        rpc.query({
+            model: 'is.chantier',
+            method: 'move_chantier',
+            kwargs: {
+                chantierid     : chantierid,
+                debut          : debut,
+                decale_planning: decale_planning,
+            }
+        }).then(function (result) {
+            console.log("moveChantier : result=",result);
+            //self.state.partners = result.partners;
+        });
+    }
+
+
+
+
 }
 
 PlanningChantierRenderer.components = {};

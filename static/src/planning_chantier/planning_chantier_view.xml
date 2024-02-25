@@ -4,22 +4,19 @@
 <!--
     <div style="background-color:LightGreen">
         Reste à faire : <br />
-        - Pouvoir déplacer et réduire la durée d'un chantier <br />
-        - Mettre à jour le chantier dans Odoo après allongement ou déplacement <br />
         - Rendre modifiable uniquement pour le groupe autorisé<br />
         - Afficher les jours de fermeture<br />
         - Afficher des alertes<br />
     </div>
  -->
 
-
     <div t-name="is_clair_sarl.PlanningChantierTemplate" class="planning_chantier" owl="1" style="100vh;background-color:white">
         <div class="buttons">
-            <table style="border:0">
+            <table>
                 <tr>
-                    <td><button class="btn btn-primary" t-on-click="PrecedentClick">&lt;</button></td>
+                    <td><button class="btn btn-primary" t-on-click="PrecedentClick" title="Semaine précédente">&lt;</button></td>
                     <td><button class="btn btn-primary" t-on-click="OKButtonClick">Aujourd'hui</button></td>
-                    <td><button class="btn btn-primary" t-on-click="SuivantClick">&gt;</button></td>
+                    <td><button class="btn btn-primary" t-on-click="SuivantClick" title="Semaine suivante">&gt;</button></td>
                     <td>
                         <input 
                             name="nb_semaines" 
@@ -31,24 +28,11 @@
                             style="width:120px" 
                         />
                     </td>
-                    <td style="width:100px"><t t-esc="state.chantierid"/></td>
+                    <!-- <td style="width:100px"><t t-esc="state.chantierid"/></td>
                     <td style="width:100px"><t t-esc="state.jour"/></td>
                     <td style="width:100px"><t t-esc="state.color"/></td>
                     <td style="width:100px"><t t-esc="state.action"/></td>
-
-
-                    <!-- this.state.chantierid=chantierid.value;
-                }
-                var jour=ev.target.attributes.jour;
-                if (jour!==undefined){
-                    this.state.jour=jour.value;
-                }
-                var color=ev.target.attributes.color;
-                if (color!==undefined){
-                    this.state.color=color.value;
-         -->
-
-
+                    <td style="width:100px"><t t-esc="state.debut"/></td> -->
                 </tr>
             </table> 
         </div>
@@ -71,13 +55,13 @@
                     </t>
                 </tr>
                 <tr>
-                    <th style="height:15pt"><div>Action</div></th>
+                    <th style="height:15pt"><div></div></th>
                     <th style="height:15pt"><div>Chantier</div></th>
                     <th style="height:15pt"><div>Equipe</div></th>
                     <th style="height:15pt"><div>Travaux</div></th>
                     <t t-foreach="Object.values(state.semaines or {})" t-as="semaine" t-key="semaine.key">
                         <th style="height:15pt;width:15pt;font-size: 8pt;text-align:left" t-att-colspan="semaine.colspan">
-                            <div t-esc="semaine.jour"/>
+                            <div style="padding-left:5px" t-esc="semaine.jour"/>
                         </th>
                     </t>
                 </tr>
@@ -94,13 +78,13 @@
                             t-att-chantierid="chantier.id"
                         >
                         <td style="width:10px;white-space: nowrap;">
-                            <span 
+                            <!-- <span 
                                 class="fa fa-trash link"
                                 alt="Masquer chantier"
                                 t-on-click="MasquerChantierClick" 
                                 t-att-id="chantier.id"
                                 style="margin-left:0.5em;cursor: pointer;"
-                            />
+                            /> -->
                             <span 
                                 class="fa fa-search-plus link"
                                 alt="Voir chantier"
@@ -132,10 +116,5 @@
                 </t>
             </tbody>
         </table> 
-
-
-
     </div>
-
-
 </templates>
