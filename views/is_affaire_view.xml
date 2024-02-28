@@ -450,9 +450,9 @@
         </field>
     </record>
     <record id="is_affaire_action" model="ir.actions.act_window">
-        <field name="name">Affaires</field>
+        <field name="name">Toutes les affaires</field>
         <field name="res_model">is.affaire</field>
-        <field name="view_mode">tree,form,activity</field>
+        <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_tree_view"/>
     </record>
     <record model="ir.ui.view" id="is_affaire_suivi_marge_tree_view">
@@ -485,11 +485,32 @@
         </field>
     </record>
     <record id="is_affaire_suivi_marge_action" model="ir.actions.act_window">
-        <field name="name">Suivi marge affaires</field>
+        <field name="name">Suivi marge affaires chantier</field>
         <field name="res_model">is.affaire</field>
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
         <field name="domain">[('state','=','commande'),('type_affaire','=','chantier')]</field>
+    </record>
+    <record id="is_affaire_entretien_action" model="ir.actions.act_window">
+        <field name="name">Affaires d'entretien</field>
+        <field name="res_model">is.affaire</field>
+        <field name="view_mode">tree,form,activity,pivot,graph</field>
+        <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
+        <field name="domain">[('state','=','commande'),('type_affaire','=','entretien')]</field>
+    </record>
+    <record id="is_affaire_sav_action" model="ir.actions.act_window">
+        <field name="name">Affaires de SAV</field>
+        <field name="res_model">is.affaire</field>
+        <field name="view_mode">tree,form,activity,pivot,graph</field>
+        <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
+        <field name="domain">[('state','=','commande'),('type_affaire','=','sav')]</field>
+    </record>
+    <record id="is_affaire_interne_action" model="ir.actions.act_window">
+        <field name="name">Affaires internes</field>
+        <field name="res_model">is.affaire</field>
+        <field name="view_mode">tree,form,activity,pivot,graph</field>
+        <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
+        <field name="domain">[('state','=','commande'),('type_affaire','=','interne')]</field>
     </record>
 
 

@@ -21,7 +21,7 @@
     <menuitem 
         id="is_affaire_affaire_menu" 
         sequence="10" 
-        name="Affaires"
+        name="Toutes les affaires"
         action="is_affaire_action" 
         parent="is_affaire_top_menu" 
     />
@@ -32,9 +32,38 @@
         action="is_affaire_suivi_marge_action" 
         parent="is_affaire_top_menu" 
     />
+
+    <menuitem 
+        id="is_affaire_entretien_menu" 
+        sequence="30" 
+        name="Affaires d'entretien"
+        action="is_affaire_entretien_action" 
+        parent="is_affaire_top_menu" 
+    />
+
+    <menuitem 
+        id="is_affaire_sav_menu" 
+        sequence="40" 
+        name="Affaires de SAV"
+        action="is_affaire_sav_action" 
+        parent="is_affaire_top_menu" 
+    />
+
+    <menuitem 
+        id="is_affaire_interne_menu" 
+        sequence="50" 
+        name="Affaires internes"
+        action="is_affaire_interne_action" 
+        parent="is_affaire_top_menu" 
+    />
+
+
+
+
+
     <menuitem 
         id="is_import_salaire_menu" 
-        sequence="30" 
+        sequence="90" 
         name="Importation des salaires dans les affaires"
         action="is_import_salaire_action" 
         parent="is_affaire_top_menu" 
