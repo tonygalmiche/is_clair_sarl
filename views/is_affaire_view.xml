@@ -454,6 +454,7 @@
         <field name="res_model">is.affaire</field>
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_tree_view"/>
+        <field name="limit">1000</field>
     </record>
     <record model="ir.ui.view" id="is_affaire_suivi_marge_tree_view">
         <field name="name">is_affaire_suivi_marge_tree_view</field>
@@ -489,6 +490,7 @@
         <field name="res_model">is.affaire</field>
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
+        <field name="limit">1000</field>
         <field name="domain">[('state','=','commande'),('type_affaire','=','chantier')]</field>
     </record>
     <record id="is_affaire_entretien_action" model="ir.actions.act_window">
@@ -497,6 +499,7 @@
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
         <field name="domain">[('state','=','commande'),('type_affaire','=','entretien')]</field>
+        <field name="limit">1000</field>
     </record>
     <record id="is_affaire_sav_action" model="ir.actions.act_window">
         <field name="name">Affaires de SAV</field>
@@ -504,6 +507,7 @@
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
         <field name="domain">[('state','=','commande'),('type_affaire','=','sav')]</field>
+        <field name="limit">1000</field>
     </record>
     <record id="is_affaire_interne_action" model="ir.actions.act_window">
         <field name="name">Affaires internes</field>
@@ -511,6 +515,7 @@
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
         <field name="domain">[('state','=','commande'),('type_affaire','=','interne')]</field>
+        <field name="limit">1000</field>
     </record>
 
 
