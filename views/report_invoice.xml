@@ -50,114 +50,41 @@
                                 </tbody>
                             </table>
                         </t>
-
                         <h2>TRAVAUX EXÉCUTÉS AU <span t-field="o.invoice_date"/></h2>
                         <t t-if="o.is_order_id.is_section_ids">
                             <t t-set="move_lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
                             <table class="table table-sm o_main_table">
                                 <tbody>
                                     <t t-foreach="o.is_order_id.is_section_ids" t-as="l">
-                                        <t t-set="total_section" t-value="0"/>
+                                        <t t-set="total_section"       t-value="0"/>
+                                        <t t-set="facturable_pourcent" t-value="0"/>
                                         <t t-if="l.option!=True">
                                             <t t-foreach="l.line_ids" t-as="sale_line">
                                                 <t t-foreach="move_lines" t-as="move_line">
                                                     <t t-if="move_line.is_sale_line_id.id==sale_line.id">
+                                                        <!-- En affichage uniquement des sections, le % facturable de la section 
+                                                        doit être le même que n'importe qu'elle ligne  -->
+                                                        <t t-set="facturable_pourcent" t-value="move_line.is_facturable_pourcent"/>
                                                         <t t-set="total_section" t-value="total_section + move_line.price_subtotal"/>
                                                     </t>
                                                 </t>
                                             </t>
                                             <tr t-if="l.facturable_pourcent">
                                                 <td style="width:80%" class="text-left">
-                                                    <span t-field="l.section"/> (<span t-field="l.facturable_pourcent"/>%)
+                                                    <span t-field="l.section"/> (<span t-esc="facturable_pourcent"/>%)
                                                 </td>
                                                 <td class="text-right"><span  t-if="total_section" t-esc="total_section" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
                                             </tr>
                                         </t>
                                     </t>
-                                    <!-- <tr>
-                                        <td class="text-right" style="color:#C7B90F"><b>Total HT réalisé : </b></td>
-                                        <td class="text-right" style="color:#C7B90F"><b><span t-field="o.is_facture"/></b></td>
-                                    </tr> -->
-                                    <!-- Regroupement des situations (factures) précédentes -->
-                                    <!-- <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
-                                    <t t-set="total_situation" t-value="0"/>
-                                    <t t-foreach="lines" t-as="line">
-                                        <t t-if="line.product_id and line.product_id.is_famille_id.name=='Facturation'">
-                                            <t t-if="line.product_id and line.product_id.default_code=='FACTURE'">
-                                                <t t-set="total_situation" t-value="total_situation+line.price_subtotal"/>
-
-
-                                            </t>
-                                        </t>
-                                    </t>
-                                    <t t-if="total_situation!=0">
-                                        <tr>
-                                            <td class="text-right" style="color:black">Situations précédentes : </td>
-                                            <td class="text-right">
-                                                <span t-esc="round(total_situation,2)" t-options="{'widget': 'float', 'precision': 2}"/> €
-                                            </td>
-                                        </tr>
-                                    </t> -->
-                                    <!-- Autres déductions (ex : retenue de garantie) -->
-                                    <!-- <t t-foreach="lines" t-as="line">
-                                        <t t-if="line.product_id and line.product_id.is_famille_id.name=='Facturation'">
-                                            <t t-if="line.product_id and line.product_id.default_code!='FACTURE'">
-                                                <tr>
-                                                    <td class="text-right" style="color:black"><span t-field="line.name"/> : </td>
-                                                    <td class="text-right">
-                                                        <span t-field="line.price_subtotal"/>
-                                                    </td>
-                                                </tr>
-                                            </t>
-                                        </t>
-                                    </t>
-                                    <tr t-if="o.amount_untaxed!=o.is_facture">
-                                        <td class="text-right"><b>Reste dû HT : </b></td>
-                                        <td class="text-right"><span t-field="o.amount_untaxed"/></td>
-                                    </tr> -->
-                                    <!-- <t t-if="o.amount_total>o.amount_untaxed">
-                                        <t t-set="tax_totals" t-value="json.loads(o.tax_totals_json)"/>
-                                        <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
-                                            <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
-                                            <t t-foreach="tax_totals['groups_by_subtotal'][subtotal_to_show]" t-as="amount_by_group">
-                                                <tr>
-                                                    <t t-if="len(tax_totals['groups_by_subtotal'][subtotal_to_show]) > 1">
-                                                        <td  class="text-right">
-                                                            <span t-esc="amount_by_group['tax_group_name']"/>
-                                                            <span class="text-nowrap"> on
-                                                                <t t-esc="amount_by_group['formatted_tax_group_base_amount']"/>
-                                                            </span> : 
-                                                        </td>
-                                                        <td class="text-right">
-                                                            <span class="text-nowrap" t-esc="amount_by_group['formatted_tax_group_amount']"/>
-                                                        </td>
-                                                    </t>
-                                                    <t t-else="">
-                                                        <td class="text-right"><span class="text-nowrap" t-esc="amount_by_group['tax_group_name']"/> : </td>
-                                                        <td class="text-right">
-                                                            <span class="text-nowrap" t-esc="amount_by_group['formatted_tax_group_amount']" />
-                                                        </td>
-                                                    </t>
-                                                </tr>
-                                            </t>
-                                        </t>
-                                        <tr>
-                                            <td class="text-right"><strong>TTC : </strong></td>
-                                            <td class="text-right" style="background-color:black;color:white">
-                                                <strong><span t-field="o.amount_total"/></strong>
-                                            </td>
-                                        </tr>
-                                    </t> -->
                                 </tbody>
                             </table>
                         </t>
                     </t>
 
 
-
                     <!-- Affichage détaillé de la facture -->
                     <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
-
                     <t t-if="o.is_order_id.is_affichage_pdf!='total_section'">
                         <table class="table table-sm o_main_table" name="invoice_line_table" style="border:1px solid black">
                             <thead>
@@ -173,7 +100,6 @@
                             </thead>
                             <tbody class="invoice_tbody">
                                 <t t-set="current_subtotal" t-value="0"/>
-                                <!-- Détail des lignes -->
                                 <t t-foreach="lines" t-as="line">
                                     <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
                                     <t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
@@ -238,6 +164,7 @@
                     </t>
 
 
+                    <!-- Totaux / Bas de page -->
                     <div class="clearfix">
                         <div id="total" class="row">
                             <div class="col-6">
@@ -257,93 +184,72 @@
                                 </p>
                             </div>
                             <div class="col-6">
-                                <!-- Totaux pour affichage détaillé de la facture -->
-                                <!-- <t t-if="o.is_order_id.is_affichage_pdf!='total_section'"> -->
-                                    <table class="table table-sm" style="page-break-inside: avoid;">
-                                        <tr class="border-black">
-                                            <td style="color:black"><strong>TOTAL HT réalisé</strong></td>
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+                                    <tr class="border-black">
+                                        <td style="color:black"><strong>TOTAL HT réalisé</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.is_facture"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black">
+                                        <td colspan="2" style="height:0"></td>
+                                    </tr>
+                                    <!-- Regroupement des situations (factures) précédentes -->
+                                    <t t-set="total_situation" t-value="0"/>
+                                    <t t-foreach="lines" t-as="line">
+                                        <t t-if="line.product_id and line.product_id.is_famille_id.name=='Facturation'">
+                                            <t t-if="line.product_id and line.product_id.default_code=='FACTURE'">
+                                                <t t-set="total_situation" t-value="total_situation+line.price_subtotal"/>
+
+
+                                            </t>
+                                        </t>
+                                    </t>
+                                    <t t-if="total_situation!=0">
+                                        <tr>
+                                            <td class="text-right" style="color:black">Situations précédentes : </td>
                                             <td class="text-right">
-                                                <span t-field="o.is_facture"/>
+                                                <span t-esc="round(total_situation,2)" t-options="{'widget': 'float', 'precision': 2}"/> €
                                             </td>
                                         </tr>
-                                        <tr class="border-black">
-                                            <td colspan="2" style="height:0"></td>
-                                        </tr>
-                                        
-                                        <!-- Regroupement des situations (factures) précédentes -->
-                                        <t t-set="total_situation" t-value="0"/>
-                                        <t t-foreach="lines" t-as="line">
-                                            <t t-if="line.product_id and line.product_id.is_famille_id.name=='Facturation'">
-                                                <t t-if="line.product_id and line.product_id.default_code=='FACTURE'">
-                                                    <t t-set="total_situation" t-value="total_situation+line.price_subtotal"/>
-
-
-                                                </t>
-                                            </t>
-                                        </t>
-                                        <t t-if="total_situation!=0">
-                                            <tr>
-                                                <td class="text-right" style="color:black">Situations précédentes : </td>
-                                                <td class="text-right">
-                                                    <span t-esc="round(total_situation,2)" t-options="{'widget': 'float', 'precision': 2}"/> €
-                                                </td>
-                                            </tr>
-                                        </t>
-                                        <!-- Autres déductions (ex : retenue de garantie) -->
-                                        <t t-foreach="lines" t-as="line">
-                                            <t t-if="line.product_id and line.product_id.is_famille_id.name=='Facturation'">
-                                                <t t-if="line.product_id and line.product_id.default_code!='FACTURE'">
-                                                    <tr>
-                                                        <td class="text-right" style="color:black"><span t-field="line.name"/> : </td>
-                                                        <td class="text-right">
-                                                            <span t-field="line.price_subtotal"/>
-                                                        </td>
-                                                    </tr>
-                                                </t>
-                                            </t>
-                                        </t>
-    
-
-
-                                        <!-- <t t-foreach="lines" t-as="line">
-                                            <t t-if="line.product_id and line.product_id.is_famille_id.name=='Facturation'">
+                                    </t>
+                                    <!-- Autres déductions (ex : retenue de garantie) -->
+                                    <t t-foreach="lines" t-as="line">
+                                        <t t-if="line.product_id and line.product_id.is_famille_id.name=='Facturation'">
+                                            <t t-if="line.product_id and line.product_id.default_code!='FACTURE'">
                                                 <tr>
-                                                    <td style="color:black"><span t-field="line.name"/></td>
+                                                    <td class="text-right" style="color:black"><span t-field="line.name"/> : </td>
                                                     <td class="text-right">
                                                         <span t-field="line.price_subtotal"/>
                                                     </td>
                                                 </tr>
                                             </t>
-                                        </t> -->
+                                        </t>
+                                    </t>
+                                    <tr class="border-black">
+                                        <td style="color:black"><strong>Reste dû HT</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.amount_untaxed"/>
+                                        </td>
+                                    </tr>
+                                    <t t-if="o.amount_total>o.amount_untaxed">
+                                        <t t-set="tax_totals" t-value="json.loads(o.tax_totals_json)"/>
+                                        <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
+                                            <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
+                                            <t t-call="account.tax_groups_totals"/>
+                                        </t>
                                         <tr class="border-black">
-                                            <td style="color:black"><strong>Reste dû HT</strong></td>
+                                            <td style="color:black"><strong>TTC</strong></td>
                                             <td class="text-right">
-                                                <span t-field="o.amount_untaxed"/>
+                                                <span t-field="o.amount_total"/>
                                             </td>
                                         </tr>
-
-                                        <t t-if="o.amount_total>o.amount_untaxed">
-                                            <t t-set="tax_totals" t-value="json.loads(o.tax_totals_json)"/>
-                                            <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
-                                                <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
-                                                <t t-call="account.tax_groups_totals"/>
-                                            </t>
-                                            <tr class="border-black">
-                                                <td style="color:black"><strong>TTC</strong></td>
-                                                <td class="text-right">
-                                                    <span t-field="o.amount_total"/>
-                                                </td>
-                                            </tr>
-                                        </t>
-
-                                    </table>
-                                <!-- </t> -->
+                                    </t>
+                                </table>
                             </div>
                         </div>
                     </div>
-
                     <div style="page-break-before:always"/>
-
                     <h3>Conditions générales de vente</h3>
                     <p t-if="res_company.is_clause_de_reserve">
                         <h4>Clause de réserve de propriété et de transfert des risques</h4>
