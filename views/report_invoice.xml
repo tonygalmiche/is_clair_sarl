@@ -125,7 +125,7 @@
                                         <tr>
                                             <td class="text-right"><strong>TTC : </strong></td>
                                             <td class="text-right" style="background-color:black;color:white">
-                                                <strong><span t-field="o.amount_residual"/></strong>
+                                                <strong><span t-field="o.amount_total"/></strong>
                                             </td>
                                         </tr>
                                     </t>
@@ -281,7 +281,7 @@
                                             <tr class="border-black">
                                                 <td style="color:black"><strong>TTC</strong></td>
                                                 <td class="text-right">
-                                                    <span t-field="o.amount_residual"/>
+                                                    <span t-field="o.amount_total"/>
                                                 </td>
                                             </tr>
                                         </t>
