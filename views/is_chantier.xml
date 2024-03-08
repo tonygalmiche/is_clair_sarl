@@ -18,6 +18,14 @@
                         white-space: nowrap;
                     }
                 </style>
+
+                <header>
+                    <button
+                        name="ajouter_alerte_action"
+                        type="object"
+                        string="Ajouter une alerte"
+                    />
+                </header>
                  <sheet>
                     <group>
                         <field name="name"/>

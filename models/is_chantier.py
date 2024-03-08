@@ -77,6 +77,20 @@ class IsChantier(models.Model):
         return 'OK'
 
 
+    def ajouter_alerte_action(self):
+        date=self.date_debut - timedelta(days=1)
+        res= {
+            'name': 'Alerte',
+            'view_mode': 'form',
+            'res_model': 'is.chantier.alerte',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'context': {'default_chantier_id':self.id, 'default_date':date},
+        }
+        return res
+
+
+
     @api.model
     def get_chantiers(self,domain,decale_planning=0, nb_semaines=16):#, res_model, ):
 
@@ -92,7 +106,6 @@ class IsChantier(models.Model):
             if date_alerte not in alertes[chantier_id]:
                 alertes[chantier_id][date_alerte]=[]
             alertes[chantier_id][date_alerte].append(line.alerte)
-        print(alertes)
         #**********************************************************************
 
         try:
@@ -182,30 +195,12 @@ class IsChantier(models.Model):
                 fin = decal + duree 
                 for i in range(0, nb_jours):
                     date_jour = debut_planning+timedelta(days=i)
-                    # # #** Recherche des alertes *********************************************
-                    # filtre=[
-                    #     ('chantier_id','=',chantier.id),
-                    #     ('date'       ,'=',date_jour),
-                    # ]
-                    # lines=self.env['is.chantier.alerte'].search(filtre)
-                    # print(lines)
-                    # alertes=[]
-                    # for line in lines:
-                    #    alertes.append(line.alerte)
-                    # alerte=False
-                    # if len(alertes)>0:
-                    #     alerte="\n".join(alertes)
-                    # # #**********************************************************************
                     alerte=False
                     if chantier.id in alertes:
                         if date_jour in alertes[chantier.id]:
                             alerte = alertes[chantier.id][date_jour]
                     if alerte:
                         alerte='\n'.join(alerte)
-
-
-
-
                     border="none"
                     if i%7==0:
                         border="1px solid gray"
@@ -226,8 +221,11 @@ class IsChantier(models.Model):
                         jour["cursor"] = "col-resize"
                         jour["border"] = "none"
                     jours[i]=jour
-                name       = chantier.affaire_id.nom or chantier.commentaire or chantier.name
-                short_name = name[0:30]
+                name=chantier.commentaire or chantier.name
+                if chantier.affaire_id:
+                    name=chantier.affaire_id.name_get()[0][1]
+                #name       = chantier.affaire_id.nom or chantier.commentaire or chantier.name
+                short_name = name[0:40]
 
                 vals={
                     "id"        : chantier.id,
@@ -261,5 +259,5 @@ class IsChantierAlerte(models.Model):
     chantier_id = fields.Many2one('is.chantier', 'Chantier', required=True, index=True)
     affaire_id  = fields.Many2one(related="chantier_id.affaire_id")
     alerte      = fields.Text('Alerte'                     , required=True)
-    date        = fields.Date('Date alerte', index=True, help="Date à laquelle l'alerte sera positionnée sur le planning des chantiers")
+    date        = fields.Date('Date alerte', default=fields.Datetime.now, index=True, help="Date à laquelle l'alerte sera positionnée sur le planning des chantiers")
 
