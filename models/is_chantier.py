@@ -41,17 +41,20 @@ class IsChantier(models.Model):
     @api.onchange('date_debut')
     def onchange_date_debut(self):
         for obj in self:
-            obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
+            if obj.date_debut and obj.duree:
+                obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
 
     @api.onchange('duree')
     def onchange_duree(self):
         for obj in self:
-            obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
+            if obj.date_debut and obj.duree:
+                obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
 
     @api.onchange('date_fin')
     def onchange_date_fin(self):
         for obj in self:
-            obj.date_debut = obj.date_fin - timedelta(days=obj.duree)
+            if obj.date_fin and obj.duree:
+                obj.date_debut = obj.date_fin - timedelta(days=obj.duree)
 
     @api.model
     def create(self, vals):
@@ -76,6 +79,22 @@ class IsChantier(models.Model):
 
     @api.model
     def get_chantiers(self,domain,decale_planning=0, nb_semaines=16):#, res_model, ):
+
+        #** Recherche des alertes *********************************************
+        lines=self.env['is.chantier.alerte'].search([])
+        alertes={}
+        for line in lines:
+            chantier_id = line.chantier_id.id
+            date_alerte = line.date
+
+            if chantier_id not in alertes:
+                alertes[chantier_id]={}
+            if date_alerte not in alertes[chantier_id]:
+                alertes[chantier_id][date_alerte]=[]
+            alertes[chantier_id][date_alerte].append(line.alerte)
+        print(alertes)
+        #**********************************************************************
+
         try:
             nb_semaines = int(nb_semaines)
         except:
@@ -162,14 +181,41 @@ class IsChantier(models.Model):
                 debut = decal+1
                 fin = decal + duree 
                 for i in range(0, nb_jours):
+                    date_jour = debut_planning+timedelta(days=i)
+                    # # #** Recherche des alertes *********************************************
+                    # filtre=[
+                    #     ('chantier_id','=',chantier.id),
+                    #     ('date'       ,'=',date_jour),
+                    # ]
+                    # lines=self.env['is.chantier.alerte'].search(filtre)
+                    # print(lines)
+                    # alertes=[]
+                    # for line in lines:
+                    #    alertes.append(line.alerte)
+                    # alerte=False
+                    # if len(alertes)>0:
+                    #     alerte="\n".join(alertes)
+                    # # #**********************************************************************
+                    alerte=False
+                    if chantier.id in alertes:
+                        if date_jour in alertes[chantier.id]:
+                            alerte = alertes[chantier.id][date_jour]
+                    if alerte:
+                        alerte='\n'.join(alerte)
+
+
+
+
                     border="none"
                     if i%7==0:
                         border="1px solid gray"
                     jour={
-                        "key"   : i,
-                        "color" : "none",
-                        "cursor": "default",
-                        "border": border,
+                        "key"      : i,
+                        "color"    : "none",
+                        "cursor"   : "default",
+                        "border"   : border,
+                        "date_jour": date_jour.strftime('%d/%m'),
+                        "alerte"   : alerte,
                     }
                     if i>=decal and i<(decal+duree-1):
                         jour["color"]  = color
@@ -204,3 +250,16 @@ class IsChantier(models.Model):
             "nb_semaines": nb_semaines,
         }
     
+
+
+class IsChantierAlerte(models.Model):
+    _name='is.chantier.alerte'
+    _description = "Alertes pour les chantiers"
+    _order='id desc'
+
+
+    chantier_id = fields.Many2one('is.chantier', 'Chantier', required=True, index=True)
+    affaire_id  = fields.Many2one(related="chantier_id.affaire_id")
+    alerte      = fields.Text('Alerte'                     , required=True)
+    date        = fields.Date('Date alerte', index=True, help="Date à laquelle l'alerte sera positionnée sur le planning des chantiers")
+

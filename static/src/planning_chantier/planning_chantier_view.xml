@@ -87,7 +87,7 @@
                             /> -->
                             <span 
                                 class="fa fa-search-plus link"
-                                alt="Voir chantier"
+                                title="Voir chantier"
                                 t-on-click="VoirChantierClick" 
                                 t-att-id="chantier.id"
                                 style="cursor: pointer;padding-right:5px"
@@ -109,7 +109,13 @@
                                 t-att-jour="jour.key"
                                 t-att-style="'cursor:' + jour.cursor + ';background-color:'+jour.color + ';border-left:'+jour.border"
                                 t-att-color="jour.color"
-                            >
+                            > 
+                                <!-- <span style="padding-right:10px" t-esc="jour.date_jour"/> -->
+                                <t  t-if="jour.alerte">
+                                    <span class="fa fa-exclamation-circle alerte"  t-att-title="jour.alerte"/>
+                                </t>
+
+                                
                             </td>
                         </t>
                     </tr>

@@ -21,12 +21,12 @@
                  <sheet>
                     <group>
                         <field name="name"/>
-                        <field name="affaire_id"/>
-                        <field name="equipe_id"/>
-                        <field name="nature_travaux_id"/>
-                        <field name="date_debut"/>
-                        <field name="duree"/>
-                        <field name="date_fin"/>
+                        <field name="affaire_id"        required="1"/>
+                        <field name="equipe_id"         required="1"/>
+                        <field name="nature_travaux_id" required="1"/>
+                        <field name="date_debut"        required="1"/>
+                        <field name="duree"             required="1"/>
+                        <field name="date_fin"          required="1"/>
                         <field name="commentaire"/>
                      </group>
                 </sheet>
@@ -158,6 +158,59 @@
         <field name="res_model">is.equipe</field>
         <field name="view_mode">tree,form</field>
     </record>
+
+
+
+    <!--is.chantier.alerte -->
+    <record id="is_chantier_alerte_form_view" model="ir.ui.view">
+        <field name="name">is_chantier_alerte_from_view</field>
+        <field name="model">is.chantier.alerte</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="chantier_id" />
+                        <field name="affaire_id" />
+                        <field name="alerte" />
+                        <field name="date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_chantier_alerte_tree_view">
+        <field name="name">is_chantier_alerte_tree_view</field>
+        <field name="model">is.chantier.alerte</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="alerte"/>
+                <field name="chantier_id" widget="many2one_clickable"/>
+                <field name="affaire_id"  widget="many2one_clickable"/>
+                <field name="date"/>
+                <field name="create_date" string="Créée le"/>
+                <field name="create_uid"  string="par"/>
+                <field name="write_date"  string="Modifée le"/>
+                <field name="create_uid"  string="par"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_chantier_alerte_search_view" model="ir.ui.view">
+        <field name="name">is_chantier_alerte_search_view</field>
+        <field name="model">is.chantier.alerte</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="alerte"/>
+                <field name="chantier_id"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_chantier_alerte_action" model="ir.actions.act_window">
+        <field name="name">Alertes</field>
+        <field name="res_model">is.chantier.alerte</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
 
 
 
