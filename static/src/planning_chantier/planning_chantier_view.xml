@@ -78,13 +78,6 @@
                             t-att-chantierid="chantier.id"
                         >
                         <td style="width:15px;white-space: nowrap;text-align:left">
-                            <!-- <span 
-                                class="fa fa-trash link"
-                                alt="Masquer chantier"
-                                t-on-click="MasquerChantierClick" 
-                                t-att-id="chantier.id"
-                                style="margin-left:0.5em;cursor: pointer;"
-                            /> -->
                             <span 
                                 class="fa fa-search-plus link"
                                 title="Voir chantier"
@@ -110,12 +103,9 @@
                                 t-att-style="'cursor:' + jour.cursor + ';background-color:'+jour.color + ';border-left:'+jour.border"
                                 t-att-color="jour.color"
                             > 
-                                <!-- <span style="padding-right:10px" t-esc="jour.date_jour"/> -->
                                 <t  t-if="jour.alerte">
                                     <span class="fa fa-exclamation-circle alerte"  t-att-title="jour.alerte"/>
                                 </t>
-
-                                
                             </td>
                         </t>
                     </tr>

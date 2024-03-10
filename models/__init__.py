@@ -14,6 +14,7 @@ from . import is_export_compta
 from . import account_payment
 from . import is_courrier_expedie
 from . import ir_attachment
+from . import is_mem_var
 from . import is_purchase_order_line
 from . import is_chantier
 

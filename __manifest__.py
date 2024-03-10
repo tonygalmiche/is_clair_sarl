@@ -34,6 +34,7 @@ Module Odoo 15 pour CLAIR-SARL
         "views/account_payment_view.xml",
         "views/is_export_compta_views.xml",
         "views/is_courrier_expedie_view.xml",
+        "views/is_mem_var_view.xml",
         "views/is_purchase_order_line.xml",
         "views/res_company_view.xml",
         "views/report_invoice.xml",
@@ -43,6 +44,8 @@ Module Odoo 15 pour CLAIR-SARL
         "report/purchase_order_templates.xml",
         "report/sale_report_templates.xml",
         "report/report_templates.xml",
+        "report/is_chantier_report_templates.xml",
+        "report/report.xml",
     ],
     'assets': {
         'web.assets_backend': [

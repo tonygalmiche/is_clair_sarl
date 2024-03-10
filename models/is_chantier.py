@@ -90,9 +90,12 @@ class IsChantier(models.Model):
         return res
 
 
-
     @api.model
-    def get_chantiers(self,domain,decale_planning=0, nb_semaines=16):#, res_model, ):
+    def get_chantiers(self,domain=[],decale_planning=0, nb_semaines=""):#, res_model, ):
+        if nb_semaines=="":
+            nb_semaines = self.env['is.mem.var'].get(self._uid, 'chantier_nb_semaine') or 16
+        else:
+            self.env['is.mem.var'].set(self._uid, 'chantier_nb_semaine', nb_semaines)
 
         #** Recherche des alertes *********************************************
         lines=self.env['is.chantier.alerte'].search([])
@@ -164,9 +167,13 @@ class IsChantier(models.Model):
 
         res=[]
         chantiers=self.env['is.chantier'].search(domain, order="name") #, limit=10)
-        trcolor=""
+        trcolor="#ffffff"
+        mem_affaire=False
         dict={}
         for chantier in chantiers:
+
+
+
             #** Recherhce si le chantier est visible sur le planning **********
             test=False
             if chantier.date_debut>=debut_planning and chantier.date_debut<=fin_planning:
@@ -177,15 +184,27 @@ class IsChantier(models.Model):
                 test=True
             #******************************************************************
             if test:
+
+                #** Changement de couleur à chaque affaire ********************
+                if not mem_affaire:
+                    mem_affaire=chantier.affaire_id
+                if mem_affaire!=chantier.affaire_id:
+                    mem_affaire=chantier.affaire_id
+                    if trcolor=="#ffffff":
+                        trcolor="#f2f3f4"
+                    else:
+                        trcolor="#ffffff"
+                trstyle="background-color:%s"%(trcolor)
+                color = chantier.equipe_id.color or 'GreenYellow'
+                #**************************************************************
+
+
                 decal = (chantier.date_debut - debut_planning).days
                 if decal<0:
                     decal=0
-                if trcolor=="#ffffff":
-                    trcolor="#f2f3f4"
-                else:
-                    trcolor="#ffffff"
-                trstyle="background-color:%s"%(trcolor)
-                color = chantier.equipe_id.color or 'GreenYellow'
+
+
+
                 jours={}
 
                 duree = chantier.duree or (chantier.date_fin - chantier.date_debut).days

@@ -20,7 +20,7 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         //Chaque modification de l'objet this.state entraine une modification de l'interface utilisateur
         this.state = useState({
             decale_planning: 0,
-            nb_semaines:16,
+            nb_semaines:"",
             dict:{},
         });
     }

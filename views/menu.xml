@@ -290,8 +290,6 @@
         parent="is_chantier_top_menu"
         sequence="10"
     />
-
- 
     <menuitem
         id="is_planning_chantier_menu"
         name="Planning des chantiers"
@@ -306,7 +304,6 @@
         sequence="20"
         action="is_chantier_action"
     />
-
     <menuitem
         id="is_chantier_alerte_menu"
         name="Alertes"
@@ -314,9 +311,6 @@
         sequence="30"
         action="is_chantier_alerte_action"
     />
-
-    
-
     <menuitem
         id="is_chantier_table_menu"
         name="Tables"
@@ -338,6 +332,18 @@
         action="is_equipe_action"
     />
 
+
+    <!-- Paramètres / Utilisateurs et sociétés -->
+    <menuitem
+        id="is_mem_var_menu"
+        name="Variables utilisateurs"
+        parent="base.menu_users"
+        sequence="900"
+        action="is_mem_var_action"
+    />
+
+
+    <!--  -->
 
     
 

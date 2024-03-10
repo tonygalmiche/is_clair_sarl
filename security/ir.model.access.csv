@@ -60,3 +60,5 @@ access_is_equipe,access_is_equipe,model_is_equipe,base.group_user,1,0,0,0
 access_is_equipe_manager,access_is_equipe_manager,model_is_equipe,is_clair_sarl.is_gestionnaire_tables_group,1,1,1,1
 
 access_is_chantier_alerte,access_is_chantier_alerte,model_is_chantier_alerte,base.group_user,1,1,1,1
+
+access_is_mem_var,access_is_mem_var,model_is_mem_var,base.group_user,1,1,1,1
