@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- is.chantier -->
+
+    <record id="creation_auto_chantier_cron" model="ir.cron">
+        <field name="name">Création automatique des chantiers</field>
+        <field name="model_id" ref="is_clair_sarl.model_is_chantier"/>
+        <field name="state">code</field>
+        <field name="code">model.creation_auto_chantier_cron()</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
     <record id="is_chantier_seq" model="ir.sequence">
         <field name="name">N°Chantier</field>
         <field name="code">is.chantier</field>

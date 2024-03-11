@@ -77,30 +77,19 @@
                         </thead>
                         <tbody>
                             <t t-foreach="chantiers" t-as="key">
-
-
                                 <t t-set="jours"   t-value="chantiers[key]['jours']"/>
-
-                  
                                 <tr 
                                     t-att-style="chantiers[key]['trstyle']"
                                 >
-                                    <td style="width:65mm;white-space: nowrap;">
+                                    <td style="width:18%;white-space: nowrap;">
                                         <span>
                                             <t t-esc="chantiers[key]['short_name']"/>
                                         </span>
                                     </td>
-                                    <td style="width:30mm;white-space: nowrap;"><t t-esc="chantiers[key]['equipe']"/></td>
-                                    <td style="width:30mm;white-space: nowrap;"><t t-esc="chantiers[key]['travaux']"/></td>
-
-
-
-
+                                    <td style="width:9%;white-space: nowrap;"><t t-esc="chantiers[key]['equipe']"/></td>
+                                    <td style="width:7%;white-space: nowrap;"><t t-esc="chantiers[key]['travaux']"/></td>
                                     <t t-foreach="jours" t-as="j">
-
-                                        <!-- <td><t t-esc="j"/></td> -->
-
-                                        <td t-att-style="'width:1mm;background-color:'+jours[j]['color'] + ';border-left:'+jours[j]['border']"> 
+                                        <td t-att-style="'width:'+jours[j]['width']+';background-color:'+jours[j]['color'] + ';border-left:'+jours[j]['border']"> 
                                             <t  t-if="jours[j]['alerte']">
                                                 <span class="alerte">!</span>
                                             </t>
@@ -111,12 +100,6 @@
                         </tbody>
                     </table> 
                 </div>
-
-
-
-
-
-
                 <div style="page-break-after:always;" />
             </div>
         </t>

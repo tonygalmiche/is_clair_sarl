@@ -19,7 +19,7 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         //useState permet de faire un lien entre la vue XML et l'Object Javascript
         //Chaque modification de l'objet this.state entraine une modification de l'interface utilisateur
         this.state = useState({
-            decale_planning: 0,
+            decale_planning: "",
             nb_semaines:"",
             dict:{},
         });
@@ -67,7 +67,8 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         var jour=ev.target.attributes.jour;
         var color=ev.target.attributes.color;
         if (chantierid!==undefined && jour!==undefined && color!==undefined){
-            chantierid = parseInt(chantierid.value);
+            //chantierid = parseInt(chantierid.value);
+            chantierid = chantierid.value;
             jour       = parseInt(jour.value);
             color      = color.value;
             if (this.state.dict[chantierid]!==undefined) {
@@ -75,6 +76,10 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
                     if (this.state.dict[chantierid]["jours"][jour]!==undefined) {
                         const cursor = this.state.dict[chantierid]["jours"][jour].cursor;
                         if (cursor=="col-resize" || cursor=="move") {
+
+                            console.log("TEST 4",chantierid,jour,color);
+
+
                             this.state.action=cursor;
                             this.state.chantierid=chantierid;
                             this.state.jour=this.state.dict[chantierid].fin;
@@ -88,7 +93,8 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
     tdMouseMove(ev) {
         //Redimensionnement d'un chantier (on change la durée)
         if (this.state.action=="col-resize"){
-            if (this.state.chantierid>0){
+            //if (this.state.chantierid>0){
+            if (this.state.chantierid!==undefined){
                 const jour=ev.target.attributes.jour;
                 if (jour!==undefined){
                     //Si le jour est supérieur au jour mémorisé, il faut allonger la durée
@@ -124,7 +130,7 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
 
         //Déplacement d'un chantier (on change la date de début)
         if (this.state.action=="move"){
-            if (this.state.chantierid>0){
+            if (this.state.chantierid!==undefined){
                 var jour=ev.target.attributes.jour;
                 var chantier = this.state.dict[this.state.chantierid];
                 if (jour!==undefined){
@@ -161,17 +167,22 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         }
     }
     tdMouseUp(ev) {
+
+        const id = this.state.dict[this.state.chantierid]["id"];
+        console.log("id=",id);
+
+
         if (this.state.action=="col-resize"){
-            if (this.state.chantierid>0){
+            if (this.state.chantierid!==undefined){
                 const chantier = this.state.dict[this.state.chantierid];
                 const duree = chantier.duree;
                 if (duree>1) {
-                    this.writeChantier(this.state.chantierid,duree);
+                    this.ModifDureeChantier(id,duree);
                 }
             }
         }
         if (this.state.action=="move"){
-            this.moveChantier(this.state.chantierid, this.state.debut, this.state.decale_planning);
+            this.moveChantier(id, this.state.debut, this.state.decale_planning);
         }
         this.state.chantierid=0;
         this.state.jour=0;
@@ -218,12 +229,10 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         });
     }
 
-
     onChangeNbSemaines(ev){
         this.state.nb_semaines = ev.target.value;
         this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
     }
-
 
     PrecedentClick(ev) {
         this.state.decale_planning = this.state.decale_planning-7;
@@ -251,21 +260,26 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             self.state.dict     = result.dict;
             self.state.mois     = result.mois;
             self.state.semaines = result.semaines;
-            self.state.nb_semaines = result.nb_semaines;
+            self.state.nb_semaines     = result.nb_semaines;
+            self.state.decale_planning = result.decale_planning;
         });
     }
 
-    async writeChantier(chantierid,duree){
+    async ModifDureeChantier(chantierid,duree){
         var self=this;
-        var vals={
-            "duree": parseInt(duree),
-        }
-        var prom = rpc.query({
+        rpc.query({
             model: 'is.chantier',
-            method: 'write',
-            args: [[parseInt(chantierid)], vals],
+            method: 'modif_duree_chantier',
+            kwargs: {
+                chantierid     : chantierid,
+                duree          : duree,
+            }
+        }).then(function (result) {
+            console.log("ModifDureeChantier : result=",result);
         });
     }
+
+
 
     async moveChantier(chantierid, debut, decale_planning){
         var self=this;
@@ -279,13 +293,28 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             }
         }).then(function (result) {
             console.log("moveChantier : result=",result);
-            //self.state.partners = result.partners;
         });
     }
 
-
-
-
+    PDFClick(ev) {
+        this.GetPlanningPDF();
+    }
+    async GetPlanningPDF(s){
+        var self=this;
+        rpc.query({
+            model: 'is.chantier',
+            method: 'get_planning_pdf',
+            kwargs: {
+            }
+        }).then(function (result) {
+            self.env.bus.trigger('do-action', {
+                action: {
+                    type: 'ir.actions.act_url',
+                    url: '/web/content/'+result+'?download=true',
+                },
+            });
+        });
+    }
 }
 
 PlanningChantierRenderer.components = {};

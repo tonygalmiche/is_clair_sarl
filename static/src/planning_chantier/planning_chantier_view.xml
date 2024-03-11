@@ -6,7 +6,6 @@
         Reste à faire : <br />
         - Rendre modifiable uniquement pour le groupe autorisé<br />
         - Afficher les jours de fermeture<br />
-        - Afficher des alertes<br />
     </div>
  -->
 
@@ -17,6 +16,7 @@
                     <td><button class="btn btn-primary" t-on-click="PrecedentClick" title="Semaine précédente">&lt;</button></td>
                     <td><button class="btn btn-primary" t-on-click="OKButtonClick">Aujourd'hui</button></td>
                     <td><button class="btn btn-primary" t-on-click="SuivantClick" title="Semaine suivante">&gt;</button></td>
+                    <td>Nb semaines :</td>
                     <td>
                         <input 
                             name="nb_semaines" 
@@ -24,15 +24,34 @@
                             t-on-change="onChangeNbSemaines" 
                             type="text" 
                             class="form-control"
-                            placeholder="Nb semaines" 
-                            style="width:120px" 
+                            style="width:40px" 
+                        />
+                     </td>
+                     <td>Décalage :</td>
+                     <td>
+                         <input 
+                             name="decale_planning" 
+                             t-att-value="state.decale_planning" 
+                             t-on-change="onChangeNbSemaines" 
+                             type="text" 
+                             class="form-control"
+                             style="width:40px" 
+                         />
+                    </td>
+                    <td>
+                        <img 
+                            src="/is_clair_sarl/static/src/img/pdf.svg" 
+                            style="max-height:2em;margin-left:0.5em;margin-right:0.5em"
+                            title="Télécharger le planning PDF"
+                            class="link"
+                            t-on-click="PDFClick"
                         />
                     </td>
-                    <!-- <td style="width:100px"><t t-esc="state.chantierid"/></td>
+                    <td style="width:100px"><t t-esc="state.chantierid"/></td>
                     <td style="width:100px"><t t-esc="state.jour"/></td>
                     <td style="width:100px"><t t-esc="state.color"/></td>
                     <td style="width:100px"><t t-esc="state.action"/></td>
-                    <td style="width:100px"><t t-esc="state.debut"/></td> -->
+                    <td style="width:100px"><t t-esc="state.debut"/></td>
                 </tr>
             </table> 
         </div>
@@ -67,7 +86,7 @@
                 </tr>
             </thead>
             <tbody  t-on-mouseleave="tbodyMouseLeave">
-                <t t-foreach="Object.values(state.dict or {})" t-as="chantier" t-key="chantier.id">
+                <t t-foreach="Object.values(state.dict or {})" t-as="chantier" t-key="chantier.key">
                         <tr 
                             t-on-mouseenter="TrMouseEnter" 
                             t-on-mouseleave="TrMouseLeave" 
@@ -75,7 +94,7 @@
                             t-att-click="-1" 
                             t-att-style="chantier.trstyle"
                             t-att-memstyle="chantier.trstyle"
-                            t-att-chantierid="chantier.id"
+                            t-att-chantierid="chantier.key"
                         >
                         <td style="width:15px;white-space: nowrap;text-align:left">
                             <span 
@@ -89,6 +108,7 @@
                         <td style="width:300px;white-space: nowrap;">
                             <span t-att-title="chantier.name">
                                 <t t-esc="chantier.short_name"/>
+                                <!-- <t t-esc="chantier.key"/> -->
                             </span>
                         </td>
                         <td style="width:100px;white-space: nowrap;"><t t-esc="chantier.equipe"/></td>

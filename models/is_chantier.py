@@ -4,6 +4,7 @@ from random import randint
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from calendar import monthrange
+import base64
 
 
 class IsNatureTravaux(models.Model):
@@ -36,6 +37,11 @@ class IsChantier(models.Model):
     duree             = fields.Integer('Durée')
     date_fin          = fields.Date('Date fin', required=False)
     commentaire       = fields.Char('Commentaire')
+
+
+    # def write(self, vals):
+    #     res = super(IsChantier, self).write(vals)
+    #     return res
 
 
     @api.onchange('date_debut')
@@ -77,6 +83,16 @@ class IsChantier(models.Model):
         return 'OK'
 
 
+    @api.model
+    def modif_duree_chantier(self,chantierid=False,duree=False):
+        if chantierid and duree:
+            chantiers = self.env['is.chantier'].search([('id', '=',chantierid)])
+            for chantier in chantiers:
+                chantier.duree = duree
+                chantier.onchange_duree()
+        return 'OK'
+
+
     def ajouter_alerte_action(self):
         date=self.date_debut - timedelta(days=1)
         res= {
@@ -91,11 +107,16 @@ class IsChantier(models.Model):
 
 
     @api.model
-    def get_chantiers(self,domain=[],decale_planning=0, nb_semaines=""):#, res_model, ):
+    def get_chantiers(self,domain=[],decale_planning="", nb_semaines=""):#, res_model, ):
         if nb_semaines=="":
             nb_semaines = self.env['is.mem.var'].get(self._uid, 'chantier_nb_semaine') or 16
         else:
             self.env['is.mem.var'].set(self._uid, 'chantier_nb_semaine', nb_semaines)
+        if decale_planning=="":
+            decale_planning = self.env['is.mem.var'].get(self._uid, 'chantier_decale_planning') or 16
+        else:
+            self.env['is.mem.var'].set(self._uid, 'chantier_decale_planning', decale_planning)
+
 
         #** Recherche des alertes *********************************************
         lines=self.env['is.chantier.alerte'].search([])
@@ -115,6 +136,12 @@ class IsChantier(models.Model):
             nb_semaines = int(nb_semaines)
         except:
             nb_semaines = 16
+
+        try:
+            decale_planning = int(decale_planning)
+        except:
+            decale_planning = 0
+
         if nb_semaines<4:
             nb_semaines=4
         if nb_semaines>40:
@@ -165,15 +192,39 @@ class IsChantier(models.Model):
             jour = jour + timedelta(days=1)
         #**********************************************************************
 
-        res=[]
-        chantiers=self.env['is.chantier'].search(domain, order="name") #, limit=10)
+
+        #** Recherche de la date de début de chaque affaire pour le tri *******
+        date_debut_affaire={}
+        chantiers=self.env['is.chantier'].search(domain)
+        for chantier in chantiers:
+            affaire_id = chantier.affaire_id.id or 0
+            if affaire_id not in date_debut_affaire:
+                date_debut_affaire[affaire_id]=chantier.date_debut
+            if date_debut_affaire[affaire_id]>chantier.date_debut:
+                date_debut_affaire[affaire_id]=chantier.date_debut
+        #**********************************************************************
+
+
+        #** Dictionnaire trié des chantiers par date début affaire ***********
+        chantiers=self.env['is.chantier'].search(domain)
+        my_dict={}
+        for chantier in chantiers:
+            affaire_id = chantier.affaire_id.id or 0
+            date_affaire = date_debut_affaire[affaire_id]
+            key = "%s-%s-%s-%s"%(date_affaire,chantier.affaire_id.name,chantier.date_debut,chantier.name)
+            my_dict[key]=chantier
+        sorted_chantiers = dict(sorted(my_dict.items()))
+        #**********************************************************************
+
+
+        #** Contruction du dictionnaire finale des données dans le bon ordre **
         trcolor="#ffffff"
         mem_affaire=False
-        dict={}
-        for chantier in chantiers:
-
-
-
+        res=[]
+        my_dict={}
+        width_jour = str(round(66/nb_jours,1))+"%"
+        for k in sorted_chantiers:
+            chantier = sorted_chantiers[k]
             #** Recherhce si le chantier est visible sur le planning **********
             test=False
             if chantier.date_debut>=debut_planning and chantier.date_debut<=fin_planning:
@@ -184,7 +235,6 @@ class IsChantier(models.Model):
                 test=True
             #******************************************************************
             if test:
-
                 #** Changement de couleur à chaque affaire ********************
                 if not mem_affaire:
                     mem_affaire=chantier.affaire_id
@@ -198,13 +248,9 @@ class IsChantier(models.Model):
                 color = chantier.equipe_id.color or 'GreenYellow'
                 #**************************************************************
 
-
                 decal = (chantier.date_debut - debut_planning).days
                 if decal<0:
                     decal=0
-
-
-
                 jours={}
 
                 duree = chantier.duree or (chantier.date_fin - chantier.date_debut).days
@@ -230,6 +276,7 @@ class IsChantier(models.Model):
                         "border"   : border,
                         "date_jour": date_jour.strftime('%d/%m'),
                         "alerte"   : alerte,
+                        "width"    : width_jour,
                     }
                     if i>=decal and i<(decal+duree-1):
                         jour["color"]  = color
@@ -243,10 +290,12 @@ class IsChantier(models.Model):
                 name=chantier.commentaire or chantier.name
                 if chantier.affaire_id:
                     name=chantier.affaire_id.name_get()[0][1]
-                #name       = chantier.affaire_id.nom or chantier.commentaire or chantier.name
                 short_name = name[0:40]
-
+                affaire_id = chantier.affaire_id.id or 0
+                date_affaire = date_debut_affaire[affaire_id]
+                key = "%s-%s-%s-%s"%(date_affaire,chantier.affaire_id.name,chantier.date_debut,chantier.name)
                 vals={
+                    "key"       : key,
                     "id"        : chantier.id,
                     "debut"     : debut,
                     "fin"       : fin,
@@ -259,14 +308,91 @@ class IsChantier(models.Model):
                     "jours"     : jours,
                 }
                 res.append(vals)
-                dict[chantier.id]=vals
+                my_dict[key]=vals
+        sorted_dict = dict(sorted(my_dict.items()))
         return {
-            "dict"       : dict,
-            "mois"       : mois,
-            "semaines"   : semaines,
-            "nb_semaines": nb_semaines,
+            "dict"           : sorted_dict,
+            "mois"           : mois,
+            "semaines"       : semaines,
+            "nb_semaines"    : nb_semaines,
+            "decale_planning": decale_planning,
         }
     
+
+    @api.model
+    def get_planning_pdf(self):
+        #** Recherche du premier chantier pour générer le planning PDF
+        chantiers = self.env['is.chantier'].search([],limit=1)
+
+        if len(chantiers)>0:
+            chantier_id = chantiers[0].id
+            pdf = self.env.ref('is_clair_sarl.is_chantier_reports')._render_qweb_pdf(chantier_id)[0]
+            datas = base64.b64encode(pdf).decode()
+
+            # ** Recherche si une pièce jointe est déja associèe *******************
+            attachment_obj = self.env['ir.attachment']
+            name="planning_chantiers_%s.pdf"%self._uid
+            attachments = attachment_obj.search([('name','=',name)],limit=1)
+            # **********************************************************************
+
+            # ** Creation ou modification de la pièce jointe ***********************
+            vals = {
+                'name':  name,
+                'type':  'binary',
+                'datas': datas,
+            }
+            if attachments:
+                for attachment in attachments:
+                    attachment.write(vals)
+                    attachment_id=attachment.id
+            else:
+                attachment = attachment_obj.create(vals)
+                attachment_id=attachment.id
+            #***********************************************************************
+            return attachment_id
+
+
+    def creation_auto_chantier_cron(self):
+        today = date.today()
+        filtre=[
+            ('state','=','commande'),
+            ('type_affaire','=','chantier')
+        ]
+        lines = self.env['is.affaire'].search(filtre)
+        affaires=[]
+        for line in lines:
+            affaires.append(line)
+        chantiers = self.env['is.chantier'].search([])
+        affaires_chantiers=[]
+        for chantier in chantiers:
+            if chantier.affaire_id not in affaires_chantiers:
+                affaires_chantiers.append(chantier.affaire_id)
+        ct=1
+        for affaire in affaires:
+            if affaire not in affaires_chantiers:
+                vals={
+                    "affaire_id": affaire.id,
+                    "date_debut": today,
+                    "duree": 21,
+                }
+                chantier = self.env['is.chantier'].create(vals)
+                chantier.onchange_duree()
+                ct+=1
+
+        #** Recaler à la date du jour les chantiers non plannifiés ***********
+        filtre=[
+            ('equipe_id' ,'=',False),
+            ('date_debut','!=',today),
+        ]
+        chantiers = self.env['is.chantier'].search(filtre)
+        for chantier in chantiers:
+            vals={
+                "date_debut": today,
+                #"duree"     : 21,
+            }
+            chantier.write(vals)
+            chantier.onchange_date_debut()
+        #**********************************************************************
 
 
 class IsChantierAlerte(models.Model):
