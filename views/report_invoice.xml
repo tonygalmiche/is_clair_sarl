@@ -265,7 +265,7 @@
                                             <t t-call="account.tax_groups_totals"/>
                                         </t>
                                         <tr class="border-black">
-                                            <td style="color:black"><strong>TTC</strong></td>
+                                            <td style="color:black"><strong style="color:white">TTC</strong></td>
                                             <td class="text-right">
                                                 <span t-field="o.amount_total"/>
                                             </td>
