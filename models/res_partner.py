@@ -62,3 +62,41 @@ class ResPartner(models.Model):
             modele=self.env['is.modele.commande'].create(vals)
             obj.is_modele_commande_id = modele.id
             modele.initialiser_action()
+
+
+
+    # @api.model
+    # def _address_fields(self):
+    #     """Returns the list of address fields that are synced from the parent."""
+    #     res = list(super(ResPartner, self)._address_fields())
+    #     print("TEST 1 : res=",res)
+    #     if 'country_id' in res:
+    #         res.remove('country_id')
+    #     print("TEST 2 : res=",res)
+    #     return res
+
+    # def _prepare_display_address(self, without_company=False):
+    #     # res = super(ResPartner, self)._prepare_display_address(without_company=without_company)
+    #     # print(res)
+    #     # return res
+
+    # def _prepare_display_address(self, without_company=False):
+    #     # get the information that will be injected into the display format
+    #     # get the address format
+    #     address_format = self._get_address_format()
+    #     args = {
+    #         'state_code': self.state_id.code or '',
+    #         'state_name': self.state_id.name or '',
+    #         #'country_code': self.country_id.code or '',
+    #         #'country_name': self._get_country_name(),
+    #         'country_code': False,
+    #         'country_name':False,
+    #         'company_name': self.commercial_company_name or '',
+    #     }
+    #     for field in self._formatting_address_fields():
+    #         args[field] = getattr(self, field) or ''
+    #     if without_company:
+    #         args['company_name'] = ''
+    #     elif self.commercial_company_name:
+    #         address_format = '%(company_name)s\n' + address_format
+    #     return address_format, args

@@ -14,7 +14,7 @@ class AccountMove(models.Model):
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
     is_courrier_id      = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
     is_traite_id        = fields.Many2one('is.traite', 'Traite')
-    is_situation        = fields.Char("Situation")
+    is_situation        = fields.Char("Situation (Titre)")
     is_a_facturer       = fields.Monetary("Total à facturer", currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer')
     is_facture          = fields.Monetary("Total facturé"   , currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer', help="Montant total facturé hors remises")
     is_attente_avoir    = fields.Char("Attente avoir", help="Motif de l'attente de l'avoir")
