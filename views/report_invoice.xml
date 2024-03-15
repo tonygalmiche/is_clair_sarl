@@ -253,7 +253,7 @@
                                         </t>
                                     </t>
                                     <tr class="border-black">
-                                        <td><strong style="color:white">Reste dû HT</strong></td>
+                                        <td style="background-color:white"><strong style="color:black">Reste dû HT</strong></td>
                                         <td class="text-right">
                                             <span t-field="o.amount_untaxed"/>
                                         </td>
@@ -264,8 +264,8 @@
                                             <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
                                             <t t-call="account.tax_groups_totals"/>
                                         </t>
-                                        <tr class="border-black">
-                                            <td style="color:black"><strong style="color:white">TTC</strong></td>
+                                        <tr>
+                                            <td style="background-color:white"><strong style="color:black">TTC</strong></td>
                                             <td class="text-right">
                                                 <span t-field="o.amount_total"/>
                                             </td>
