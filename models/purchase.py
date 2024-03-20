@@ -825,7 +825,7 @@ class purchase_order_line(models.Model):
     is_traitement_id   = fields.Many2one('is.traitement', 'Traitement')
     is_largeur         = fields.Float('Largeur')
     is_hauteur         = fields.Float('Hauteur')
-    is_colis_ids       = fields.One2many('is.purchase.order.line.colis', 'line_id', 'Colis')
+    is_colis_ids       = fields.One2many('is.purchase.order.line.colis', 'line_id', 'Colis', copy=True)
     is_liste_colis_action_vsb = fields.Boolean("Liste colis vsb", store=False, readonly=True, compute='_compute_is_liste_colis_action_vsb')
     is_colisage               = fields.Text("Colisage", store=False, readonly=True, compute='_compute_is_colisage')
     is_repere_ids             = fields.One2many('is.purchase.order.line.repere', 'line_id', 'Repère de plan')
@@ -1005,7 +1005,7 @@ class IsPurchaseOrderLineColis(models.Model):
     name             = fields.Char('Colis', required=True, index=True)
     surface          = fields.Float("Surface (㎡)", digits=(14,2), store=True, readonly=True, compute='_compute_surface')
     forfait_coupe    = fields.Integer("Forfait coupe"            , store=True, readonly=True, compute='_compute_surface')
-    line_ids         = fields.One2many('is.purchase.order.line.colis.line', 'colis_id', 'Lignes')
+    line_ids         = fields.One2many('is.purchase.order.line.colis.line', 'colis_id', 'Lignes', copy=True)
 
     @api.depends('line_ids')
     def _compute_poids_colis(self):
