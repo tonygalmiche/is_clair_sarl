@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- account.move -->
-
     <record id="initialiser_affaire_action_server" model="ir.actions.server">
         <field name="name">Initialiser affaire</field>
         <field name="model_id" ref="account.model_account_move"/>
@@ -16,7 +15,6 @@
         <field name="state">code</field>
         <field name="code">records.initialiser_compte_vente_action()</field>
     </record>
-
     <record id="is_view_move_form" model="ir.ui.view">
         <field name="name">is_view_move_form</field>
         <field name="model">account.move</field>
@@ -117,9 +115,6 @@
                 <field name="is_export_compta_id" optional="show"/>
                 <field name="is_courrier_id"      optional="show"/>
             </field>
-            <!-- <field name="state" position="after">
-                <field name="active" optional="hide"/>
-            </field> -->
         </field>
     </record>
     <record id="is_view_in_invoice_tree" model="ir.ui.view">
@@ -128,7 +123,6 @@
         <field name="inherit_id" ref="account.view_in_invoice_tree" />
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <!-- <field name="purchase_id" optional="hide"/> -->
                 <field name="is_affaire_id" optional="show" class="white_space_normal"/>
             </field>
             <field name="invoice_date_due" position="before">
@@ -151,9 +145,6 @@
             <field name="activity_ids" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
-            <!-- <tree position="attributes">
-                <attribute name="default_order">name</attribute>
-            </tree> -->
         </field>
     </record>
     <record id="is_view_account_invoice_filter" model="ir.ui.view">
@@ -169,6 +160,47 @@
             </field>
         </field>
     </record>
+
+
+
+
+    <record id="is_suivi_facturation_mensuel_tree_view" model="ir.ui.view">
+        <field name="name">is_suivi_facturation_mensuel_tree_view</field>
+        <field name="model">account.move</field>
+        <field name="type">tree</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="invoice_date"          optional="show" string="Date"/>
+                <field name="name"                  optional="show" string="N°Facture"/>
+                <field name="partner_id"            optional="show" string="Client" widget="many2one_clickable"/>
+                <field name="is_affaire_id"         optional="show" widget="many2one_clickable"/>
+                <field name="amount_untaxed_signed" optional="show" string="Montant HT" sum="Total"/>
+                <field name="invoice_date_due"      optional="show" string="Échéance"/>
+                <field name="is_situation"          optional="show"/>
+                <field name="move_type"             optional="show" widget="badge" decoration-danger="move_type == 'out_refund'" decoration-success="move_type == 'out_invoice'"/>
+                <field name="payment_state"         optional="hide" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"/>
+                <field name="state"                 optional="hide" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_suivi_facturation_mensuel_action" model="ir.actions.act_window">
+        <field name="name">Suivi facturation mensuel</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="view_id" ref="is_clair_sarl.is_suivi_facturation_mensuel_tree_view"/>
+        <field name="domain">[('move_type', 'in', ('out_invoice','out_refund')),('state', '=', 'posted')]</field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="limit">200</field>
+    </record>
+
+
+
+
+
+
+
+
 
 
     <!-- account.move.line -->
@@ -191,7 +223,6 @@
                             <field name="product_uom_id" readonly="1"/>
                             <field name="price_unit" readonly="1"/>
                             <field name="price_subtotal" readonly="1"/>
-
                             <field name="is_sale_line_id" readonly="1"/>
                         </group>
                     </group>
