@@ -486,7 +486,7 @@
         </field>
     </record>
     <record id="is_affaire_suivi_marge_action" model="ir.actions.act_window">
-        <field name="name">Suivi marge affaires chantier</field>
+        <field name="name">Affaires Chantier Suivi marge</field>
         <field name="res_model">is.affaire</field>
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
@@ -494,7 +494,7 @@
         <field name="domain">[('state','=','commande'),('type_affaire','=','chantier')]</field>
     </record>
     <record id="is_affaire_entretien_action" model="ir.actions.act_window">
-        <field name="name">Affaires d'entretien</field>
+        <field name="name">Affaires Contrat d'entretien</field>
         <field name="res_model">is.affaire</field>
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
@@ -502,7 +502,7 @@
         <field name="limit">1000</field>
     </record>
     <record id="is_affaire_sav_action" model="ir.actions.act_window">
-        <field name="name">Affaires de SAV</field>
+        <field name="name">Affaires Réparation</field>
         <field name="res_model">is.affaire</field>
         <field name="view_mode">tree,form,activity,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_affaire_suivi_marge_tree_view"/>
