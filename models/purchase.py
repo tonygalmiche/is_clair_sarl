@@ -356,7 +356,18 @@ class purchase_order(models.Model):
                             break
                 #**************************************************************
 
- 
+                #** N°Facture *************************************************
+                if test:
+                    for line in lines:
+                        x = re.search("Facture N° :(.*) du (.*)", line) 
+                        if x:
+                            v = x.groups()
+                            if len(v)==2:
+                                dict["N°Facture"]    = v[0].strip()
+                                dict["Date Facture"] = v[1].strip()
+                                break
+                #**************************************************************
+
                 #** Lignes avec des Quantités ou des montants *****************
                 if test:
                     debut=fin=False
