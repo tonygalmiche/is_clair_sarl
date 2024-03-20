@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models,fields,api
+from dateutil.relativedelta import relativedelta
 
 
 class AccountMove(models.Model):
@@ -19,6 +20,24 @@ class AccountMove(models.Model):
     is_facture          = fields.Monetary("Total facturé"   , currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer', help="Montant total facturé hors remises")
     is_attente_avoir    = fields.Char("Attente avoir", help="Motif de l'attente de l'avoir")
     active              = fields.Boolean("Active", store=True, readonly=True, compute='_compute_active')
+    is_montant_paye     = fields.Monetary(string='Montant payé', store=True, readonly=True, compute='_compute_is_montant_paye', currency_field='company_currency_id')
+    is_pourcent_du      = fields.Float(string='% dû'           , store=True, readonly=True, compute='_compute_is_montant_paye')
+    is_echeance_1an     = fields.Date("Échéance 1an"           , store=True, readonly=True, compute='_compute_is_montant_paye')
+
+
+    @api.depends('state','amount_total_signed','amount_residual_signed','invoice_date')
+    def _compute_is_montant_paye(self):
+        for obj in self:
+            montant = obj.amount_total_signed-obj.amount_residual_signed
+            obj.is_montant_paye = montant
+            pourcent=0
+            if obj.amount_total_signed!=0:
+                pourcent = 100*obj.amount_residual_signed / obj.amount_total_signed
+            obj.is_pourcent_du  = pourcent
+            echeance=False
+            if obj.invoice_date:
+                echeance = obj.invoice_date + relativedelta(years=1)
+            obj.is_echeance_1an = echeance
 
 
     @api.depends('state')

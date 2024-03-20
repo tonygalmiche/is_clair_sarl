@@ -251,10 +251,7 @@
         action="is_traite_action"
     />
 
-
-
-
-
+    
     <!-- Facturation / Client -->
     <menuitem
         id="is_suivi_facturation_mensuel_menu"
@@ -270,10 +267,13 @@
         sequence="810"
         action="is_suivi_retard_paiement_action"
     />
-
-
-    
-
+    <menuitem
+        id="is_suivi_partiellemnt_regle_menu"
+        name="Suivi partiellement réglé"
+        parent="account.menu_finance_receivables"
+        sequence="810"
+        action="is_suivi_partiellemnt_regle_action"
+    />
     <menuitem
         id="is_export_compta_vente_menu"
         name="Export Compta Vente"

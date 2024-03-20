@@ -203,7 +203,7 @@
         <field name="type">tree</field>
         <field name="priority">100</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree create="false" default_order="invoice_date_due">
                 <field name="invoice_date"            optional="show" string="Date"/>
                 <field name="name"                    optional="show" string="N°Facture"/>
                 <field name="partner_id"              optional="show" string="Client" widget="many2one_clickable"/>
@@ -236,6 +236,45 @@
 
 
 
+
+
+    <record id="is_suivi_partiellemnt_regle_tree_view" model="ir.ui.view">
+        <field name="name">is_suivi_partiellemnt_regle_tree_view</field>
+        <field name="model">account.move</field>
+        <field name="type">tree</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <tree create="false" default_order="invoice_date">
+                <field name="invoice_date"            optional="show" string="Date"/>
+                <field name="name"                    optional="show" string="N°Facture"/>
+                <field name="partner_id"              optional="show" string="Client" widget="many2one_clickable"/>
+                <field name="is_affaire_id"           optional="show" widget="many2one_clickable"/>
+                <field name="amount_total_signed"     optional="show" string="Montant TTC"  sum="Total"/>
+                <field name="is_montant_paye"         optional="show" string="Montant payé" sum="Total"/>
+                <field name="amount_residual_signed"  optional="show" string="Montant dû"   sum="Total"/>
+                <field name="is_pourcent_du"          optional="show"/>
+                <field name="invoice_payment_term_id" optional="hide" />
+                <field name="is_echeance_1an"         widget="remaining_days"/>
+                <field name="is_situation"            optional="hide"/>
+                <field name="payment_state"           optional="show" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"/>
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_suivi_partiellemnt_regle_action" model="ir.actions.act_window">
+        <field name="name">Suivi partiellement réglé</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="view_id" ref="is_clair_sarl.is_suivi_partiellemnt_regle_tree_view"/>
+        <field name="domain">[
+            ('move_type', '=', 'out_invoice'),
+            ('state', '=', 'posted'),
+            ('payment_state', '=','partial'),
+        ]
+        </field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="limit">500</field>
+    </record>
 
 
 
