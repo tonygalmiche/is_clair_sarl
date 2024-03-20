@@ -264,6 +264,17 @@
         action="is_suivi_facturation_mensuel_action"
     />
     <menuitem
+        id="is_suivi_retard_paiement_menu"
+        name="Suivi retard paiement"
+        parent="account.menu_finance_receivables"
+        sequence="810"
+        action="is_suivi_retard_paiement_action"
+    />
+
+
+    
+
+    <menuitem
         id="is_export_compta_vente_menu"
         name="Export Compta Vente"
         parent="account.menu_finance_receivables"

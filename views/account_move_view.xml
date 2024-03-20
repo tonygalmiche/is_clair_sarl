@@ -197,6 +197,50 @@
 
 
 
+    <record id="is_suivi_retard_paiement_tree_view" model="ir.ui.view">
+        <field name="name">is_suivi_retard_paiement_tree_view</field>
+        <field name="model">account.move</field>
+        <field name="type">tree</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="invoice_date"            optional="show" string="Date"/>
+                <field name="name"                    optional="show" string="N°Facture"/>
+                <field name="partner_id"              optional="show" string="Client" widget="many2one_clickable"/>
+                <field name="is_affaire_id"           optional="show" widget="many2one_clickable"/>
+                <field name="amount_untaxed_signed"   optional="show" string="Montant HT" sum="Total"/>
+                <field name="invoice_payment_term_id" optional="show" />
+                <field name="invoice_date_due"        string="Échéance"/>
+                <field name="invoice_date_due"        string="Échéance" widget="remaining_days"  attrs="{'invisible': [['payment_state', 'in', ('paid', 'in_payment', 'reversed')]]}"/>
+                <field name="is_situation"            optional="hide"/>
+                <field name="payment_state"           optional="show" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"/>
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_suivi_retard_paiement_action" model="ir.actions.act_window">
+        <field name="name">Suivi retard paiement</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="view_id" ref="is_clair_sarl.is_suivi_retard_paiement_tree_view"/>
+        <field name="domain">[
+            ('move_type', '=', 'out_invoice'),
+            ('state', '=', 'posted'),
+            ('payment_state', 'in', ('not_paid', 'partial')),
+            ('invoice_date_due', '&lt;', time.strftime('%Y-%m-%d'))
+        ]
+        </field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="limit">500</field>
+    </record>
+
+
+
+
+
+
+
+
 
 
 
