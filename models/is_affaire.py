@@ -638,8 +638,6 @@ class IsAffaire(models.Model):
             }
 
 
-
-
     def name_get(self):
         result = []
         for obj in self:
@@ -651,17 +649,8 @@ class IsAffaire(models.Model):
                 name = "%s"%(obj.name)
             if obj.nom and not obj.name:
                 name = "%s"%(obj.nom)
-            #if obj.chantier_id:
-            #    name+=" - %s %s %s %s"%(obj.chantier_id.street or '', obj.chantier_id.street2 or '', obj.chantier_id.zip or '', obj.chantier_id.city or '')
-            
-            name+=" - %s %s %s %s"%(obj.street or '', obj.street2 or '', obj.zip or '', obj.city or '')
-
-
-            
+            #name+=" - %s %s %s %s"%(obj.street or '', obj.street2 or '', obj.zip or '', obj.city or '')
             result.append((obj.id, name))
-
-
-
         return result
 
 

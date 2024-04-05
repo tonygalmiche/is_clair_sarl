@@ -27,26 +27,49 @@
                         white-space: nowrap;
                     }
                 </style>
-
                 <header>
+                    <button 
+                        name="vers_en_encours" type="object" class="oe_highlight" 
+                        attrs="{'invisible': [('state', '!=', 'a_planifier')]}"
+                        string="vers 'En cours'" groups="is_clair_sarl.is_responsable_planning_chantiers_group"
+                    />
+                    <button 
+                        name="vers_a_planifier" type="object"
+                        attrs="{'invisible': [('state', '!=', 'en_cours')]}"
+                        string="vers 'A planifier'" groups="is_clair_sarl.is_responsable_planning_chantiers_group"
+                    />
                     <button
                         name="ajouter_alerte_action"
                         type="object"
                         string="Ajouter une alerte"
                     />
+                <field name="state" widget="statusbar"/>
                 </header>
                  <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="affaire_id"        required="1"/>
-                        <field name="equipe_id"         required="1"/>
-                        <field name="nature_travaux_id" required="1"/>
-                        <field name="date_debut"        required="1"/>
-                        <field name="duree"             required="1"/>
-                        <field name="date_fin"          required="1"/>
+                        <group>
+                            <field name="name"/>
+                            <field name="affaire_id"        required="1"/>
+                            <field name="equipe_id"         attrs="{'required': [('state', '=', 'en_cours')]}"/>
+                            <field name="nature_travaux_id" attrs="{'required': [('state', '=', 'en_cours')]}"/>
+                            <field name="date_debut"        attrs="{'required': [('state', '=', 'en_cours')]}"/>
+                            <field name="duree"             attrs="{'required': [('state', '=', 'en_cours')]}"/>
+                            <field name="date_fin"          attrs="{'required': [('state', '=', 'en_cours')]}"/>
+                         </group>
+                         <group>
+                            <field name="date_debut_souhaitee" attrs="{'readonly': [('state', '=', 'en_cours')]}"/>
+                            <field name="duree_souhaitee"      attrs="{'readonly': [('state', '=', 'en_cours')]}"/>
+                         </group>
+                    </group>
+                    <group>
                         <field name="commentaire"/>
-                     </group>
+                    </group>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </div>
             </form>
         </field>
     </record>
@@ -56,22 +79,24 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
-                <field name="affaire_id"/>
-                <field name="equipe_color"/>
-                <field name="equipe_id" widget="many2one_clickable"/>
-                <field name="nature_travaux_id"/>
-                <field name="date_debut"/>
-                <field name="duree" sum="Total"/>
-                <field name="date_fin"/>
-                <field name="commentaire" optional="show"/>
-                <field name="create_date" optional="hide"/>
-                <field name="create_uid"  optional="hide"/>
-                <field name="write_date"  optional="hide"/>
-                <field name="write_uid"   optional="hide"/>
+                <field name="affaire_id"        optional="show" widget="many2one_clickable"/>
+                <field name="equipe_color"      optional="show" widget="color"/>
+                <field name="equipe_id"         optional="show" widget="many2one_clickable"/>
+                <field name="nature_travaux_id" optional="show"/>
+                <field name="date_debut_souhaitee" optional="hide"/>
+                <field name="duree_souhaitee"      optional="hide"/>
+                <field name="date_debut"        optional="show"/>
+                <field name="duree"             optional="show" sum="Total"/>
+                <field name="date_fin"          optional="show"/>
+                <field name="commentaire"       optional="show"/>
+                <field name="create_date"       optional="hide"/>
+                <field name="create_uid"        optional="hide"/>
+                <field name="write_date"        optional="hide"/>
+                <field name="write_uid"         optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state == 'en_cours'" decoration-warning="state == 'a_planifier'" optional="show"/>
             </tree>
         </field>
     </record>
-
     <record model="ir.ui.view" id="is_chantier_calendar" >
         <field name="name">is_chantier_calendar</field>
         <field name="model">is.chantier</field>
@@ -143,7 +168,7 @@
                     <group>
                         <group>
                             <field name="name" />
-                            <field name="color" required="True"/>
+                            <field name="color" required="True" widget="color"/>
                         </group>
                     </group>
                 </sheet>
@@ -157,7 +182,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
-                <field name="color" required="True"/>
+                <field name="color" widget="color"/>
             </tree>
         </field>
     </record>

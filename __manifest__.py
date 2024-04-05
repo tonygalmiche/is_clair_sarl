@@ -18,10 +18,12 @@ Module Odoo 15 pour CLAIR-SARL
         "l10n_fr",
         "l10n_fr_fec",
         "web",
+        "web_company_color",
     ],
     "data" : [
         "security/res.groups.xml",
         "security/ir.model.access.csv",
+        "security/ir.rule.xml",
         "views/is_affaire_view.xml",
         "views/is_import_clair_views.xml",
         "views/is_modele_commande_view.xml",

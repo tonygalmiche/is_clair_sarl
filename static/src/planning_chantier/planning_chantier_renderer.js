@@ -62,28 +62,30 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
 
     //Alonger la durée du chantier par glissé/déposé
     tdMouseDown(ev) {
-        //On mémorise le chantier, le jour et la couleur lors du down de la souris
-        var chantierid=ev.target.parentElement.attributes.chantierid;
-        var jour=ev.target.attributes.jour;
-        var color=ev.target.attributes.color;
-        if (chantierid!==undefined && jour!==undefined && color!==undefined){
-            //chantierid = parseInt(chantierid.value);
-            chantierid = chantierid.value;
-            jour       = parseInt(jour.value);
-            color      = color.value;
-            if (this.state.dict[chantierid]!==undefined) {
-                if (this.state.dict[chantierid]["jours"]!==undefined) {
-                    if (this.state.dict[chantierid]["jours"][jour]!==undefined) {
-                        const cursor = this.state.dict[chantierid]["jours"][jour].cursor;
-                        if (cursor=="col-resize" || cursor=="move") {
+        if (this.state.autorise_modif==true){
+            //On mémorise le chantier, le jour et la couleur lors du down de la souris
+            var chantierid=ev.target.parentElement.attributes.chantierid;
+            var jour=ev.target.attributes.jour;
+            var color=ev.target.attributes.color;
+            if (chantierid!==undefined && jour!==undefined && color!==undefined){
+                //chantierid = parseInt(chantierid.value);
+                chantierid = chantierid.value;
+                jour       = parseInt(jour.value);
+                color      = color.value;
+                if (this.state.dict[chantierid]!==undefined) {
+                    if (this.state.dict[chantierid]["jours"]!==undefined) {
+                        if (this.state.dict[chantierid]["jours"][jour]!==undefined) {
+                            const cursor = this.state.dict[chantierid]["jours"][jour].cursor;
+                            if (cursor=="col-resize" || cursor=="move") {
 
-                            console.log("TEST 4",chantierid,jour,color);
+                                console.log("TEST 4",chantierid,jour,color);
 
 
-                            this.state.action=cursor;
-                            this.state.chantierid=chantierid;
-                            this.state.jour=this.state.dict[chantierid].fin;
-                            this.state.color=color;
+                                this.state.action=cursor;
+                                this.state.chantierid=chantierid;
+                                this.state.jour=this.state.dict[chantierid].fin;
+                                this.state.color=color;
+                            }
                         }
                     }
                 }
@@ -167,28 +169,29 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         }
     }
     tdMouseUp(ev) {
-
-        const id = this.state.dict[this.state.chantierid]["id"];
-        console.log("id=",id);
-
-
-        if (this.state.action=="col-resize"){
-            if (this.state.chantierid!==undefined){
-                const chantier = this.state.dict[this.state.chantierid];
-                const duree = chantier.duree;
-                if (duree>1) {
-                    this.ModifDureeChantier(id,duree);
+        if (this.state.dict[this.state.chantierid]!==undefined){
+            const id = this.state.dict[this.state.chantierid]["id"];
+            console.log("id=",id);
+            if (this.state.action=="col-resize"){
+                if (this.state.chantierid!==undefined){
+                    const chantier = this.state.dict[this.state.chantierid];
+                    const duree = chantier.duree;
+                    if (duree>1) {
+                        this.ModifDureeChantier(id,duree);
+                    }
                 }
             }
+            if (this.state.action=="move"){
+                this.moveChantier(id, this.state.debut, this.state.decale_planning);
+            }
+            this.state.chantierid=0;
+            this.state.jour=0;
+            this.state.color="";
+            this.state.action="";
         }
-        if (this.state.action=="move"){
-            this.moveChantier(id, this.state.debut, this.state.decale_planning);
-        }
-        this.state.chantierid=0;
-        this.state.jour=0;
-        this.state.color="";
-        this.state.action="";
     }
+
+
     tbodyMouseLeave(ev) {
         this.state.chantierid=0;
         this.state.jour=0;
@@ -242,6 +245,15 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         this.state.decale_planning = this.state.decale_planning+7;
         this.GetChantiers(this.state.decale_planning);
     }
+
+
+    onChangeState(ev) {
+        this.state.chantier_state = ev.target.value;
+        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
+    }
+
+
+
     OKButtonClick(ev) {
         this.state.decale_planning = 0;
         this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
@@ -255,6 +267,7 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
                 domain         : this.props.domain,
                 decale_planning: this.state.decale_planning,
                 nb_semaines    : this.state.nb_semaines,
+                chantier_state : this.state.chantier_state,
             }
         }).then(function (result) {
             self.state.dict     = result.dict;
@@ -262,6 +275,9 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             self.state.semaines = result.semaines;
             self.state.nb_semaines     = result.nb_semaines;
             self.state.decale_planning = result.decale_planning;
+            self.state.autorise_modif  = result.autorise_modif;
+            self.state.state_options   = result.state_options;
+            self.state.chantier_state  = result.chantier_state;
         });
     }
 

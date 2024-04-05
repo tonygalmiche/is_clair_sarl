@@ -25,23 +25,27 @@ class IsNatureTravaux(models.Model):
 
 class IsChantier(models.Model):
     _name='is.chantier'
+    _inherit = ["portal.mixin", "mail.thread", "mail.activity.mixin", "utm.mixin"]
     _description = "Chantiers"
     _order='name'
 
     name              = fields.Char('N°', index=True, readonly=True)
-    affaire_id        = fields.Many2one('is.affaire', 'Affaire', required=False)
-    equipe_id         = fields.Many2one('is.equipe', 'Equipe', required=False)
+    affaire_id        = fields.Many2one('is.affaire', 'Affaire', required=False, tracking=True)
+    equipe_id         = fields.Many2one('is.equipe', 'Equipe', required=False, tracking=True)
     equipe_color      = fields.Char('Couleur', help='Couleur Equipe', related="equipe_id.color")
-    nature_travaux_id = fields.Many2one('is.nature.travaux', string="Nature des travaux", required=False)
-    date_debut        = fields.Date('Date début', required=False)
-    duree             = fields.Integer('Durée')
-    date_fin          = fields.Date('Date fin', required=False)
-    commentaire       = fields.Char('Commentaire')
+    nature_travaux_id = fields.Many2one('is.nature.travaux', string="Nature des travaux", required=False, tracking=True)
 
+    date_debut_souhaitee = fields.Date('Date début souhaitée', tracking=True)
+    duree_souhaitee      = fields.Integer('Durée souhaitée (J)', tracking=True)
 
-    # def write(self, vals):
-    #     res = super(IsChantier, self).write(vals)
-    #     return res
+    date_debut        = fields.Date('Date début', required=True, tracking=True)
+    duree             = fields.Integer('Durée (J)', tracking=True)
+    date_fin          = fields.Date('Date fin', required=False, tracking=True)
+    commentaire       = fields.Text('Commentaire', tracking=True)
+    state = fields.Selection([
+        ('a_planifier', 'A planifier'),
+        ('en_cours'   , 'En cours'),
+    ], 'Etat', index=True, default="a_planifier", required=True, tracking=True)
 
 
     @api.onchange('date_debut')
@@ -93,6 +97,16 @@ class IsChantier(models.Model):
         return 'OK'
 
 
+    def vers_en_encours(self):
+        for obj in self:
+            obj.state='en_cours'
+
+
+    def vers_a_planifier(self):
+        for obj in self:
+            obj.state='a_planifier'
+
+
     def ajouter_alerte_action(self):
         date=self.date_debut - timedelta(days=1)
         res= {
@@ -107,7 +121,11 @@ class IsChantier(models.Model):
 
 
     @api.model
-    def get_chantiers(self,domain=[],decale_planning="", nb_semaines=""):#, res_model, ):
+    def get_chantiers(self,domain=[],decale_planning="", nb_semaines="", chantier_state=""):
+        autorise_modif=False
+        if self.user_has_groups('is_clair_sarl.is_responsable_planning_chantiers_group'):
+            autorise_modif=True
+
         if nb_semaines=="":
             nb_semaines = self.env['is.mem.var'].get(self._uid, 'chantier_nb_semaine') or 16
         else:
@@ -117,6 +135,24 @@ class IsChantier(models.Model):
         else:
             self.env['is.mem.var'].set(self._uid, 'chantier_decale_planning', decale_planning)
 
+        if chantier_state=="":
+            chantier_state = self.env['is.mem.var'].get(self._uid, 'chantier_state') or "Tous"
+        else:
+            self.env['is.mem.var'].set(self._uid, 'chantier_state', chantier_state)
+
+        #** Liste de choix ****************************************************
+        options = ["A planifier","En cours", "Tous"]
+        state_options=[]
+        for o in options:
+            selected=False
+            if o==chantier_state:
+                selected=True
+            state_options.append({
+                "id": o,
+                "name": o,
+                "selected": selected,
+            })
+        #**********************************************************************
 
         #** Recherche des alertes *********************************************
         lines=self.env['is.chantier.alerte'].search([])
@@ -234,6 +270,21 @@ class IsChantier(models.Model):
             if chantier.date_debut<=debut_planning and chantier.date_fin>=fin_planning:
                 test=True
             #******************************************************************
+
+
+            #** Recherche si le chantier est dans l'état sélectionné **********
+            if chantier_state=="En cours"    and chantier.state!="en_cours":
+                test=False
+            if chantier_state=="A planifier" and chantier.state!="a_planifier":
+                test=False
+
+            #******************************************************************
+
+        #options = ["A planifier","En cours", "Tous"]
+
+
+
+
             if test:
                 #** Changement de couleur à chaque affaire ********************
                 if not mem_affaire:
@@ -316,6 +367,9 @@ class IsChantier(models.Model):
             "semaines"       : semaines,
             "nb_semaines"    : nb_semaines,
             "decale_planning": decale_planning,
+            "autorise_modif" : autorise_modif,
+            "state_options"  : state_options,
+            "chantier_state" : chantier_state,
         }
     
 
@@ -383,6 +437,7 @@ class IsChantier(models.Model):
         filtre=[
             ('equipe_id' ,'=',False),
             ('date_debut','!=',today),
+            ('state','=','a_planifier'),
         ]
         chantiers = self.env['is.chantier'].search(filtre)
         for chantier in chantiers:
