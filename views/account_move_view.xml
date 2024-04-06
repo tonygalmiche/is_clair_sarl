@@ -96,6 +96,10 @@
                     name="is_facture"
                     attrs="{'invisible': [('is_facture', '=', 0)], 'readonly': True}"
                 />
+                <field 
+                    name="is_remarque_paiement"
+                    attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"
+                />
             </div>
         </field>
     </record> 
@@ -148,9 +152,6 @@
             <field name="state" position="before">
                  <field name="is_export_compta_id" optional="show"/>
             </field>
-
-
-
         </field>
     </record>
     <record id="is_view_account_invoice_filter" model="ir.ui.view">
@@ -169,8 +170,7 @@
     </record>
 
 
-
-
+    <!-- Suivi facturation mensuel -->
     <record id="is_suivi_facturation_mensuel_tree_view" model="ir.ui.view">
         <field name="name">is_suivi_facturation_mensuel_tree_view</field>
         <field name="model">account.move</field>
@@ -201,9 +201,7 @@
         <field name="limit">200</field>
     </record>
 
-
-
-
+    <!-- Suivi retard paiement -->
     <record id="is_suivi_retard_paiement_tree_view" model="ir.ui.view">
         <field name="name">is_suivi_retard_paiement_tree_view</field>
         <field name="model">account.move</field>
@@ -221,6 +219,7 @@
                 <field name="invoice_date_due"        string="Échéance" widget="remaining_days"  attrs="{'invisible': [['payment_state', 'in', ('paid', 'in_payment', 'reversed')]]}"/>
                 <field name="is_situation"            optional="hide"/>
                 <field name="payment_state"           optional="show" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"/>
+                <field name="is_remarque_paiement"    optional="show"/>
                 <field name="state" invisible="1"/>
             </tree>
         </field>
@@ -241,10 +240,7 @@
         <field name="limit">500</field>
     </record>
 
-
-
-
-
+    <!-- Suivi partiellement réglé -->
     <record id="is_suivi_partiellemnt_regle_tree_view" model="ir.ui.view">
         <field name="name">is_suivi_partiellemnt_regle_tree_view</field>
         <field name="model">account.move</field>
@@ -264,6 +260,7 @@
                 <field name="is_echeance_1an"         widget="remaining_days"/>
                 <field name="is_situation"            optional="hide"/>
                 <field name="payment_state"           optional="show" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"/>
+                <field name="is_remarque_paiement"    optional="hide"/>
                 <field name="state" invisible="1"/>
             </tree>
         </field>

@@ -7,22 +7,21 @@ class AccountMove(models.Model):
     _inherit = "account.move"
     _order='name desc'
 
-
-    is_order_id         = fields.Many2one('sale.order', 'Commande')
-    #is_affaire_id       = fields.Many2one('is.affaire', 'Affaire', related='is_order_id.is_affaire_id')
-    is_affaire_id       = fields.Many2one('is.affaire', 'Affaire', compute='_compute_is_affaire_id', store=True, readonly=True)
-    is_banque_id        = fields.Many2one('account.journal', 'Banque par défaut', related='partner_id.is_banque_id')
-    is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
-    is_courrier_id      = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
-    is_traite_id        = fields.Many2one('is.traite', 'Traite')
-    is_situation        = fields.Char("Situation (Titre)")
-    is_a_facturer       = fields.Monetary("Total à facturer", currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer')
-    is_facture          = fields.Monetary("Total facturé"   , currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer', help="Montant total facturé hors remises")
-    is_attente_avoir    = fields.Char("Attente avoir", help="Motif de l'attente de l'avoir")
-    active              = fields.Boolean("Active", store=True, readonly=True, compute='_compute_active')
-    is_montant_paye     = fields.Monetary(string='Montant payé', store=True, readonly=True, compute='_compute_is_montant_paye', currency_field='company_currency_id')
-    is_pourcent_du      = fields.Float(string='% dû'           , store=True, readonly=True, compute='_compute_is_montant_paye')
-    is_echeance_1an     = fields.Date("Échéance 1an"           , store=True, readonly=True, compute='_compute_is_montant_paye')
+    is_order_id          = fields.Many2one('sale.order', 'Commande')
+    is_affaire_id        = fields.Many2one('is.affaire', 'Affaire', compute='_compute_is_affaire_id', store=True, readonly=True)
+    is_banque_id         = fields.Many2one('account.journal', 'Banque par défaut', related='partner_id.is_banque_id')
+    is_export_compta_id  = fields.Many2one('is.export.compta', 'Folio', copy=False)
+    is_courrier_id       = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
+    is_traite_id         = fields.Many2one('is.traite', 'Traite')
+    is_situation         = fields.Char("Situation (Titre)")
+    is_a_facturer        = fields.Monetary("Total à facturer", currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer')
+    is_facture           = fields.Monetary("Total facturé"   , currency_field='currency_id', store=True, readonly=True, compute='_compute_is_a_facturer', help="Montant total facturé hors remises")
+    is_attente_avoir     = fields.Char("Attente avoir", help="Motif de l'attente de l'avoir")
+    active               = fields.Boolean("Active", store=True, readonly=True, compute='_compute_active')
+    is_montant_paye      = fields.Monetary(string='Montant payé', store=True, readonly=True, compute='_compute_is_montant_paye', currency_field='company_currency_id')
+    is_pourcent_du       = fields.Float(string='% dû'           , store=True, readonly=True, compute='_compute_is_montant_paye')
+    is_echeance_1an      = fields.Date("Échéance 1an"           , store=True, readonly=True, compute='_compute_is_montant_paye')
+    is_remarque_paiement = fields.Char("Remarque paiememt")
 
 
     @api.depends('state','amount_total_signed','amount_residual_signed','invoice_date')
