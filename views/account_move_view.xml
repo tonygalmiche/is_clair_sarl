@@ -132,7 +132,6 @@
             <field name="state" position="before">
                 <field name="is_attente_avoir"    optional="hide"/>
                 <field name="is_banque_id"        optional="hide"/>
-                <field name="is_export_compta_id" optional="show"/>
                 <field name="is_traite_id"        optional="show"/>
             </field>
         </field>
@@ -145,6 +144,13 @@
             <field name="activity_ids" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
+
+            <field name="state" position="before">
+                 <field name="is_export_compta_id" optional="show"/>
+            </field>
+
+
+
         </field>
     </record>
     <record id="is_view_account_invoice_filter" model="ir.ui.view">
