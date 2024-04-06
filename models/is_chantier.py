@@ -280,10 +280,6 @@ class IsChantier(models.Model):
 
             #******************************************************************
 
-        #options = ["A planifier","En cours", "Tous"]
-
-
-
 
             if test:
                 #** Changement de couleur à chaque affaire ********************

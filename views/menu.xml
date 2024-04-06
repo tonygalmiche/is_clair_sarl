@@ -229,27 +229,6 @@
         action="is_account_move_line_action" 
         parent="account.menu_finance_payables" 
     />
-    <menuitem
-        id="is_preparation_facture_menu"
-        name="Préparation facture"
-        parent="account.menu_finance_payables"
-        sequence="902"
-        action="is_preparation_facture_action"
-    />
-    <menuitem
-        id="is_export_compta_achat_menu"
-        name="Export Compta Achat"
-        parent="account.menu_finance_payables"
-        sequence="910"
-        action="is_export_compta_achat_action"
-    />
-    <menuitem
-        id="is_traite_menu"
-        name="Traites"
-        parent="account.menu_finance_payables"
-        sequence="911"
-        action="is_traite_action"
-    />
 
 
     <!-- Facturation / Client -->
@@ -281,6 +260,42 @@
         sequence="910"
         action="is_export_compta_vente_action"
     />
+
+
+    <!-- Facturation / Fournisseur -->
+    <menuitem
+        id="is_preparation_facture_menu"
+        name="Préparation facture"
+        parent="account.menu_finance_payables"
+        sequence="910"
+        action="is_preparation_facture_action"
+    />
+    <menuitem
+        id="is_export_compta_achat_menu"
+        name="Export Compta Achat"
+        parent="account.menu_finance_payables"
+        sequence="920"
+        action="is_export_compta_achat_action"
+    />
+    <menuitem
+        id="is_traite_menu"
+        name="Traites"
+        parent="account.menu_finance_payables"
+        sequence="930"
+        action="is_traite_action"
+    />
+    <menuitem
+        id="is_suivi_paiement_fournisseur_menu"
+        name="Suivi paiement fournisseur"
+        parent="account.menu_finance_payables"
+        sequence="940"
+        action="is_suivi_paiement_fournisseur_action"
+    />
+
+
+
+
+    
 
 
 
