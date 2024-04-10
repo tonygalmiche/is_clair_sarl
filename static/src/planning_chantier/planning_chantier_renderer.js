@@ -31,7 +31,7 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         this.ActivePatched=true;
 
         //onMounted(() => this._mounted());
-        onPatched(() => this._patched());
+        //onPatched(() => this._patched());
 
 
 
@@ -43,17 +43,17 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
 
 
 
-    _patched() {
-        console.log('_patched : this.ActivePatched=',this.ActivePatched);
-        if (this.ActivePatched==true) {
-            this.ActivePatched=false;
-            this.GetChantiers();
-        } else {
-            this.ActivePatched=true;
-        }
-        //this.renderDhtmlxGantt();
-        //this.GetDocuments();
-    }
+    // _patched() {
+    //     console.log('_patched : this.ActivePatched=',this.ActivePatched);
+    //     if (this.ActivePatched==true) {
+    //         this.ActivePatched=false;
+    //         this.GetChantiers();
+    //     } else {
+    //         this.ActivePatched=true;
+    //     }
+    //     //this.renderDhtmlxGantt();
+    //     //this.GetDocuments();
+    // }
 
 
 
