@@ -7,7 +7,7 @@ from calendar import monthrange
 import base64
 
 
-class IsNatureTravaux(models.Model):
+class IsEquipe(models.Model):
     _name='is.equipe'
     _description = "Equipe"
     _order='name'
@@ -15,12 +15,23 @@ class IsNatureTravaux(models.Model):
     # def _get_default_color(self):
     #     return randint(1, 11)
 
-    name  = fields.Char('Equipe', required=True, index=True)
-    color = fields.Char('Couleur')
+    name       = fields.Char('Equipe', required=True, index=True)
+    color      = fields.Char('Couleur')
+    color_code = fields.Char('Code Couleur')
 
     _sql_constraints = [
         ('name_uniq', 'unique (name)', "Cette équipe exite déjà !"),
     ]
+
+
+    @api.onchange('color_code')
+    def onchange_color_code(self):
+        for obj in self:
+            obj.color=obj.color_code
+            print(obj, obj.color)
+
+
+
 
 
 class IsChantier(models.Model):
@@ -31,6 +42,7 @@ class IsChantier(models.Model):
 
     name              = fields.Char('N°', index=True, readonly=True)
     affaire_id        = fields.Many2one('is.affaire', 'Affaire', required=False, tracking=True)
+    contact_chantier_id = fields.Many2one(related='affaire_id.contact_chantier_id')
     equipe_id         = fields.Many2one('is.equipe', 'Equipe', required=False, tracking=True)
     equipe_color      = fields.Char('Couleur', help='Couleur Equipe', related="equipe_id.color")
     nature_travaux_id = fields.Many2one('is.nature.travaux', string="Nature des travaux", required=False, tracking=True)
@@ -266,9 +278,14 @@ class IsChantier(models.Model):
         chantiers=self.env['is.chantier'].search(domain)
         my_dict={}
         for chantier in chantiers:
+            #** Mettre à la fin les chantiers à plannifier*********************
+            prefix=0
+            if chantier.state=='a_planifier':
+                prefix=1
+            #******************************************************************
             affaire_id = chantier.affaire_id.id or 0
             date_affaire = date_debut_affaire[affaire_id]
-            key = "%s-%s-%s-%s"%(date_affaire,chantier.affaire_id.name,chantier.date_debut,chantier.name)
+            key = "%s-%s-%s-%s-%s"%(prefix,date_affaire,chantier.affaire_id.name,chantier.date_debut,chantier.name)
             my_dict[key]=chantier
         sorted_chantiers = dict(sorted(my_dict.items()))
         #**********************************************************************
@@ -281,6 +298,7 @@ class IsChantier(models.Model):
         my_dict={}
         width_jour = str(round(66/nb_jours,1))+"%"
         for k in sorted_chantiers:
+            print(k)
             chantier = sorted_chantiers[k]
             #** Recherhce si le chantier est visible sur le planning **********
             test=False
@@ -361,7 +379,12 @@ class IsChantier(models.Model):
                 short_name = name[0:40]
                 affaire_id = chantier.affaire_id.id or 0
                 date_affaire = date_debut_affaire[affaire_id]
-                key = "%s-%s-%s-%s"%(date_affaire,chantier.affaire_id.name,chantier.date_debut,chantier.name)
+                #** Mettre à la fin les chantiers à plannifier*********************
+                prefix=0
+                if chantier.state=='a_planifier':
+                    prefix=1
+                #******************************************************************
+                key = "%s-%s-%s-%s-%s"%(prefix,date_affaire,chantier.affaire_id.name,chantier.date_debut,chantier.name)
                 vals={
                     "key"       : key,
                     "id"        : chantier.id,
@@ -443,23 +466,23 @@ class IsChantier(models.Model):
             if affaire not in affaires_chantiers:
                 vals={
                     "affaire_id": affaire.id,
-                    "date_debut": today,
-                    "date_fin"  : today + timedelta(days=21),
+                    "date_debut": today + timedelta(days=21),
+                    "date_fin"  : today + timedelta(days=24),
                 }
                 chantier = self.env['is.chantier'].create(vals)
                 ct+=1
 
-        #** Recaler à la date du jour les chantiers non plannifiés ***********
+        #** Recaler les chantiers non plannifiés ******************************
         filtre=[
             ('equipe_id' ,'=',False),
-            ('date_debut','!=',today),
+            ('date_debut','<',today + timedelta(days=7)),
             ('state','=','a_planifier'),
         ]
         chantiers = self.env['is.chantier'].search(filtre)
         for chantier in chantiers:
             vals={
-                "date_debut": today,
-                "date_fin"  : today + timedelta(days=21),
+                "date_debut": today + timedelta(days=21),
+                "date_fin"  : today + timedelta(days=24),
             }
             chantier.write(vals)
         #**********************************************************************

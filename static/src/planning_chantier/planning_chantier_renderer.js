@@ -29,19 +29,13 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             dict:{},
         });
         this.ActivePatched=true;
-
         //onMounted(() => this._mounted());
         //onPatched(() => this._patched());
-
-
-
     }
 
     mounted() {
         this.GetChantiers();
     }
-
-
 
     // _patched() {
     //     console.log('_patched : this.ActivePatched=',this.ActivePatched);
@@ -54,10 +48,6 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
     //     //this.renderDhtmlxGantt();
     //     //this.GetDocuments();
     // }
-
-
-
-
 
 
     // Click pour colorier une ligne
@@ -248,6 +238,51 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             },
         });
     }
+
+    CreationAlerteClick(ev) {
+        const id=ev.target.attributes.id.value;
+        console.log('CreationAlerteClick',id);
+        this.env.bus.trigger('do-action', {
+            action: {
+                name:'Alerte',
+                type: 'ir.actions.act_window',
+                res_model: 'is.chantier.alerte',
+                views: [[false, 'form']],
+                view_mode: 'form',
+            //    target: 'new',
+                context: {
+                    //'active_id': id,
+                    'default_chantier_id': parseInt(id),
+                }
+            },
+        });
+    }
+
+
+
+    // chantier_id = fields.Many2one('is.chantier', 'Chantier', required=True, index=True)
+    // affaire_id  = fields.Many2one(related="chantier_id.affaire_id")
+    // alerte      = fields.Text('Alerte'                     , required=True)
+    // date        = fields.Date('Date alerte', default=fields.Datetime.now, index=True, help="Date à laquelle l'alerte sera positionnée sur le planning des chantiers")
+
+
+
+//     return {
+//         type: 'ir.actions.act_window',
+//         name: _t('Employee Termination'),
+//         res_model: 'hr.departure.wizard',
+//         views: [[false, 'form']],
+//         view_mode: 'form',
+//         target: 'new',
+//         context: {
+//             'active_id': id,
+//             'toggle_active': true,
+//         }
+//     }
+// }
+
+
+
     ModifierChantierClick(ev) {
         const id=ev.target.attributes.id.value;
         this.env.bus.trigger('do-action', {
