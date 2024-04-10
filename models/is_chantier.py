@@ -38,33 +38,52 @@ class IsChantier(models.Model):
     date_debut_souhaitee = fields.Date('Date début souhaitée', tracking=True)
     duree_souhaitee      = fields.Integer('Durée souhaitée (J)', tracking=True)
 
-    date_debut        = fields.Date('Date début', required=True, tracking=True)
-    duree             = fields.Integer('Durée (J)', tracking=True)
-    date_fin          = fields.Date('Date fin', required=False, tracking=True)
-    commentaire       = fields.Text('Commentaire', tracking=True)
+    date_debut        = fields.Date('Date début', required=True , tracking=True)
+    duree             = fields.Integer('Durée (J)'              , tracking=True, compute='_compute_duree', store=True, readonly=True)
+    date_fin          = fields.Date('Date fin'  , required=False, tracking=True)
+    commentaire       = fields.Text('Commentaire'               , tracking=True)
     state = fields.Selection([
         ('a_planifier', 'A planifier'),
         ('en_cours'   , 'En cours'),
     ], 'Etat', index=True, default="a_planifier", required=True, tracking=True)
 
 
-    @api.onchange('date_debut')
-    def onchange_date_debut(self):
+    def recalculer_duree_action(self):
         for obj in self:
-            if obj.date_debut and obj.duree:
-                obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
+            obj._compute_duree()
+            # if obj.date_fin and obj.date_debut and obj.duree==0:
+            #     duree = (obj.date_fin-obj.date_debut).days
+            #     if duree<0:
+            #         duree=0
+            #     obj.duree=duree
 
-    @api.onchange('duree')
-    def onchange_duree(self):
+    @api.depends('date_debut','date_fin')
+    def _compute_duree(self):
         for obj in self:
-            if obj.date_debut and obj.duree:
-                obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
+            duree=0
+            if obj.date_fin and obj.date_debut:
+                duree = (obj.date_fin-obj.date_debut).days
+                if duree<0:
+                    duree=0
+            obj.duree=duree
 
-    @api.onchange('date_fin')
-    def onchange_date_fin(self):
-        for obj in self:
-            if obj.date_fin and obj.duree:
-                obj.date_debut = obj.date_fin - timedelta(days=obj.duree)
+    # @api.onchange('date_debut')
+    # def onchange_date_debut(self):
+    #     for obj in self:
+    #         if obj.date_debut and obj.duree:
+    #             obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
+
+    # @api.onchange('duree')
+    # def onchange_duree(self):
+    #     for obj in self:
+    #         if obj.date_debut and obj.duree>=0:
+    #             obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
+
+    # @api.onchange('date_fin')
+    # def onchange_date_fin(self):
+    #     for obj in self:
+    #         if obj.date_fin and obj.duree:
+    #             obj.date_debut = obj.date_fin - timedelta(days=obj.duree)
 
     @api.model
     def create(self, vals):
@@ -79,11 +98,13 @@ class IsChantier(models.Model):
         if chantierid and debut:
             chantiers = self.env['is.chantier'].search([('id', '=',chantierid)])
             for chantier in chantiers:
+                duree = chantier.duree
                 now = date.today()
                 jour = now.isoweekday()
                 debut_planning = now - timedelta(days=(jour-1)) + timedelta(days=decale_planning)
                 date_debut = debut_planning + timedelta(days=debut)
                 chantier.date_debut = date_debut
+                chantier.date_fin = chantier.date_debut + timedelta(days=duree)
         return 'OK'
 
 
@@ -92,8 +113,8 @@ class IsChantier(models.Model):
         if chantierid and duree:
             chantiers = self.env['is.chantier'].search([('id', '=',chantierid)])
             for chantier in chantiers:
-                chantier.duree = duree
-                chantier.onchange_duree()
+                if chantier.date_debut:
+                    chantier.date_fin = chantier.date_debut + timedelta(days=duree)
         return 'OK'
 
 
@@ -423,10 +444,9 @@ class IsChantier(models.Model):
                 vals={
                     "affaire_id": affaire.id,
                     "date_debut": today,
-                    "duree": 21,
+                    "date_fin"  : today + timedelta(days=21),
                 }
                 chantier = self.env['is.chantier'].create(vals)
-                chantier.onchange_duree()
                 ct+=1
 
         #** Recaler à la date du jour les chantiers non plannifiés ***********
@@ -439,10 +459,9 @@ class IsChantier(models.Model):
         for chantier in chantiers:
             vals={
                 "date_debut": today,
-                #"duree"     : 21,
+                "date_fin"  : today + timedelta(days=21),
             }
             chantier.write(vals)
-            chantier.onchange_date_debut()
         #**********************************************************************
 
 

@@ -649,7 +649,7 @@ class IsAffaire(models.Model):
                 name = "%s"%(obj.name)
             if obj.nom and not obj.name:
                 name = "%s"%(obj.nom)
-            name+=" - %s %s %s %s"%(obj.street or '', obj.street2 or '', obj.zip or '', obj.city or '')
+            #name+=" - %s %s %s %s"%(obj.street or '', obj.street2 or '', obj.zip or '', obj.city or '')
             result.append((obj.id, name))
         return result
 

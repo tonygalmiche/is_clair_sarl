@@ -49,9 +49,20 @@
                 <div class="oe_structure"/>
 
                 <br />
-                <h2 t-if="o.is_affaire_id">Affaire : 
+                <!-- <h2 t-if="o.is_affaire_id">Affaire : 
                     <span t-field="o.is_affaire_id.display_name"/>
+                </h2> -->
+
+                <h2 t-if="o.is_affaire_id">Affaire : 
+                    <span t-field="o.is_affaire_id.display_name"/> - 
+                    <span t-if ="o.is_affaire_id.street"  t-field="o.is_affaire_id.street"/> 
+                    <span t-if ="o.is_affaire_id.street2" t-field="o.is_affaire_id.street2"/> 
+                    <span t-if ="o.is_affaire_id.zip"     t-field="o.is_affaire_id.zip"/> 
+                    <span t-if ="o.is_affaire_id.city"    t-field="o.is_affaire_id.city"/> 
                 </h2>
+
+
+
                 <div style="height:3mm"/>
                 <h3>Commande <span t-field="o.name"/> du <span t-field="o.is_date"/></h3>
                 <div style="height:3mm"/>

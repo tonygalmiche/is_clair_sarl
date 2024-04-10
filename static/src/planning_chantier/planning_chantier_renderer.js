@@ -6,7 +6,12 @@ import session from 'web.session';
 import utils from 'web.utils';
 
 const _t = core._t;
-const { useState } = owl.hooks;
+//const { useState } = owl.hooks;
+
+const { useState, onMounted, onPatched, onWillUnmount } = owl.hooks;
+
+
+
 var rpc = require('web.rpc');
 
 
@@ -23,11 +28,36 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             nb_semaines:"",
             dict:{},
         });
+        this.ActivePatched=true;
+
+        //onMounted(() => this._mounted());
+        onPatched(() => this._patched());
+
+
+
     }
 
     mounted() {
         this.GetChantiers();
     }
+
+
+
+    _patched() {
+        console.log('_patched : this.ActivePatched=',this.ActivePatched);
+        if (this.ActivePatched==true) {
+            this.ActivePatched=false;
+            this.GetChantiers();
+        } else {
+            this.ActivePatched=true;
+        }
+        //this.renderDhtmlxGantt();
+        //this.GetDocuments();
+    }
+
+
+
+
 
 
     // Click pour colorier une ligne
@@ -259,6 +289,10 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
     }
     async GetChantiers(s){
+
+
+        console.log("TEST GetChantiers")
+
         var self=this;
         rpc.query({
             model: 'is.chantier',

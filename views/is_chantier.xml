@@ -2,6 +2,16 @@
 <odoo>
     <!-- is.chantier -->
 
+    <record id="recalculer_duree_action_server" model="ir.actions.server">
+        <field name="name">Recalculer durée</field>
+        <field name="model_id" ref="is_clair_sarl.model_is_chantier"/>
+        <field name="binding_model_id" ref="is_clair_sarl.model_is_chantier"/>
+        <field name="state">code</field>
+        <field name="code">records.recalculer_duree_action()</field>
+    </record>
+
+
+
     <record id="creation_auto_chantier_cron" model="ir.cron">
         <field name="name">Création automatique des chantiers</field>
         <field name="model_id" ref="is_clair_sarl.model_is_chantier"/>
@@ -53,9 +63,9 @@
                             <field name="equipe_id"         attrs="{'required': [('state', '=', 'en_cours')]}"/>
                             <field name="nature_travaux_id" attrs="{'required': [('state', '=', 'en_cours')]}"/>
                             <field name="date_debut"        attrs="{'required': [('state', '=', 'en_cours')]}"/>
-                            <field name="duree"             attrs="{'required': [('state', '=', 'en_cours')]}"/>
                             <field name="date_fin"          attrs="{'required': [('state', '=', 'en_cours')]}"/>
-                         </group>
+                            <field name="duree"/>
+                        </group>
                          <group>
                             <field name="date_debut_souhaitee" attrs="{'readonly': [('state', '=', 'en_cours')]}"/>
                             <field name="duree_souhaitee"      attrs="{'readonly': [('state', '=', 'en_cours')]}"/>
@@ -86,8 +96,8 @@
                 <field name="date_debut_souhaitee" optional="hide"/>
                 <field name="duree_souhaitee"      optional="hide"/>
                 <field name="date_debut"        optional="show"/>
-                <field name="duree"             optional="show" sum="Total"/>
                 <field name="date_fin"          optional="show"/>
+                <field name="duree"             optional="show" sum="Total"/>
                 <field name="commentaire"       optional="show"/>
                 <field name="create_date"       optional="hide"/>
                 <field name="create_uid"        optional="hide"/>
