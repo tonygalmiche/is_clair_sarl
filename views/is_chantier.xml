@@ -75,6 +75,15 @@
                     <group>
                         <field name="commentaire"/>
                     </group>
+                    <field name="alerte_ids" nolabel="1">
+                        <tree editable="bottom">
+                            <field name="date"/>
+                            <field name="alerte"/>                           
+                        </tree>
+                    </field>
+                    <!-- <group>
+                        <field name="alerte_html"/>
+                    </group>-->
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" />

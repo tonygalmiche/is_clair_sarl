@@ -28,10 +28,6 @@ class IsEquipe(models.Model):
     def onchange_color_code(self):
         for obj in self:
             obj.color=obj.color_code
-            print(obj, obj.color)
-
-
-
 
 
 class IsChantier(models.Model):
@@ -58,6 +54,21 @@ class IsChantier(models.Model):
         ('a_planifier', 'A planifier'),
         ('en_cours'   , 'En cours'),
     ], 'Etat', index=True, default="a_planifier", required=True, tracking=True)
+    alerte_ids  = fields.One2many('is.chantier.alerte', 'chantier_id', 'Alertes', tracking=True)
+    alerte_html = fields.Text('Alertes ',compute='_compute_alerte_html', store=True, readonly=True, tracking=True)
+
+
+    @api.depends('alerte_ids')
+    def _compute_alerte_html(self):
+        for obj in self:
+            html=[]
+            if obj.alerte_ids:
+                #html.append('<table>')
+                for line in obj.alerte_ids:
+                    #html.append('<tr><td>%s</td><td>%s</td></tr>'%(line.date, line.alerte))
+                    html.append('%s:%s'%(line.date, line.alerte))
+                #html.append('</table>')
+            obj.alerte_html='\n'.join(html)
 
 
     def recalculer_duree_action(self):
