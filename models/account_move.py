@@ -8,6 +8,7 @@ class AccountMove(models.Model):
     _order='name desc'
 
     is_order_id          = fields.Many2one('sale.order', 'Commande')
+    is_date_pv           = fields.Date(related='is_order_id.is_date_pv')
     is_affaire_id        = fields.Many2one('is.affaire', 'Affaire', compute='_compute_is_affaire_id', store=True, readonly=True)
     is_banque_id         = fields.Many2one('account.journal', 'Banque par défaut', related='partner_id.is_banque_id')
     is_export_compta_id  = fields.Many2one('is.export.compta', 'Folio', copy=False)
@@ -24,7 +25,7 @@ class AccountMove(models.Model):
     is_remarque_paiement = fields.Char("Remarque paiememt")
 
 
-    @api.depends('state','amount_total_signed','amount_residual_signed','invoice_date')
+    @api.depends('state','amount_total_signed','amount_residual_signed','invoice_date','is_order_id', 'is_order_id.is_date_pv')
     def _compute_is_montant_paye(self):
         for obj in self:
             montant = obj.amount_total_signed-obj.amount_residual_signed
@@ -34,8 +35,13 @@ class AccountMove(models.Model):
                 pourcent = 100*obj.amount_residual_signed / obj.amount_total_signed
             obj.is_pourcent_du  = pourcent
             echeance=False
-            if obj.invoice_date:
-                echeance = obj.invoice_date + relativedelta(years=1)
+            if obj.is_order_id.is_date_pv:
+                echeance=obj.is_order_id.is_date_pv
+            else:
+                if obj.invoice_date:
+                    echeance=obj.invoice_date   
+            if echeance:
+                echeance += relativedelta(years=1)
             obj.is_echeance_1an = echeance
 
 

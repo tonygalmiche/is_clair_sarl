@@ -69,6 +69,13 @@
                 <field name="client_order_ref"/>
                 <field name="is_affichage_pdf"/>
             </field>
+
+
+            <xpath expr="//group[@name='order_details']/field[@name='payment_term_id']" position="after">
+                <field name="is_date_pv"/>
+                <field name="is_pv_ids" widget="many2many_binary"/>
+            </xpath>
+
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree" position="attributes">
                 <attribute name="editable"></attribute>
             </xpath>
@@ -220,6 +227,8 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_affaire_id" optional="show" class="white_space_normal"/>
+                <field name="is_date_pv"    optional="show"/>
+                <field name="is_pv_ids"     optional="hide" widget="many2many_binary"/>
             </field>
             <field name="amount_total" position="after">
                 <field name="is_total_facture"    sum="Total" widget="monetary" decoration-bf="1" optional="show"/>

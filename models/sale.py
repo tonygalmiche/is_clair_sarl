@@ -201,6 +201,8 @@ class sale_order(models.Model):
 
     is_total_facture    = fields.Float("Total facturé"   , digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
     is_reste_a_facturer = fields.Float("Reste à facturer", digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
+    is_date_pv          = fields.Date("Date PV", help="Date de réception du PV")
+    is_pv_ids           = fields.Many2many('ir.attachment' , 'sale_order_is_pv_ids_rel', 'order_id', 'attachment_id', 'PV de réception')
 
 
     def voir_commande_action(self):

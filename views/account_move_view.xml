@@ -252,6 +252,8 @@
                 <field name="name"                    optional="show" string="N°Facture"/>
                 <field name="partner_id"              optional="show" string="Client" widget="many2one_clickable"/>
                 <field name="is_affaire_id"           optional="show" widget="many2one_clickable"/>
+                <field name="is_order_id"             optional="show" widget="many2one_clickable"/>
+                <field name="is_date_pv"              optional="show"/>
                 <field name="amount_total_signed"     optional="show" string="Montant TTC"  sum="Total"/>
                 <field name="is_montant_paye"         optional="show" string="Montant payé" sum="Total"/>
                 <field name="amount_residual_signed"  optional="show" string="Montant dû"   sum="Total"/>
