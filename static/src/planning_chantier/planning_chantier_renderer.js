@@ -301,7 +301,9 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         this.state.nb_semaines = ev.target.value;
         this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
     }
-
+    RafraichirClick(ev) {
+        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
+    }
     PrecedentClick(ev) {
         this.state.decale_planning = this.state.decale_planning-7;
         this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);

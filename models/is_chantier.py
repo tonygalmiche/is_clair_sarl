@@ -309,7 +309,6 @@ class IsChantier(models.Model):
         my_dict={}
         width_jour = str(round(66/nb_jours,1))+"%"
         for k in sorted_chantiers:
-            print(k)
             chantier = sorted_chantiers[k]
             #** Recherhce si le chantier est visible sur le planning **********
             test=False
@@ -346,8 +345,8 @@ class IsChantier(models.Model):
                 #**************************************************************
 
                 decal = (chantier.date_debut - debut_planning).days
-                if decal<0:
-                    decal=0
+                #if decal<0:
+                #    decal=0
                 jours={}
 
                 duree = chantier.duree or (chantier.date_fin - chantier.date_debut).days
@@ -355,6 +354,10 @@ class IsChantier(models.Model):
                     duree=1
                 debut = decal+1
                 fin = decal + duree 
+
+
+
+
                 for i in range(0, nb_jours):
                     date_jour = debut_planning+timedelta(days=i)
                     alerte=False

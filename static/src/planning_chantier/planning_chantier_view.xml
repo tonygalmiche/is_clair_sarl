@@ -13,6 +13,7 @@
         <div class="buttons">
             <table>
                 <tr>
+                    <td><button class="btn btn-secondary"         t-on-click="RafraichirClick">Rafraichir</button></td>
                     <td><button class="btn btn-primary" t-on-click="PrecedentClick" title="Semaine précédente">&lt;</button></td>
                     <td><button class="btn btn-primary" t-on-click="OKButtonClick">Aujourd'hui</button></td>
                     <td><button class="btn btn-primary" t-on-click="SuivantClick" title="Semaine suivante">&gt;</button></td>
