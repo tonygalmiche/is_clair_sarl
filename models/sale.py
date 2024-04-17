@@ -3,6 +3,7 @@ from odoo import models,fields,api
 from odoo.http import request
 from odoo.exceptions import UserError, ValidationError
 import datetime
+from dateutil.relativedelta import relativedelta
 import base64
 import os
 import openpyxl
@@ -179,6 +180,19 @@ class sale_order(models.Model):
             is_reste_a_facturer = obj.amount_untaxed - is_total_facture
             obj.is_total_facture    = is_total_facture
             obj.is_reste_a_facturer = is_reste_a_facturer
+            pourcent=0
+            if obj.amount_untaxed!=0:
+                pourcent = 100 * obj.is_reste_a_facturer / obj.amount_untaxed
+            obj.is_pourcent_a_facturer = pourcent
+
+
+    @api.depends('is_date_pv')
+    def _compute_is_echeance_1an(self):
+        for obj in self:
+            echeance=False
+            if obj.is_date_pv:
+                echeance = obj.is_date_pv + relativedelta(years=1)
+            obj.is_echeance_1an = echeance
 
 
     is_import_excel_ids     = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Devis .xlsx à importer')
@@ -199,10 +213,13 @@ class sale_order(models.Model):
     is_numero_facture = fields.Char("Numéro de la facture à générer")
     is_situation      = fields.Char("Situation facture à générer")
 
-    is_total_facture    = fields.Float("Total facturé"   , digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
-    is_reste_a_facturer = fields.Float("Reste à facturer", digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
+    is_total_facture       = fields.Float("Total facturé"   , digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
+    is_reste_a_facturer    = fields.Float("Reste à facturer", digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
+    is_pourcent_a_facturer = fields.Float("% à facturer"    , digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
+
     is_date_pv          = fields.Date("Date PV", help="Date de réception du PV")
     is_pv_ids           = fields.Many2many('ir.attachment' , 'sale_order_is_pv_ids_rel', 'order_id', 'attachment_id', 'PV de réception')
+    is_echeance_1an     = fields.Date("Échéance 1an", store=True, readonly=True, compute='_compute_is_echeance_1an')
 
 
     def voir_commande_action(self):

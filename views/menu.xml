@@ -250,8 +250,15 @@
         id="is_suivi_partiellemnt_regle_menu"
         name="Suivi partiellement réglé"
         parent="account.menu_finance_receivables"
-        sequence="810"
+        sequence="820"
         action="is_suivi_partiellemnt_regle_action"
+    />
+    <menuitem
+        id="is_suivi_reste_a_facturer_menu"
+        name="Suivi RG 5% à facturer"
+        parent="account.menu_finance_receivables"
+        sequence="830"
+        action="is_suivi_reste_a_facturer_action"
     />
     <menuitem
         id="is_export_compta_vente_menu"
