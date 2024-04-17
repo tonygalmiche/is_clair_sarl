@@ -26,6 +26,26 @@ class IsTraite(models.Model):
             obj.montant        = montant
             obj.date_reglement = date_reglement
 
+         
+    def write(self, vals):
+        moves=[]
+        for line in self.ligne_ids:
+            moves.append(line)
+        res = super(IsTraite, self).write(vals)
+        for line in self.ligne_ids:
+            moves.append(line)
+        for move in moves:
+            move.initialiser_paiement_traite_action()
+        return res
+
+
+    @api.model
+    def create(self, vals):
+        res = super(IsTraite, self).create(vals)
+        res.ligne_ids.initialiser_paiement_traite_action()
+        return res
+
+
 
     def enregistre_courrier_action(self):
         for obj in self:

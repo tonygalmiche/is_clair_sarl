@@ -9,6 +9,7 @@
         <field name="type">tree</field>
         <field name="arch" type="xml">
             <tree limit="1000">
+                <button name="acceder_facture_action" title="Facture" type="object" icon="fa-search-plus"/>
                 <field name="name"/>
                 <field name="invoice_date"/>
                 <field name="date"/>
@@ -17,6 +18,8 @@
                 <field name="invoice_date_due"/>
                 <field name="ref"/>
                 <field name="amount_total_signed" sum="Total"/>
+                <field name="amount_residual"     sum="Total"/>
+                <field name="payment_state" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"  optional="show"/>
                 <field name="state" optional="hide"/>
             </tree>
         </field>

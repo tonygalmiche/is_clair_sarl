@@ -128,6 +128,17 @@ class AccountMove(models.Model):
                     line.account_id = account_id
 
 
+    def initialiser_paiement_traite_action(self):
+        for obj in self:
+            if obj.state=='posted' and obj.move_type in ('in_invoice','in_refund'):
+                if obj.payment_state=='not_paid' and obj.is_traite_id.id:
+                    obj.sudo().payment_state='paid'
+                    obj.sudo().amount_residual=0
+                if obj.payment_state=='paid' and obj.is_traite_id.id==False and obj.invoice_payments_widget=='false':
+                    obj.sudo().payment_state='not_paid'
+                    obj.sudo()._compute_amount()
+
+
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
