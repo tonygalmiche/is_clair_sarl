@@ -42,6 +42,12 @@ class ResPartner(models.Model):
     is_adresse                  = fields.Text("Adresse complète", store=True, readonly=True, compute='_compute_is_adresse')
     is_affaire_ids              = fields.One2many('is.affaire', 'client_id', 'Affaires')
     is_sale_order_ids           = fields.One2many('sale.order', 'partner_id', 'Commandes client')
+    is_type_paiement            = fields.Selection([
+        ('traite'      , 'Traite'),
+        ('virement'    , 'Virement'),
+        ('cheque'      , 'Chèque'),
+        ('prelevement' , 'Prélèvement automatique'),
+    ], 'Type de paiement')
 
 
     @api.depends('name', 'street','street2','city','zip')

@@ -40,6 +40,10 @@
                     }
                 </style>
             </xpath>
+            <xpath expr="//widget[@name='web_ribbon'][1]" position="after">
+                <widget name="web_ribbon" title="Archivée" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                <field name="active" invisible="1"/> 
+            </xpath>
             <button name="action_post" position="after">
                 <button 
                     name="enregistre_courrier_action" 
@@ -71,12 +75,13 @@
             </xpath>
             <field name="payment_reference" position="before">
                 <field name="ref" string="Référence facture"/>
+                <field name="is_motif_avoir" attrs="{'invisible': [('move_type', 'not in', ['out_refund','in_refund'])]}"/>
             </field>
             <field name="payment_reference" position="after">
-                <field name="is_order_id"   attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
-                <field name="is_affaire_id" attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
-                <field name="is_situation"  attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
-                <field name="is_banque_id"  attrs="{'invisible': [('is_banque_id', '=', False)]}"/>
+                <field name="is_order_id"    attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
+                <field name="is_affaire_id"  attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
+                <field name="is_situation"   attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
+                <field name="is_banque_id"   attrs="{'invisible': [('is_banque_id', '=', False)]}"/>
             </field>
             <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="before">
                 <field name="is_sale_line_id"        optional="hide"/>
@@ -136,6 +141,9 @@
                 <field name="is_export_compta_id" optional="show"/>
                 <field name="is_courrier_id"      optional="show"/>
             </field>
+            <field name="payment_state" position="after">
+                <field name="is_remarque_paiement" optional="hide"/>
+            </field>
         </field>
     </record>
     <record id="is_view_in_invoice_tree" model="ir.ui.view">
@@ -167,9 +175,9 @@
                 <attribute name="invisible">1</attribute>
             </field>
 
-            <!-- <field name="state" position="before">
-                 <field name="is_export_compta_id" optional="show"/>
-            </field> -->
+            <field name="ref" position="after">
+                <field name="is_motif_avoir" optional="hide"/>
+            </field>
         </field>
     </record>
     <record id="is_view_account_invoice_filter" model="ir.ui.view">

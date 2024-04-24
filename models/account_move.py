@@ -23,6 +23,16 @@ class AccountMove(models.Model):
     is_pourcent_du       = fields.Float(string='% dû'           , store=True, readonly=True, compute='_compute_is_montant_paye')
     is_echeance_1an      = fields.Date("Échéance 1an"           , store=True, readonly=True, compute='_compute_is_montant_paye')
     is_remarque_paiement = fields.Char("Remarque paiememt")
+    is_motif_avoir       = fields.Char("Motif avoir")
+    active               = fields.Boolean("Active", store=True, readonly=True, compute='_compute_active')
+
+    @api.depends('state')
+    def _compute_active(self):
+        for obj in self:
+            active=True
+            if obj.state=='cancel':
+                active=False
+            obj.active=active
 
 
     @api.depends('state','amount_total_signed','amount_residual_signed','invoice_date','is_order_id', 'is_order_id.is_date_pv')
@@ -67,7 +77,6 @@ class AccountMove(models.Model):
                     if line.is_affaire_id:
                         affaire_id = line.is_affaire_id.id
                         break
-            print(obj.name, affaire_id)
             obj.is_affaire_id = affaire_id
 
 

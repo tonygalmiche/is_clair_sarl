@@ -88,7 +88,6 @@ class purchase_order(models.Model):
                     sequence = 0
                     order_line=False
                     for line in obj.order_line:
-                        print(line, line.sequence)
                         if line.sequence>sequence:
                             sequence=line.sequence
                         if line.product_id == product:
@@ -336,7 +335,6 @@ class purchase_order(models.Model):
                         if adresse!='':
                             ratio = fuzz.ratio(chantier, adresse)
                             affaire_dict[ratio] = (line, line.name)
-                            #print(ratio,chantier, adresse)
                     key_sorted = sorted(affaire_dict, reverse=True)
                     for key in key_sorted:
                         affaire = affaire_dict[key][0]
