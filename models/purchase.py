@@ -58,19 +58,23 @@ class purchase_order(models.Model):
     is_date_facture_fournisseur = fields.Date('Date Facture')
 
 
+    @api.depends('order_line.invoice_lines.move_id','order_line.invoice_lines.move_id.state')
+    def _compute_invoice(self):
+        for order in self:
+            invoices = order.mapped('order_line.invoice_lines.move_id')
+            nb=0
+            for invoice in invoices:
+                if invoice.state!='cancel':
+                    nb+=1
+            order.invoice_ids = invoices
+            order.invoice_count = nb
+
+
     @api.onchange('is_affaire_id')
     def onchange_is_affaire_id(self):
         for obj in self:
             if obj.is_affaire_id.contact_chantier_id:
                 obj.is_contact_chantier_id = obj.is_affaire_id.contact_chantier_id.id
-
-
-    # @api.depends('is_delai_mois_id','is_delai_annee')
-    # def _compute_is_delai(self):
-    #     for obj in self:
-    #         t=[(obj.is_delai_mois_id.name or ''), (obj.is_delai_annee or '')]
-    #         x = " ".join(t)
-    #         obj.is_delai=x
 
 
     def write(self, vals):

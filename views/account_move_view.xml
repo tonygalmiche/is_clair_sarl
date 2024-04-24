@@ -104,6 +104,7 @@
                 <attribute name="limit">1000</attribute>
             </xpath>
             <div name="journal_div" position="after">
+                <field name="is_purchase_order_id"  attrs="{'invisible': [('is_purchase_order_id', '=', False)]}"/>
                 <field name="is_export_compta_id"/>
                 <field name="is_traite_id"/>
                 <field 
@@ -159,10 +160,11 @@
                 <field name="invoice_date_due"        optional="show"/>
             </field>
             <field name="state" position="before">
-                <field name="is_export_compta_id" optional="show"/>
-                <field name="is_attente_avoir"    optional="hide"/>
-                <field name="is_banque_id"        optional="hide"/>
-                <field name="is_traite_id"        optional="show" widget="many2one_clickable"/>
+                <field name="is_purchase_order_id" optional="hide" widget="many2one_clickable"/>
+                <field name="is_export_compta_id"  optional="show"/>
+                <field name="is_attente_avoir"     optional="hide"/>
+                <field name="is_banque_id"         optional="hide"/>
+                <field name="is_traite_id"         optional="show" widget="many2one_clickable"/>
             </field>
         </field>
     </record>

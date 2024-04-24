@@ -25,6 +25,18 @@ class AccountMove(models.Model):
     is_remarque_paiement = fields.Char("Remarque paiememt")
     is_motif_avoir       = fields.Char("Motif avoir")
     active               = fields.Boolean("Active", store=True, readonly=True, compute='_compute_active')
+    is_purchase_order_id = fields.Many2one('purchase.order', 'Commande fournisseur', compute='_compute_is_purchase_order_id', store=False, readonly=True)
+
+
+    @api.depends('state')
+    def _compute_is_purchase_order_id(self):
+        for obj in self:
+            purchase_id = False
+            for line in obj.invoice_line_ids:
+                if line.purchase_line_id:
+                    purchase_id = line.purchase_line_id.order_id.id
+            obj.is_purchase_order_id=purchase_id
+
 
     @api.depends('state')
     def _compute_active(self):
