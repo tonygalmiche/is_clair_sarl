@@ -181,10 +181,16 @@
                         />
                     </group>
                     <group string="Résultat importation" attrs="{'invisible':[('is_import_pdf_resultat','=',False)]}" >
-                        <div style="background:gainsboro;font-weight:normal;padding-left:5pt;font-family:courier, courier new, serif;">
-                            <field name="is_import_pdf_resultat" nolabel="1"/>
-                        </div>
-                    </group>
+                        <group>
+                            <div style="background:gainsboro;font-weight:normal;padding-left:5pt;margin-right:10pt;font-family:courier, courier new, serif;">
+                                <field name="is_import_pdf_resultat" nolabel="1"/>
+                            </div>    
+                        </group>
+                        <group>
+                            <field name="is_num_facture_fournisseur"/>
+                            <field name="is_date_facture_fournisseur"/>    
+                        </group>
+                     </group>
                 </page>
             </xpath>
             <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/notebook/page[@name='notes']" position="after">
