@@ -37,7 +37,6 @@ class IsImportClair(models.Model):
                 #** Test si fichier est bien du xlsx **************************
                 try:
                     wb    = openpyxl.load_workbook(filename = path, data_only=True)
-                    #print(wb.sheetnames)
                 except:
                     raise Warning("Le fichier "+attachment.name+u" n'est pas un fichier xlsx")
                 #**************************************************************
@@ -237,7 +236,6 @@ class IsImportClair(models.Model):
                             else:
                                 supplierinfo = supplierinfos[0]
                                 supplierinfo.write(vals)
-                        #print(lig,product, fournisseur,code,designation)
                 lig+=1
 
 

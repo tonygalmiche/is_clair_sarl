@@ -10,7 +10,6 @@ class IsPreparationFacture(models.Model):
     _rec_name='partner_id'
 
     partner_id     = fields.Many2one('res.partner' , 'Fournisseur', required=True)
-    #date_limite    = fields.Date('Date livraison maxi', required=True, default=fields.Date.context_today)
     montant        = fields.Float("Montant", digits=(14,2), store=True, readonly=True, compute='_compute_montant')
     invoice_id     = fields.Many2one('account.move' , 'Facture créée', readonly=True)
     ligne_ids      = fields.One2many('purchase.order.line', 'is_preparation_id', 'Lignes')
@@ -31,18 +30,13 @@ class IsPreparationFacture(models.Model):
                     line.is_qt_a_facturer = qt
                     line.is_sequence_facturation = sequence
                     sequence+=10
-                    print(line,line.is_sequence_facturation,line.is_affaire_id.name)
-
                 line.is_montant_a_facturer = line.is_qt_a_facturer * line.price_unit
                 montant+=line.is_montant_a_facturer
-
             obj.montant = montant
 
 
     def creer_facture_action(self):
         for obj in self:
-            print(obj)
-
             #** Création des lignes *******************************************
             invoice_line_ids=[]
             for line in obj.ligne_ids:

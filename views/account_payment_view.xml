@@ -135,8 +135,15 @@
                     attrs="{'invisible': [('is_courrier_id', '!=', False)], 'readonly': True}"
                 />
             </button>
+            <field name="is_internal_transfer"  position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="payment_type" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
             <field name="ref" position="after">
-                <field name="is_num_cheque"/>
+                <field name="is_type_paiement"/>
+                <field name="is_num_cheque" attrs="{'invisible': [('is_type_paiement', '!=', 'cheque')]}"/>
                 <field 
                     name="is_courrier_id"
                     attrs="{'invisible': [('is_courrier_id', '=', False)], 'readonly': True}"
@@ -149,8 +156,9 @@
         <field name="model">account.payment.register</field>
         <field name="inherit_id" ref="account.view_account_payment_register_form"/>
         <field name="arch" type="xml">
-            <field name="communication" position="after">
-                <field name="is_num_cheque"/>
+            <field name="partner_bank_id" position="after">
+                <field name="is_type_paiement" required='1'/>
+                <field name="is_num_cheque" attrs="{'invisible': [('is_type_paiement', '!=', 'cheque')],'required': [('is_type_paiement', '=', 'cheque')]}"/>
             </field>
         </field>
     </record>
@@ -159,10 +167,14 @@
         <field name="model">account.payment</field>
         <field name="inherit_id" ref="account.view_account_payment_tree"/>
         <field name="arch" type="xml">
+            <field name="payment_method_line_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
             <field name="partner_id" position="after">
-                <field name="ref"           optional="show"/>
-                <field name="is_num_cheque" optional="show"/>
-                <field name="is_courrier_id" optional="show"/>
+                <field name="ref"              optional="show"/>
+                <field name="is_type_paiement" optional="show"/>
+                <field name="is_num_cheque"    optional="show"/>
+                <field name="is_courrier_id"   optional="show"/>
             </field>
         </field>
     </record>
@@ -173,6 +185,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="ref"/>
+                <field name="is_type_paiement"/>
                 <field name="is_num_cheque"/>
             </field>
         </field>

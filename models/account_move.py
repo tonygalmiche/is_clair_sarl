@@ -26,6 +26,8 @@ class AccountMove(models.Model):
     is_motif_avoir       = fields.Char("Motif avoir")
     active               = fields.Boolean("Active", store=True, readonly=True, compute='_compute_active')
     is_purchase_order_id = fields.Many2one('purchase.order', 'Commande fournisseur', compute='_compute_is_purchase_order_id', store=False, readonly=True)
+    is_type_paiement     = fields.Selection(related='partner_id.is_type_paiement')
+
 
 
     @api.depends('state')

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models,fields,api
+from odoo.addons.is_clair_sarl.models.res_partner import _TYPE_PAIEMENT
+
 
 class IsTraite(models.Model):
     _name='is.traite'
@@ -63,8 +65,9 @@ class IsTraite(models.Model):
 class AccountPayment(models.Model):
     _inherit = "account.payment"
 
-    is_num_cheque  = fields.Char("Mode de règlement", help="N° du chèque")
-    is_courrier_id = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
+    is_type_paiement = fields.Selection(_TYPE_PAIEMENT, 'Type de paiement')
+    is_num_cheque    = fields.Char("N° du chèque")
+    is_courrier_id   = fields.Many2one('is.courrier.expedie', 'Courrier expédié', copy=False)
 
 
     def enregistre_courrier_action(self):
@@ -83,12 +86,26 @@ class AccountPayment(models.Model):
 class AccountPaymentRegister(models.TransientModel):
     _inherit = "account.payment.register"
 
-    is_num_cheque = fields.Char("Mode de règlement", help="N° du chèque")
+    def _get_is_type_paiement(self):
+        context=self.env.context
+        type_paiement=False
+        if 'active_id' in context:
+            active_id = context['active_id']
+            move=self.env['account.move'].browse(active_id)
+            if move:
+                type_paiement = move.partner_id.is_type_paiement
+        return type_paiement
 
+    is_type_paiement = fields.Selection(_TYPE_PAIEMENT, 'Type de paiement', default=_get_is_type_paiement)
+    is_num_cheque    = fields.Char("N° du chèque")
 
+ 
     def _create_payment_vals_from_wizard(self):
         payment_vals = super(AccountPaymentRegister, self)._create_payment_vals_from_wizard()
-        payment_vals["is_num_cheque"] = "%s sur %s"%(self.is_num_cheque,self.journal_id.name)
+        payment_vals["is_type_paiement"] = self.is_type_paiement
+        payment_vals["is_num_cheque"]    = self.is_num_cheque
+
+        #payment_vals["is_num_cheque"] = "%s sur %s"%(self.is_num_cheque,self.journal_id.name)
         # for obj in self:
         #     objet="Règlement %s %s"%(self.communication, payment_vals["is_num_cheque"])
         #     vals={

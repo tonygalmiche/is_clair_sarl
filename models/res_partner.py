@@ -4,6 +4,15 @@ from odoo import api, fields, models, _
 import datetime
 import re
 
+
+_TYPE_PAIEMENT=[
+    ('traite'      , 'Traite'),
+    ('virement'    , 'Virement'),
+    ('cheque'      , 'Chèque'),
+    ('prelevement' , 'Prélèvement automatique'),
+]
+
+
 class IsStatut(models.Model):
     _name='is.statut'
     _description = "Statut"
@@ -42,12 +51,7 @@ class ResPartner(models.Model):
     is_adresse                  = fields.Text("Adresse complète", store=True, readonly=True, compute='_compute_is_adresse')
     is_affaire_ids              = fields.One2many('is.affaire', 'client_id', 'Affaires')
     is_sale_order_ids           = fields.One2many('sale.order', 'partner_id', 'Commandes client')
-    is_type_paiement            = fields.Selection([
-        ('traite'      , 'Traite'),
-        ('virement'    , 'Virement'),
-        ('cheque'      , 'Chèque'),
-        ('prelevement' , 'Prélèvement automatique'),
-    ], 'Type de paiement')
+    is_type_paiement            = fields.Selection(_TYPE_PAIEMENT, 'Type de paiement')
 
 
     @api.depends('name', 'street','street2','city','zip')
@@ -75,15 +79,12 @@ class ResPartner(models.Model):
     # def _address_fields(self):
     #     """Returns the list of address fields that are synced from the parent."""
     #     res = list(super(ResPartner, self)._address_fields())
-    #     print("TEST 1 : res=",res)
     #     if 'country_id' in res:
     #         res.remove('country_id')
-    #     print("TEST 2 : res=",res)
     #     return res
 
     # def _prepare_display_address(self, without_company=False):
     #     # res = super(ResPartner, self)._prepare_display_address(without_company=without_company)
-    #     # print(res)
     #     # return res
 
     # def _prepare_display_address(self, without_company=False):

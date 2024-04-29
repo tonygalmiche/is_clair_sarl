@@ -27,7 +27,6 @@ class IrAttachment(models.Model):
                     continue
 
                 #TODO : J'ai commenté ces lignes pour autoriser à voir les pieces jointes d'un autre modèle
-                # print("## TEST ##",self.ids,res_model, res_id, create_uid, public, res_field,self.env.uid)
                 # if not self.env.is_system() and (res_field or (not res_id and create_uid != self.env.uid)):
                 #     raise AccessError(_("Sorry, you are not allowed to access this document."))
                 if not (res_model and res_id):
