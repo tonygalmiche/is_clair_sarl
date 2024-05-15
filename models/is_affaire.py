@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
 from random import randint
+from datetime import datetime, date, timedelta
 import re
 import logging
 _logger = logging.getLogger(__name__)
@@ -249,6 +250,13 @@ class IsAffaire(models.Model):
     ], 'Etat', index=True, default="offre", required=True)
 
 
+    def write(self, vals):
+        res = super(IsAffaire, self).write(vals)
+        if 'state' in vals:
+            self.creer_chantier_affaire_action()
+        return res
+
+
     def actualiser_marge_affaire_cron(self):
         self.env['is.affaire'].search([], order="name,id").actualiser_marge()
 
@@ -302,22 +310,6 @@ class IsAffaire(models.Model):
                 for row in cr.fetchall():
                     val = row[0]
             obj.achat_facture = val
-
-
-    # def _update_vente_facture(self):
-    #     cr,uid,context,su = self.env.args
-    #     for obj in self:
-    #         val=0
-    #         if isinstance(obj.id, int):
-    #             SQL="""
-    #                 SELECT sum(aml.price_subtotal)
-    #                 FROM account_move_line aml join account_move am on aml.move_id=am.id
-    #                 WHERE aml.is_affaire_id=%s and aml.exclude_from_invoice_tab='f' and aml.journal_id=1 and am.state='posted'
-    #             """
-    #             cr.execute(SQL,[obj.id])
-    #             for row in cr.fetchall():
-    #                 val = row[0]
-    #         obj.vente_facture = val
 
 
     def _update_vente_facture(self):
@@ -537,9 +529,6 @@ class IsAffaire(models.Model):
     def import_budget_famille_action(self):
         cr,uid,context,su = self.env.args
         for obj in self:
-            # filtre=[('is_affaire_id', '=', obj.id)]
-            # orders = self.env['sale.order'].search(filtre)
-            # for order in orders:
             for line in obj.budget_famille_ids:
                 SQL="""
                     SELECT sum(sol.product_uom_qty*sol.is_prix_achat)
@@ -594,38 +583,20 @@ class IsAffaire(models.Model):
 
     def liste_vente_facture_action(self):
         for obj in self:
-            #tree_id = self.env.ref('is_clair_sarl.is_account_move_line_tree_view').id
-            #form_id = self.env.ref('is_clair_sarl.is_account_move_line_form_view').id
             return {
                 "name": "Factures ",
                 "view_mode": "tree,form",
                 "res_model": "account.move",
                 "domain": [
                     ("is_affaire_id","=",obj.id),
-                    #("exclude_from_invoice_tab","=",False),
                     ("journal_id","=",1),
                 ],
                 "type": "ir.actions.act_window",
-                #"views"    : [[tree_id, "tree"],[form_id, "form"]],
             }
-            # return {
-            #     "name": "Lignes de factures ",
-            #     "view_mode": "tree,form",
-            #     "res_model": "account.move.line",
-            #     "domain": [
-            #         ("move_id.is_affaire_id","=",obj.id),
-            #         ("exclude_from_invoice_tab","=",False),
-            #         ("journal_id","=",1),
-            #     ],
-            #     "type": "ir.actions.act_window",
-            #     "views"    : [[tree_id, "tree"],[form_id, "form"]],
-            # }
-
+          
 
     def liste_commandes_action(self):
         for obj in self:
-            #tree_id = self.env.ref('is_clair_sarl.is_account_move_line_tree_view').id
-            #form_id = self.env.ref('is_clair_sarl.is_account_move_line_form_view').id
             return {
                 "name": "Offres ",
                 "view_mode": "tree,form",
@@ -634,7 +605,6 @@ class IsAffaire(models.Model):
                     ("is_affaire_id","=",obj.id),
                 ],
                 "type": "ir.actions.act_window",
-                #"views"    : [[tree_id, "tree"],[form_id, "form"]],
             }
 
 
@@ -649,7 +619,6 @@ class IsAffaire(models.Model):
                 name = "%s"%(obj.name)
             if obj.nom and not obj.name:
                 name = "%s"%(obj.nom)
-            #name+=" - %s %s %s %s"%(obj.street or '', obj.street2 or '', obj.zip or '', obj.city or '')
             result.append((obj.id, name))
         return result
 
@@ -660,17 +629,6 @@ class IsAffaire(models.Model):
 
         ids = []
         if len(name) >= 1:
-            # filtre=[
-            #     '|','|','|','|','|','|',
-            #     ('name', 'ilike', name),
-            #     ('nom', 'ilike', name),
-            #     ('chantier_id.name', 'ilike', name),
-            #     ('chantier_id.street', 'ilike', name),
-            #     ('chantier_id.street2', 'ilike', name),
-            #     ('chantier_id.zip', 'ilike', name),
-            #     ('chantier_id.city', 'ilike', name),
-            # ]
-
             filtre=[
                 '|','|','|','|','|',
                 ('name'   , 'ilike', name),
@@ -680,9 +638,6 @@ class IsAffaire(models.Model):
                 ('zip'    , 'ilike', name),
                 ('city'   , 'ilike', name),
             ]
-
-
-
             if name=="[":
                 filtre=[('name', '!=', False)]
             if name=="#":
@@ -694,6 +649,30 @@ class IsAffaire(models.Model):
             search_domain.append(('id', 'not in', ids))
         ids += list(self._search(search_domain + args, limit=limit))
         return ids
+
+
+    def creer_chantier_affaire_action(self):
+        today = date.today()
+        ct=1
+        for obj in self:
+            if obj.state=='commande' and obj.type_affaire=='chantier':
+                for nature in obj.nature_travaux_ids:
+                    filtre=[
+                        ('affaire_id'       ,'=' , obj.id),
+                        ('nature_travaux_id','=' , nature.id),
+                        ('active'           ,'in', [True,False]),
+                    ]
+                    chantiers = self.env['is.chantier'].search(filtre)
+                    if len(chantiers)==0:
+                        vals={
+                            "affaire_id"       : obj.id,
+                            "date_debut"       : today + timedelta(days=21),
+                            "date_fin"         : today + timedelta(days=24),
+                            "nature_travaux_id": nature.id,
+                        }
+                        chantier = self.env['is.chantier'].create(vals)
+                        _logger.info("creer_chantier_affaire_action : %s : %s : %s : %s"%(ct,obj.name,nature.name,chantier.name))
+                        ct+=1
 
 
 class IsImportSalaire(models.Model):

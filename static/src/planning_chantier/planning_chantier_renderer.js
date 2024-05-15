@@ -211,6 +211,8 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         }
     }
 
+    
+
 
     tbodyMouseLeave(ev) {
         this.state.chantierid=0;
@@ -218,7 +220,6 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
         this.state.color="";
         this.state.action="";
     }
-
 
 
     // Actions
@@ -257,6 +258,22 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
             },
         });
     }
+
+
+
+    alerteClick(ev) {
+        const id=ev.target.attributes.id.value;
+        this.env.bus.trigger('do-action', {
+            action: {
+                name:'Alerte',
+                type: 'ir.actions.act_window',
+                res_id: parseInt(id),
+                res_model: 'is.chantier.alerte',
+                views: [[false, 'form']],
+            },
+        });
+    }
+
 
 
 

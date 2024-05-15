@@ -12,9 +12,6 @@ class IsEquipe(models.Model):
     _description = "Equipe"
     _order='name'
 
-    # def _get_default_color(self):
-    #     return randint(1, 11)
-
     name       = fields.Char('Equipe', required=True, index=True)
     color      = fields.Char('Couleur')
     color_code = fields.Char('Code Couleur')
@@ -56,6 +53,7 @@ class IsChantier(models.Model):
     ], 'Etat', index=True, default="a_planifier", required=True, tracking=True)
     alerte_ids  = fields.One2many('is.chantier.alerte', 'chantier_id', 'Alertes', tracking=True)
     alerte_html = fields.Text('Alertes ',compute='_compute_alerte_html', store=True, readonly=True, tracking=True)
+    active      = fields.Boolean("Actif", default=True, copy=False)
 
 
     @api.depends('alerte_ids')
@@ -63,22 +61,15 @@ class IsChantier(models.Model):
         for obj in self:
             html=[]
             if obj.alerte_ids:
-                #html.append('<table>')
                 for line in obj.alerte_ids:
-                    #html.append('<tr><td>%s</td><td>%s</td></tr>'%(line.date, line.alerte))
                     html.append('%s:%s'%(line.date, line.alerte))
-                #html.append('</table>')
             obj.alerte_html='\n'.join(html)
 
 
     def recalculer_duree_action(self):
         for obj in self:
             obj._compute_duree()
-            # if obj.date_fin and obj.date_debut and obj.duree==0:
-            #     duree = (obj.date_fin-obj.date_debut).days
-            #     if duree<0:
-            #         duree=0
-            #     obj.duree=duree
+ 
 
     @api.depends('date_debut','date_fin')
     def _compute_duree(self):
@@ -90,24 +81,7 @@ class IsChantier(models.Model):
                     duree=0
             obj.duree=duree
 
-    # @api.onchange('date_debut')
-    # def onchange_date_debut(self):
-    #     for obj in self:
-    #         if obj.date_debut and obj.duree:
-    #             obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
-
-    # @api.onchange('duree')
-    # def onchange_duree(self):
-    #     for obj in self:
-    #         if obj.date_debut and obj.duree>=0:
-    #             obj.date_fin = obj.date_debut + timedelta(days=obj.duree)
-
-    # @api.onchange('date_fin')
-    # def onchange_date_fin(self):
-    #     for obj in self:
-    #         if obj.date_fin and obj.duree:
-    #             obj.date_debut = obj.date_fin - timedelta(days=obj.duree)
-
+   
     @api.model
     def create(self, vals):
         vals['name'] = self.env['ir.sequence'].next_by_code('is.chantier')
@@ -209,7 +183,7 @@ class IsChantier(models.Model):
                 alertes[chantier_id]={}
             if date_alerte not in alertes[chantier_id]:
                 alertes[chantier_id][date_alerte]=[]
-            alertes[chantier_id][date_alerte].append(line.alerte)
+            alertes[chantier_id][date_alerte].append(line)
         #**********************************************************************
 
         try:
@@ -361,11 +335,16 @@ class IsChantier(models.Model):
                 for i in range(0, nb_jours):
                     date_jour = debut_planning+timedelta(days=i)
                     alerte=False
+                    alerte_id=False
                     if chantier.id in alertes:
                         if date_jour in alertes[chantier.id]:
                             alerte = alertes[chantier.id][date_jour]
                     if alerte:
-                        alerte='\n'.join(alerte)
+                        alerte_cumul=[]
+                        for a in alerte:
+                            alerte_cumul.append(a.alerte)
+                            alerte_id = a.id
+                        alerte='\n'.join(alerte_cumul)
                     border="none"
                     if i%7==0:
                         border="1px solid gray"
@@ -376,6 +355,7 @@ class IsChantier(models.Model):
                         "border"   : border,
                         "date_jour": date_jour.strftime('%d/%m'),
                         "alerte"   : alerte,
+                        "alerte_id": alerte_id,
                         "width"    : width_jour,
                     }
                     if i>=decal and i<(decal+duree-1):
@@ -460,33 +440,8 @@ class IsChantier(models.Model):
             return attachment_id
 
 
-    def creation_auto_chantier_cron(self):
+    def recalage_auto_chantier_cron(self):
         today = date.today()
-        filtre=[
-            ('state','=','commande'),
-            ('type_affaire','=','chantier')
-        ]
-        lines = self.env['is.affaire'].search(filtre)
-        affaires=[]
-        for line in lines:
-            affaires.append(line)
-        chantiers = self.env['is.chantier'].search([])
-        affaires_chantiers=[]
-        for chantier in chantiers:
-            if chantier.affaire_id not in affaires_chantiers:
-                affaires_chantiers.append(chantier.affaire_id)
-        ct=1
-        for affaire in affaires:
-            if affaire not in affaires_chantiers:
-                vals={
-                    "affaire_id": affaire.id,
-                    "date_debut": today + timedelta(days=21),
-                    "date_fin"  : today + timedelta(days=24),
-                }
-                chantier = self.env['is.chantier'].create(vals)
-                ct+=1
-
-        #** Recaler les chantiers non plannifiés ******************************
         filtre=[
             ('equipe_id' ,'=',False),
             ('date_debut','<',today + timedelta(days=7)),
@@ -499,7 +454,6 @@ class IsChantier(models.Model):
                 "date_fin"  : today + timedelta(days=24),
             }
             chantier.write(vals)
-        #**********************************************************************
 
 
 class IsChantierAlerte(models.Model):

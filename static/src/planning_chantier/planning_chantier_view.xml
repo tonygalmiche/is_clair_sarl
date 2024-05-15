@@ -58,14 +58,6 @@
                             t-on-click="PDFClick"
                         />
                     </td>
-  
-
-<!-- 
-                    <td style="width:100px"><t t-esc="state.chantierid"/></td>
-                    <td style="width:100px"><t t-esc="state.jour"/></td>
-                    <td style="width:100px"><t t-esc="state.color"/></td>
-                    <td style="width:100px"><t t-esc="state.action"/></td>
-                    <td style="width:100px"><t t-esc="state.debut"/></td> -->
                 </tr>
             </table> 
         </div>
@@ -149,7 +141,13 @@
                                 t-att-color="jour.color"
                             > 
                                 <t  t-if="jour.alerte">
-                                    <span class="fa fa-exclamation-circle alerte"  t-att-title="jour.alerte"/>
+                                    <span 
+                                        class="fa fa-exclamation-circle alerte"  
+                                        t-att-id="jour.alerte_id"
+                                        t-on-click="alerteClick" 
+                                        t-att-jour="jour.key"
+                                        t-att-title="jour.alerte"
+                                    />
                                 </t>
                             </td>
                         </t>

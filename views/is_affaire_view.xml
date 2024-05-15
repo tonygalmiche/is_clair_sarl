@@ -235,6 +235,17 @@
         <field name="state">code</field>
         <field name="code">records.actualiser_marge()</field>
     </record>
+
+    <record id="creer_chantier_affaire_action_server" model="ir.actions.server">
+        <field name="name">Créer les chantiers de l'affaire</field>
+        <field name="model_id" ref="is_clair_sarl.model_is_affaire"/>
+        <field name="binding_model_id" ref="is_clair_sarl.model_is_affaire"/>
+        <field name="state">code</field>
+        <field name="code">records.creer_chantier_affaire_action()</field>
+    </record>
+
+
+
     <record id="is_affaire_form_view" model="ir.ui.view">
         <field name="name">is_affaire_from_view</field>
         <field name="model">is.affaire</field>
