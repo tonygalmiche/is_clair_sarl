@@ -32,6 +32,7 @@
                         <field name="is_conditionnement"/>
                         <field name="is_ordre_tri"/>
                         <field name="is_sous_article_ids"/>
+                        <field name="is_eco_contribution"/>
                     </group>
                     <group string="Autre">
                         <field name="colisage"/>
@@ -48,21 +49,22 @@
             <tree>
                 <field name="name" />
                 <field name="sous_famille_ids" widget="many2many_tags"/>
-                <field name="is_longueur"             optional="show"/>
-                <field name="is_largeur_utile"        optional="show"/>
-                <field name="is_surface_panneau"      optional="show"/>
-                <field name="is_surface_palette"      optional="show"/>
-                <field name="is_poids"                optional="show"/>
-                <field name="is_poids_rouleau"        optional="show"/>
-                <field name="is_ondes"                optional="show"/>
-                <field name="is_resistance_thermique" optional="show"/>
-                <field name="is_lambda"               optional="show"/>
-                <field name="is_lg_mini_forfait"      optional="show"/>
-                <field name="is_forfait_coupe_id"     optional="show"/>
-                <field name="is_conditionnement"      optional="show"/>
-                <field name="is_ordre_tri"            optional="show"/>
-                <field name="is_sous_article_ids"     optional="show"/>
-                <field name="colisage"                optional="show"/>
+                <field name="is_longueur"             optional="show" widget="boolean_toggle"/>
+                <field name="is_largeur_utile"        optional="show" widget="boolean_toggle"/>
+                <field name="is_surface_panneau"      optional="show" widget="boolean_toggle"/>
+                <field name="is_surface_palette"      optional="show" widget="boolean_toggle"/>
+                <field name="is_poids"                optional="show" widget="boolean_toggle"/>
+                <field name="is_poids_rouleau"        optional="show" widget="boolean_toggle"/>
+                <field name="is_ondes"                optional="show" widget="boolean_toggle"/>
+                <field name="is_resistance_thermique" optional="show" widget="boolean_toggle"/>
+                <field name="is_lambda"               optional="show" widget="boolean_toggle"/>
+                <field name="is_lg_mini_forfait"      optional="show" widget="boolean_toggle"/>
+                <field name="is_forfait_coupe_id"     optional="show" widget="boolean_toggle"/>
+                <field name="is_conditionnement"      optional="show" widget="boolean_toggle"/>
+                <field name="is_ordre_tri"            optional="show" widget="boolean_toggle"/>
+                <field name="is_sous_article_ids"     optional="show" widget="boolean_toggle"/>
+                <field name="colisage"                optional="show" widget="boolean_toggle"/>
+                <field name="is_eco_contribution"     optional="show" widget="boolean_toggle"/>
             </tree>
         </field>
     </record>
@@ -178,6 +180,7 @@
                 <field name="is_forfait_coupe_id_vsb"     invisible="1"/>
                 <field name="is_conditionnement_vsb"      invisible="1"/>
                 <field name="is_ordre_tri_vsb"            invisible="1"/>
+                <field name="is_eco_contribution_vsb"     invisible="1"/>
                 <field name="is_sous_article_ids_vsb"     invisible="1"/>
 
                 <field name="is_longueur"             attrs="{'invisible':[('is_longueur_vsb','=',False)]}"/>
@@ -193,6 +196,7 @@
                 <field name="is_forfait_coupe_id"     attrs="{'invisible':[('is_forfait_coupe_id_vsb','=',False)]}"/>
                 <field name="is_conditionnement"      attrs="{'invisible':[('is_conditionnement_vsb','=',False)]}"/>
                 <field name="is_ordre_tri"            attrs="{'invisible':[('is_ordre_tri_vsb','=',False)]}"/>
+                <field name="is_eco_contribution"     attrs="{'invisible':[('is_eco_contribution_vsb','=',False)]}"/>
                 <field name="is_sous_article_ids"     attrs="{'invisible':[('is_sous_article_ids_vsb','=',False)]}">
                     <tree editable="bottom">
                         <field name="product_id"/>
@@ -200,18 +204,8 @@
                     </tree>
                 </field>
             </field>
-
-
-
-
         </field>
     </record> 
-
-
-    <!-- account.product_template_form_view -->
-    <!-- <field name="property_account_income_id" groups="account.group_account_readonly"/> -->
-
-
     <record id="is_product_template_tree_view" model="ir.ui.view">
         <field name="name">is_product_template_tree_view</field>
         <field name="model">product.template</field>

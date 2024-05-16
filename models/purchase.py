@@ -52,10 +52,19 @@ class purchase_order(models.Model):
 
     is_import_pdf_ids      = fields.Many2many('ir.attachment' , 'purchase_order_is_import_pdf_ids_rel', 'order_id', 'attachment_id', 'PDF à importer')
     is_import_pdf_resultat = fields.Text("Résultat de l'importation", readonly=1)
-    is_eco_contribution    = fields.Float("Montant Eco-contribution", digits=(14,2), help='Si ce montant est renseigné, cela ajoutera automatiquement une ligne sur la commande')
+    is_eco_contribution    = fields.Float("Montant Eco-contribution", digits=(14,2), store=True, readonly=False, compute='_compute_is_eco_contribution', help='Si ce montant est renseigné, cela ajoutera automatiquement une ligne sur la commande')
 
     is_num_facture_fournisseur  = fields.Char("N°Facture")
     is_date_facture_fournisseur = fields.Date('Date Facture')
+
+
+    @api.depends('order_line.product_id','order_line.product_qty')
+    def _compute_is_eco_contribution(self):
+        for obj in self:
+            v=0
+            for line in obj.order_line:
+                v+=line.is_eco_contribution
+            obj.is_eco_contribution = v
 
 
     @api.depends('order_line.invoice_lines.move_id','order_line.invoice_lines.move_id.state')
@@ -666,6 +675,16 @@ class purchase_order_line(models.Model):
 
     is_date_livraison = fields.Date(related='order_id.is_date_livraison')
     is_sequence_facturation = fields.Integer("Ordre") #, store=True, readonly=True, compute='_compute_is_sequence_facturation') #, default=lambda self: self._default_is_sequence_facturation())
+    is_eco_contribution = fields.Float("Montant Eco-contribution", digits=(14,6), store=False, readonly=True, compute='_compute_is_eco_contribution')
+
+
+    @api.depends('product_id','product_qty')
+    def _compute_is_eco_contribution(self):
+        for obj in self:
+            v=0
+            if obj.product_id and obj.product_qty:
+                v = obj.product_id.is_eco_contribution * obj.product_qty
+            obj.is_eco_contribution = v
 
 
     @api.depends('is_colis_ids')

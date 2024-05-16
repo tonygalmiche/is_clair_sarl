@@ -26,6 +26,7 @@ class IsFamille(models.Model):
     is_ordre_tri            = fields.Boolean("Ordre de tri")
     is_sous_article_ids     = fields.Boolean("Sous-articles")
     colisage                = fields.Boolean("Accès au colisage dans les commandes")
+    is_eco_contribution     = fields.Boolean("Montant Eco-contribution")
 
 
 
@@ -79,6 +80,7 @@ class product_template(models.Model):
     is_forfait_coupe_id     = fields.Many2one('product.product', 'Forfait coupe')
     is_ordre_tri            = fields.Integer("Ordre de tri")
     is_sous_article_ids     = fields.One2many('is.sous.article', 'product_tmpl_id', 'Sous-articles')
+    is_eco_contribution     = fields.Float("Montant Eco-contribution", digits=(14,6), help='Si ce montant est renseigné, cela ajoutera automatiquement une ligne sur la commande')
 
     is_longueur_vsb             = fields.Boolean("Longueur vsb"                   , store=False, readonly=True, compute='_compute_vsb')
     is_largeur_utile_vsb        = fields.Boolean("Largeur utile (mm) vsb"         , store=False, readonly=True, compute='_compute_vsb')
@@ -94,8 +96,9 @@ class product_template(models.Model):
     is_forfait_coupe_id_vsb     = fields.Boolean("Forfait coupe vsb"              , store=False, readonly=True, compute='_compute_vsb')
     is_ordre_tri_vsb            = fields.Boolean("Ordre de tri vsb"               , store=False, readonly=True, compute='_compute_vsb')
     is_sous_article_ids_vsb     = fields.Boolean("Sous-articles vsb"              , store=False, readonly=True, compute='_compute_vsb')
+    is_fournisseur_id           = fields.Many2one('res.partner', 'Fournisseur par défaut', store=True, readonly=True, compute='_compute_is_fournisseur_id')
+    is_eco_contribution_vsb     = fields.Boolean("Montant Eco-contribution vsb"   , store=False, readonly=True, compute='_compute_vsb')
 
-    is_fournisseur_id = fields.Many2one('res.partner', 'Fournisseur par défaut', store=True, readonly=True, compute='_compute_is_fournisseur_id')
 
 
     def evolution_prix_achat_action(self):
@@ -209,3 +212,7 @@ class product_template(models.Model):
             if obj.is_famille_id.is_sous_article_ids:
                 vsb=True
             obj.is_sous_article_ids_vsb = vsb
+            vsb=False
+            if obj.is_famille_id.is_eco_contribution:
+                vsb=True
+            obj.is_eco_contribution_vsb = vsb

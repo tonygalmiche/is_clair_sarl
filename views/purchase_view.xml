@@ -135,6 +135,12 @@
                 />
             </xpath>
 
+            <xpath expr="//page[@name='products']/field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
+                <field name="is_eco_contribution" optional="hide"/>
+            </xpath>
+
+
+
             <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='product_id']" position="attributes">
                 <attribute name="context">{'tree_view_ref': 'is_clair_sarl.is_product_search_tree_view'}</attribute>
             </xpath>
@@ -147,6 +153,7 @@
             <xpath expr="//page[@name='products']/field[@name='order_line']/form/group/group/field[@name='date_planned']" position="after">
                 <field name="is_finition_id"/>
                 <field name="is_traitement_id"/>
+                <field name="is_eco_contribution"/>
             </xpath>
             <xpath expr="//page[@name='products']" position="after">
                 <page string="Repères de plan">
