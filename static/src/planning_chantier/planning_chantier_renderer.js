@@ -316,37 +316,40 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
 
     onChangeNbSemaines(ev){
         this.state.nb_semaines = ev.target.value;
-        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
+        this.GetChantiers();
+    }
+    onChangeChantier(ev){
+        this.state.filtre_chantier = ev.target.value;
+        this.GetChantiers();
+    }
+    onChangeEquipe(ev){
+        this.state.filtre_equipe = ev.target.value;
+        this.GetChantiers();
+    }
+    onChangeTravaux(ev){
+        this.state.filtre_travaux = ev.target.value;
+        this.GetChantiers();
     }
     RafraichirClick(ev) {
-        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
+        this.GetChantiers();
     }
     PrecedentClick(ev) {
         this.state.decale_planning = this.state.decale_planning-7;
-        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
+        this.GetChantiers();
     }
     SuivantClick(ev) {
         this.state.decale_planning = this.state.decale_planning+7;
-        this.GetChantiers(this.state.decale_planning);
+        this.GetChantiers();
     }
-
-
     onChangeState(ev) {
         this.state.chantier_state = ev.target.value;
-        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
+        this.GetChantiers();
     }
-
-
-
     OKButtonClick(ev) {
         this.state.decale_planning = 0;
-        this.GetChantiers(this.state.decale_planning, this.state.nb_semaines);
+        this.GetChantiers();
     }
-    async GetChantiers(s){
-
-
-        console.log("TEST GetChantiers")
-
+    async GetChantiers(){
         var self=this;
         rpc.query({
             model: 'is.chantier',
@@ -355,15 +358,21 @@ class PlanningChantierRenderer extends AbstractRendererOwl {
                 domain         : this.props.domain,
                 decale_planning: this.state.decale_planning,
                 nb_semaines    : this.state.nb_semaines,
+                filtre_chantier: this.state.filtre_chantier,
+                filtre_equipe  : this.state.filtre_equipe,
+                filtre_travaux : this.state.filtre_travaux,
                 chantier_state : this.state.chantier_state,
             }
         }).then(function (result) {
-            self.state.dict     = result.dict;
-            self.state.mois     = result.mois;
-            self.state.semaines = result.semaines;
+            self.state.dict            = result.dict;
+            self.state.mois            = result.mois;
+            self.state.semaines        = result.semaines;
             self.state.nb_semaines     = result.nb_semaines;
             self.state.decale_planning = result.decale_planning;
             self.state.autorise_modif  = result.autorise_modif;
+            self.state.filtre_chantier = result.filtre_chantier;
+            self.state.filtre_equipe   = result.filtre_equipe;
+            self.state.filtre_travaux  = result.filtre_travaux;
             self.state.state_options   = result.state_options;
             self.state.chantier_state  = result.chantier_state;
         });

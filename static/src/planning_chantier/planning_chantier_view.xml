@@ -39,6 +39,42 @@
                              style="width:40px" 
                          />
                     </td>
+
+                    <!-- Chantier / Equipe / Travaux -->
+                    <td><span style="margin-left:20px;margin-right:5px">Chantier :</span></td>
+                     <td>
+                         <input 
+                             name="filtre_chantier" 
+                             t-att-value="state.filtre_chantier" 
+                             t-on-change="onChangeChantier" 
+                             type="text" 
+                             class="form-control"
+                             style="width:80px" 
+                         />
+                    </td>
+                    <td><span style="margin-left:20px;margin-right:5px">Equipe :</span></td>
+                     <td>
+                         <input 
+                             name="filtre_equipe" 
+                             t-att-value="state.filtre_equipe" 
+                             t-on-change="onChangeEquipe" 
+                             type="text" 
+                             class="form-control"
+                             style="width:80px" 
+                         />
+                    </td>
+                    <td><span style="margin-left:20px;margin-right:5px">Travaux :</span></td>
+                     <td>
+                         <input 
+                             name="filtre_travaux" 
+                             t-att-value="state.filtre_travaux" 
+                             t-on-change="onChangeTravaux" 
+                             type="text" 
+                             class="form-control"
+                             style="width:80px" 
+                         />
+                    </td>
+
                     <td><span style="margin-left:20px;margin-right:5px">Etat chantier :</span></td>
                     <td>
                         <select name="chantier_state" class="form-select" t-on-change="onChangeState">

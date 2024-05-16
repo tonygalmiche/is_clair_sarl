@@ -139,7 +139,7 @@ class IsChantier(models.Model):
 
 
     @api.model
-    def get_chantiers(self,domain=[],decale_planning="", nb_semaines="", chantier_state=""):
+    def get_chantiers(self,domain=[],decale_planning="", nb_semaines="", filtre_chantier=False, filtre_equipe=False, filtre_travaux=False, chantier_state=""):
         autorise_modif=False
         if self.user_has_groups('is_clair_sarl.is_responsable_planning_chantiers_group'):
             autorise_modif=True
@@ -153,10 +153,24 @@ class IsChantier(models.Model):
         else:
             self.env['is.mem.var'].set(self._uid, 'chantier_decale_planning', decale_planning)
 
+        if filtre_chantier==False:
+            filtre_chantier = self.env['is.mem.var'].get(self._uid, 'filtre_chantier') or ""
+        else:
+            self.env['is.mem.var'].set(self._uid, 'filtre_chantier', filtre_chantier)
+        if filtre_equipe==False:
+            filtre_equipe = self.env['is.mem.var'].get(self._uid, 'filtre_equipe') or ""
+        else:
+            self.env['is.mem.var'].set(self._uid, 'filtre_equipe', filtre_equipe)
+        if filtre_travaux==False:
+            filtre_travaux = self.env['is.mem.var'].get(self._uid, 'filtre_travaux') or ""
+        else:
+            self.env['is.mem.var'].set(self._uid, 'filtre_travaux', filtre_travaux)
+
         if chantier_state=="":
             chantier_state = self.env['is.mem.var'].get(self._uid, 'chantier_state') or "Tous"
         else:
             self.env['is.mem.var'].set(self._uid, 'chantier_state', chantier_state)
+
 
         #** Liste de choix ****************************************************
         options = ["A planifier","En cours", "Tous"]
@@ -190,12 +204,10 @@ class IsChantier(models.Model):
             nb_semaines = int(nb_semaines)
         except:
             nb_semaines = 16
-
         try:
             decale_planning = int(decale_planning)
         except:
             decale_planning = 0
-
         if nb_semaines<4:
             nb_semaines=4
         if nb_semaines>40:
@@ -246,6 +258,15 @@ class IsChantier(models.Model):
             jour = jour + timedelta(days=1)
         #**********************************************************************
 
+        #** Ajout des filtres sur le domain ***********************************
+        if filtre_chantier!='':
+            domain.append(['affaire_id', 'ilike', filtre_chantier])
+        if filtre_equipe!='':
+            domain.append(['equipe_id', 'ilike', filtre_equipe])
+        if filtre_travaux!='':
+            domain.append(['nature_travaux_id', 'ilike', filtre_travaux])
+        #**********************************************************************
+
 
         #** Recherche de la date de début de chaque affaire pour le tri *******
         date_debut_affaire={}
@@ -294,15 +315,12 @@ class IsChantier(models.Model):
                 test=True
             #******************************************************************
 
-
             #** Recherche si le chantier est dans l'état sélectionné **********
             if chantier_state=="En cours"    and chantier.state!="en_cours":
                 test=False
             if chantier_state=="A planifier" and chantier.state!="a_planifier":
                 test=False
-
             #******************************************************************
-
 
             if test:
                 #** Changement de couleur à chaque affaire ********************
@@ -404,6 +422,9 @@ class IsChantier(models.Model):
             "autorise_modif" : autorise_modif,
             "state_options"  : state_options,
             "chantier_state" : chantier_state,
+            "filtre_chantier": filtre_chantier,
+            "filtre_equipe"  : filtre_equipe,
+            "filtre_travaux" : filtre_travaux,
         }
     
 
