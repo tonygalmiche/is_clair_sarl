@@ -11,17 +11,20 @@
                 }
             </style>
             <div class="o_boxed_header">
-                <div class="row mb8">
+                <div class="text-center">
+                    <img src="/is_clair_sarl/static/src/img/entete-correspondance-clair.png"/>
+                     <!-- style="max-width:190mm"/> -->
+                </div>
+                <!-- <div class="row mb8">
                     <div class="col-6">
                         <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
                     </div>
                     <div class="col-6 text-right mb4">
-                        <!-- <h4 class="mt0" t-field="company.report_header"/> -->
                         <div name="company_address" class="float-right mb4">
                             <span t-if="company.company_details" t-field="company.company_details"></span>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </xpath>
         <xpath expr="//div[3]" position="replace">
@@ -29,10 +32,10 @@
                 <div class="text-center">
                     <!-- <div t-field="company.report_footer"/> -->
 
-                    <img src="/is_clair_sarl/static/src/img/bas-de-page-correspondance-clair-150.png" style="max-width:190mm"/>
+                    <img src="/is_clair_sarl/static/src/img/bas-de-page-correspondance-clair.png" style="max-width:190mm"/>
                      <!-- style="max-height:70mm;max-width:90mm"/> -->
 
-
+                     <!-- entete-correspondance-clair.png -->
 
                     <div t-if="report_type == 'pdf'">
                         Page: <span class="page"/> / <span class="topage"/>

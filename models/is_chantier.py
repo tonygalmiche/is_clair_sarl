@@ -329,7 +329,7 @@ class IsChantier(models.Model):
                 if mem_affaire!=chantier.affaire_id:
                     mem_affaire=chantier.affaire_id
                     if trcolor=="#ffffff":
-                        trcolor="#f2f3f4"
+                        trcolor="#e5e7e9"
                     else:
                         trcolor="#ffffff"
                 trstyle="background-color:%s"%(trcolor)
