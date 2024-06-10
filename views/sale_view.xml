@@ -218,6 +218,21 @@
             <field name="partner_id" position="after">
                 <field name="is_affaire_id" optional="show" class="white_space_normal"/>
             </field>
+           <field name="invoice_status" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="user_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+           </field>
+           <field name="team_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="activity_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="tag_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
         </field>
     </record>
     <record id="is_view_order_tree" model="ir.ui.view">
@@ -236,13 +251,16 @@
                 <field name="is_reste_a_facturer" sum="Total" widget="monetary" decoration-bf="1" optional="show"/>
                 <field name="is_pourcent_a_facturer" optional="show"/>
             </field>
-            <field name="invoice_status" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </field>
             <field name="user_id" position="attributes">
                 <attribute name="invisible">1</attribute>
            </field>
+           <field name="team_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
            <field name="activity_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="tag_ids" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
         </field>

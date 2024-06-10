@@ -184,6 +184,11 @@ class sale_order(models.Model):
             if obj.amount_untaxed!=0:
                 pourcent = 100 * obj.is_reste_a_facturer / obj.amount_untaxed
             obj.is_pourcent_a_facturer = pourcent
+            if obj.state=='sale':
+                if abs(is_reste_a_facturer)<0.1:
+                    obj.invoice_status = 'invoiced'
+                else:
+                    obj.invoice_status = 'to invoice'
 
 
     @api.depends('is_date_pv')
