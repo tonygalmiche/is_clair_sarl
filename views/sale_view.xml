@@ -194,6 +194,7 @@
                                 <button title="Facture" name="acceder_facture_action" type="object" icon="fa-search-plus"/>
                                 <field name="is_situation"/>
                                 <field name="name"/>
+                                <field name="move_type"/>
                                 <field name="invoice_date"/>
                                 <field name="invoice_date_due"/>
                                 <field name="is_a_facturer" sum="Total"/>

@@ -40,8 +40,8 @@ class sale_order_line(models.Model):
                 cr.execute(SQL,[obj.id])
                 for row in cr.fetchall():
                     sens=1
-                    if row[0]=='out_refund':
-                        sens=-1
+                    #if row[0]=='out_refund':
+                    #    sens=-1
                     is_deja_facture += sens*(row[1] or 0)
             is_facturable = obj.price_subtotal*obj.is_facturable_pourcent/100
             is_a_facturer = is_facturable - is_deja_facture
@@ -513,7 +513,7 @@ class sale_order(models.Model):
                         'account_id': account_id,
                         'name'      : name,
                         'quantity'  : -sens*line.remise/100,
-                        'price_unit': round(total_cumul_ht,2), # La remise est calculée sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
+                        'price_unit': sens*round(total_cumul_ht,2), # La remise est calculée sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
                         'tax_ids'   : tax_ids,
                     }
                     invoice_line_ids.append(vals)
@@ -583,6 +583,4 @@ class sale_order(models.Model):
             move._onchange_partner_id()
             move._onchange_invoice_date()
             move.action_post()
-            #obj.is_date_facture = False
-            #obj.is_numero_facture = False
 
