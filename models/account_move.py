@@ -3,6 +3,20 @@ from odoo import models,fields,api
 from dateutil.relativedelta import relativedelta
 
 
+class is_account_move_section(models.Model):
+    _name='is.account.move.section'
+    _description = "Sections des factures"
+    _rec_name = 'section_id'
+    _order='sequence'
+
+    move_id          = fields.Many2one('account.move', 'Facture', required=True, ondelete='cascade')
+    section_id       = fields.Many2one('is.sale.order.section', 'Section', index=True)
+    sequence         = fields.Integer("Sequence")
+    currency_id      = fields.Many2one(related='move_id.currency_id')
+    facture          = fields.Monetary("Montant Facturé", currency_field='currency_id')
+    facture_pourcent = fields.Float("% Facturé", digits=(14,2))
+
+
 class AccountMove(models.Model):
     _inherit = "account.move"
     _order='name desc'
@@ -27,7 +41,7 @@ class AccountMove(models.Model):
     active               = fields.Boolean("Active", store=True, readonly=True, compute='_compute_active')
     is_purchase_order_id = fields.Many2one('purchase.order', 'Commande fournisseur', compute='_compute_is_purchase_order_id', store=False, readonly=True)
     is_type_paiement     = fields.Selection(related='partner_id.is_type_paiement')
-
+    is_section_ids       = fields.One2many('is.account.move.section', 'move_id', 'Sections', readonly=True)
 
 
     @api.depends('state')
@@ -38,15 +52,6 @@ class AccountMove(models.Model):
                 if line.purchase_line_id:
                     purchase_id = line.purchase_line_id.order_id.id
             obj.is_purchase_order_id=purchase_id
-
-
-    @api.depends('state')
-    def _compute_active(self):
-        for obj in self:
-            active=True
-            if obj.state=='cancel':
-                active=False
-            obj.active=active
 
 
     @api.depends('state','amount_total_signed','amount_residual_signed','invoice_date','is_order_id', 'is_order_id.is_date_pv')
@@ -76,6 +81,7 @@ class AccountMove(models.Model):
             if obj.state=='cancel':
                 active = False
             obj.active = active
+            obj.initialiser_sections_facture_action()
 
 
     @api.depends('is_order_id','purchase_id','invoice_line_ids','state')
@@ -162,12 +168,40 @@ class AccountMove(models.Model):
                     obj.sudo()._compute_amount()
 
 
+    def initialiser_sections_facture_action(self):
+        for obj in self:
+            sections={}
+            for line in obj.invoice_line_ids:
+                section = line.is_section_id
+                if section:
+                    if section not in sections:
+                        sections[section]={'montant_cde':0, 'montant_fac':0}
+                    sections[section]['montant_cde']+=line.is_montant_cde
+                    sections[section]['montant_fac']+=line.is_a_facturer
+            obj.is_section_ids.unlink()
+            for section in sections:
+                facture_pourcent = facture = 0
+                if sections[section]['montant_cde']!=0:
+                    facture          = sections[section]['montant_fac']
+                    facture_pourcent = 100 * sections[section]['montant_fac'] / sections[section]['montant_cde']
+                vals={
+                    'move_id'         : obj.id,
+                    'sequence'        : section.sequence,
+                    'section_id'      : section.id,
+                    'facture'         : facture,
+                    'facture_pourcent': facture_pourcent,
+                }
+                self.env['is.account.move.section'].create(vals)
+
+
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
     is_affaire_id          = fields.Many2one('is.affaire', 'Affaire')
     is_sale_line_id        = fields.Many2one('sale.order.line', 'Ligne de commande', index=True)
-    is_qt_commande         = fields.Float("Qt Commande"       , digits=(14,2), related='is_sale_line_id.product_uom_qty')
-    is_facturable_pourcent = fields.Float("% facturable"      , digits=(14,2))
+    is_section_id          = fields.Many2one(related='is_sale_line_id.is_section_id')
+    is_qt_commande         = fields.Float("Qt Cde", digits=(14,2), related='is_sale_line_id.product_uom_qty')
+    is_montant_cde         = fields.Monetary("Montant Cde", related='is_sale_line_id.price_subtotal' )# currency_field='currency_id', store=False, readonly=True, compute='_compute_montant')
+    is_facturable_pourcent = fields.Float("% Facturable"      , digits=(14,2))
     is_a_facturer          = fields.Float("A Facturer"        , digits=(14,2), help="Montant à facturer sur cette facture")
     is_famille_id          = fields.Many2one('is.famille', related='product_id.is_famille_id')

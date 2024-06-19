@@ -163,6 +163,7 @@
                                 <field name="section"/>
                                 <field name="montant" sum="Total"/>
                                 <field name="facturable_pourcent"/>
+                                <field name="facturable_pourcent_calcule"/>
                                 <field name="facturable"   sum="Total"/>
                                 <field name="deja_facture" sum="Total"/>
                                 <field name="a_facturer"   sum="Total"/>

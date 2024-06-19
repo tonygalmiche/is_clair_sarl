@@ -85,17 +85,13 @@
                                         <t t-set="total_section"       t-value="0"/>
                                         <t t-set="facturable_pourcent" t-value="0"/>
                                         <t t-if="l.option!=True">
-                                            <t t-foreach="l.line_ids" t-as="sale_line">
-                                                <t t-foreach="move_lines" t-as="move_line">
-                                                    <t t-if="move_line.is_sale_line_id.id==sale_line.id">
-                                                        <!-- En affichage uniquement des sections, le % facturable de la section 
-                                                        doit être le même que n'importe qu'elle ligne  -->
-                                                        <t t-set="facturable_pourcent" t-value="move_line.is_facturable_pourcent"/>
-                                                        <t t-set="total_section" t-value="total_section + move_line.price_subtotal"/>
-                                                    </t>
+                                            <t t-foreach="o.is_section_ids" t-as="section">
+                                                <t t-if="l.id==section.section_id.id">
+                                                    <t t-set="facturable_pourcent" t-value="section.facture_pourcent"/>
+                                                    <t t-set="total_section"       t-value="section.facture"/>
                                                 </t>
                                             </t>
-                                            <tr t-if="l.facturable_pourcent">
+                                            <tr t-if="facturable_pourcent">
                                                 <td style="width:80%" class="text-left">
                                                     <span t-field="l.section"/> (<span t-esc="facturable_pourcent"/>%)
                                                 </td>

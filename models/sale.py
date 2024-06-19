@@ -67,6 +67,7 @@ class is_sale_order_section(models.Model):
     sequence    = fields.Integer("Sequence")
     section     = fields.Char("Section", required=True)
     facturable_pourcent = fields.Float("% facturable", digits=(14,2))
+    facturable_pourcent_calcule = fields.Float("% facturable calculé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable_pourcent_calcule')
     option      = fields.Boolean("Option", default=False)
     line_ids    = fields.One2many('sale.order.line', 'is_section_id', 'Lignes')
     currency_id = fields.Many2one(related='order_id.currency_id')
@@ -83,6 +84,19 @@ class is_sale_order_section(models.Model):
                 raise ValidationError("Il n'est pas possible de supprimer une section contenant des lignes déjà facturées")
             obj.line_ids.unlink()
         super(is_sale_order_section, self).unlink()
+
+
+    def _compute_facturable_pourcent_calcule(self):
+        for obj in self:
+            pourcent = 0
+            total = facturable = 0
+            for line in obj.order_id.order_line:
+                if line.is_section_id==obj:
+                    total+=line.price_subtotal
+                    facturable+=line.is_facturable
+            if total!=0:
+                pourcent = 100*facturable/total
+            obj.facturable_pourcent_calcule = pourcent
 
 
     def _compute_montant(self):
@@ -238,14 +252,8 @@ class sale_order(models.Model):
             }
 
 
-
-
-
-
     def import_fichier_xlsx(self):
         for obj in self:
-            #obj.order_line.unlink()
-            #obj.is_section_ids.unlink()
             sequence=0
             alertes=[]
             section_id=False
@@ -260,7 +268,6 @@ class sale_order(models.Model):
 
                 #** Test si fichier est bien du xlsx *******************************
                 try:
-                    #wb = openpyxl.load_workbook(filename = path)
                     wb    = openpyxl.load_workbook(filename = path, data_only=True)
                     ws    = wb.active
                     cells = list(ws)
@@ -306,20 +313,6 @@ class sale_order(models.Model):
                             ("is_sale_order_id"  ,"=", obj.id),
                             ("partner_ref"  ,"=", name),
                         ]
-                        #TODO : Désactivation de la création des taches le 07/10/2023
-                        # orders = self.env['purchase.order'].search(filtre)
-                        # if orders:
-                        #     purchase_order = orders[0]
-                        #     purchase_order.order_line.unlink()
-                        # else:
-                        #     v={
-                        #         "partner_id"      : 1,
-                        #         "is_sale_order_id": obj.id,
-                        #         "partner_ref"     : name,
-                        #         "is_affaire_id"   : obj.is_affaire_id.id,
-                        #     }
-                        #     purchase_order = self.env['purchase.order'].create(v)
-
                     if ref=="NOTE" and name:
                         vals={
                             "order_id"       : not option and obj.id,
@@ -372,22 +365,6 @@ class sale_order(models.Model):
                                 "is_section_id"  : section_id,
                                 "is_masquer_ligne": is_masquer_ligne,
                             }
-                            #TODO : Désactivation de la création des taches le 07/10/2023
-                            # if purchase_order:
-                            #     v={
-                            #         "order_id"    : purchase_order.id,
-                            #         "product_id"  : product.id,
-                            #         "sequence"    : sequence,
-                            #         "name"        : name,
-                            #         "product_qty" : qty,
-                            #         "display_type": False,
-                            #     }
-                            #     if product.is_sous_article_ids:
-                            #         for line in product.is_sous_article_ids:
-                            #             v["product_id"]=line.product_id.id
-                            #             res = self.env['purchase.order.line'].create(v)
-                            #     else:
-                            #         res = self.env['purchase.order.line'].create(v)
                     if vals:
                         res = self.env['sale.order.line'].create(vals)
                     lig+=1
@@ -407,7 +384,6 @@ class sale_order(models.Model):
     def generer_facture_action(self):
         cr,uid,context,su = self.env.args
         for obj in self:
-            #is_a_facturer = 0
             if obj.is_a_facturer==0:
                 raise ValidationError("Il n'y a rien à facturer")
 
@@ -416,7 +392,6 @@ class sale_order(models.Model):
             if obj.is_a_facturer<0:
                 move_type = 'out_refund'
                 sens=-1
-
 
             #** Création des lignes *******************************************
             total_cumul_ht=0
@@ -431,10 +406,6 @@ class sale_order(models.Model):
                         'name'        : line.name,
                     }
                 else:
-                    #quantity=0
-                    #if line.price_subtotal>0:
-                    #    quantity=line.product_uom_qty*line.is_a_facturer/line.price_subtotal
-
                     quantity=line.product_uom_qty*line.is_facturable_pourcent/100
                     account_id = self._get_product_account_id(line.product_id, obj.fiscal_position_id)
                     taxes = line.product_id.taxes_id
@@ -520,53 +491,6 @@ class sale_order(models.Model):
             #******************************************************************
 
 
-            # #** Ajout Compte Prorata ******************************************
-            # if obj.is_affaire_id.compte_prorata>0:
-            #     compte_prorata = obj.is_affaire_id.compte_prorata
-            #     products = self.env['product.product'].search([("default_code","=",'COMPTE_PRORATA')])
-            #     if not len(products):
-            #         raise ValidationError("Article 'COMPTE_PRORATA' non trouvé")
-            #     product=products[0]
-            #     taxes = product.taxes_id
-            #     taxes = obj.fiscal_position_id.map_tax(taxes)
-            #     tax_ids=[]
-            #     for tax in taxes:
-            #         tax_ids.append(tax.id)
-            #     sequence+=10
-            #     name="Compte prorata %s%%"%compte_prorata
-            #     vals={
-            #         'sequence'  : sequence,
-            #         'product_id': product.id,
-            #         'name'      : name,
-            #         'quantity'  : -sens*compte_prorata/100,
-            #         'price_unit': round(total_cumul_ht,2), # Le prorata est calculé sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
-            #         'tax_ids'   : tax_ids,
-            #     }
-            #     invoice_line_ids.append(vals)
-
-            # #** Ajout Retenue de garantie *************************************
-            # if obj.is_affaire_id.retenue_garantie>0:
-            #     retenue_garantie = obj.is_affaire_id.retenue_garantie
-            #     products = self.env['product.product'].search([("default_code","=",'RETENUE_GARANTIE')])
-            #     if not len(products):
-            #         raise ValidationError("Article 'RETENUE_GARANTIE' non trouvé")
-            #     product=products[0]
-            #     taxes = product.taxes_id
-            #     taxes = obj.fiscal_position_id.map_tax(taxes)
-            #     tax_ids=[]
-            #     for tax in taxes:
-            #         tax_ids.append(tax.id)
-            #     sequence+=10
-            #     name="Retenue de garantie %s%%"%retenue_garantie
-            #     vals={
-            #         'sequence'  : sequence,
-            #         'product_id': product.id,
-            #         'name'      : name,
-            #         'quantity'  : -sens*retenue_garantie/100,
-            #         'price_unit': round(total_cumul_ht,2),
-            #         'tax_ids'   : tax_ids,
-            #     }
-            #     invoice_line_ids.append(vals)
 
             #** Création entête facture ***************************************
             vals={
@@ -575,7 +499,6 @@ class sale_order(models.Model):
                 'invoice_date'       : obj.is_date_facture or datetime.date.today(),
                 'partner_id'         : obj.partner_id.id,
                 'is_order_id'        : obj.id,
-                #'fiscal_position_id' : obj.fiscal_position_id.id,
                 'move_type'          : move_type,
                 'invoice_line_ids'   : invoice_line_ids,
             }

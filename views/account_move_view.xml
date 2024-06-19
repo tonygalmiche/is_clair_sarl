@@ -22,6 +22,13 @@
         <field name="state">code</field>
         <field name="code">records.initialiser_paiement_traite_action()</field>
     </record>
+    <record id="initialiser_sections_facture_action_server" model="ir.actions.server">
+        <field name="name">Initialiser les sections</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code">records.initialiser_sections_facture_action()</field>
+    </record>
     <record id="is_view_move_form" model="ir.ui.view">
         <field name="name">is_view_move_form</field>
         <field name="model">account.move</field>
@@ -84,8 +91,10 @@
                 <field name="is_banque_id"   attrs="{'invisible': [('is_banque_id', '=', False)]}"/>
             </field>
             <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="before">
-                <field name="is_sale_line_id"        optional="hide"/>
+                <field name="is_sale_line_id"        optional="hide" widget="many2one_clickable"/>
+                <field name="is_section_id"          optional="hide" widget="many2one_clickable"/>
                 <field name="is_qt_commande"         optional="hide"/>
+                <field name="is_montant_cde"         optional="hide" sum="Total"/>
                 <field name="is_facturable_pourcent" optional="hide"/>
                 <field name="is_a_facturer"          optional="hide" sum="Total"/>
             </xpath>
@@ -125,6 +134,20 @@
                     attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"
                 />
             </div>
+            <page id="invoice_tab" position="after">
+                <page string="Sections">
+                    <group>
+                        <field name="is_section_ids" nolabel="1">
+                            <tree>
+                                <field name="sequence" widget="handle"/>
+                                <field name="section_id"/>
+                                <field name="facture_pourcent"/>
+                                <field name="facture" sum="Total"/>
+                            </tree>
+                        </field>
+                    </group>        
+                </page>
+            </page>
         </field>
     </record> 
     <record id="is_view_out_invoice_tree" model="ir.ui.view">

@@ -52,14 +52,11 @@ access_is_import_salaire,access_is_import_salaire,model_is_import_salaire,sales_
 access_is_affaire_salaire,access_is_affaire_salaire,model_is_affaire_salaire,base.group_user,1,1,1,1
 access_is_purchase_order_line,access_is_purchase_order_line,model_is_purchase_order_line,base.group_user,1,0,0,0
 access_is_affaire_remise,access_is_affaire_remise,model_is_affaire_remise,base.group_user,1,1,1,1
-
 access_is_chantier,access_is_chantier,model_is_chantier,base.group_user,1,0,0,0
 access_is_chantier_responsable_planning,access_is_chantier_responsable_planning,model_is_chantier,is_clair_sarl.is_responsable_planning_chantiers_group,1,1,1,1
 access_is_chantier_chef_chantier,access_is_chantier_chef_chantier,model_is_chantier,is_clair_sarl.is_chef_chantier_group,1,1,1,1
-
 access_is_equipe,access_is_equipe,model_is_equipe,base.group_user,1,0,0,0
 access_is_equipe_manager,access_is_equipe_manager,model_is_equipe,is_clair_sarl.is_responsable_planning_chantiers_group,1,1,1,1
-
 access_is_chantier_alerte,access_is_chantier_alerte,model_is_chantier_alerte,base.group_user,1,1,1,1
-
 access_is_mem_var,access_is_mem_var,model_is_mem_var,base.group_user,1,1,1,1
+access_is_account_move_section,access_is_account_move_section,model_is_account_move_section,base.group_user,1,1,1,1
