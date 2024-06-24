@@ -60,3 +60,4 @@ access_is_equipe_manager,access_is_equipe_manager,model_is_equipe,is_clair_sarl.
 access_is_chantier_alerte,access_is_chantier_alerte,model_is_chantier_alerte,base.group_user,1,1,1,1
 access_is_mem_var,access_is_mem_var,model_is_mem_var,base.group_user,1,1,1,1
 access_is_account_move_section,access_is_account_move_section,model_is_account_move_section,base.group_user,1,1,1,1
+access_is_account_move_remise,access_is_account_move_remise,model_is_account_move_remise,base.group_user,1,1,1,1

@@ -148,6 +148,18 @@
                     </group>        
                 </page>
             </page>
+            <xpath expr="//field[@name='invoice_outstanding_credits_debits_widget']/../.." position="after">
+                <group string="Remise facturation après TTC" attrs="{'invisible': [('is_remise_ids', '=', [])]}">
+                    <field name="is_remise_ids" nolabel="1">
+                        <tree>
+                            <field name="product_id"/>
+                            <field name="libelle"/>
+                            <field name="montant" sum="Total"/>
+                            <field name="currency_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </group>        
+            </xpath>
         </field>
     </record> 
     <record id="is_view_out_invoice_tree" model="ir.ui.view">

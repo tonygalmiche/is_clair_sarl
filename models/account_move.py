@@ -17,6 +17,17 @@ class is_account_move_section(models.Model):
     facture_pourcent = fields.Float("% Facturé", digits=(14,2))
 
 
+class is_account_move_remise(models.Model):
+    _name='is.account.move.remise'
+    _description = "Remises après le TTC (Retenue de garantie)"
+
+    move_id          = fields.Many2one('account.move', 'Facture', required=True, ondelete='cascade')
+    product_id       = fields.Many2one('product.product', 'Remise', index=True)
+    libelle          = fields.Text("Libellé")
+    currency_id      = fields.Many2one(related='move_id.currency_id')
+    montant          = fields.Monetary("Montant", currency_field='currency_id')
+
+
 class AccountMove(models.Model):
     _inherit = "account.move"
     _order='name desc'
@@ -42,6 +53,9 @@ class AccountMove(models.Model):
     is_purchase_order_id = fields.Many2one('purchase.order', 'Commande fournisseur', compute='_compute_is_purchase_order_id', store=False, readonly=True)
     is_type_paiement     = fields.Selection(related='partner_id.is_type_paiement')
     is_section_ids       = fields.One2many('is.account.move.section', 'move_id', 'Sections', readonly=True)
+    is_remise_ids        = fields.One2many('is.account.move.remise' , 'move_id', 'Remises' , readonly=True)
+    is_reste_du_ttc      = fields.Monetary(string='Reste dû TTC', store=True, readonly=True, compute='_compute_is_montant_paye', currency_field='company_currency_id')
+
 
 
     @api.depends('state')
@@ -72,6 +86,10 @@ class AccountMove(models.Model):
             if echeance:
                 echeance += relativedelta(years=1)
             obj.is_echeance_1an = echeance
+            remise = 0
+            for line in obj.is_remise_ids:
+                remise+=line.montant
+            obj.is_reste_du_ttc = obj.amount_total - remise
 
 
     @api.depends('state')

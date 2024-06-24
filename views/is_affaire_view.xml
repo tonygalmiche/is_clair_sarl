@@ -331,6 +331,7 @@
                                 <tree editable="bottom">
                                     <field name="product_id"/>
                                     <field name="remise"/>
+                                    <field name="apres_ttc"/>
                                 </tree>
                             </field>
                         </page>

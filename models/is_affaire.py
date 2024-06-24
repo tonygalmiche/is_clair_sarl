@@ -199,6 +199,7 @@ class IsAffaireRemise(models.Model):
     affaire_id = fields.Many2one('is.affaire', 'Affaire', required=True, ondelete='cascade')
     product_id = fields.Many2one('product.product', 'Remise facturation', required=True, domain=[('is_famille_id.name','=','Facturation')])
     remise     = fields.Float("Remise (%)", digits=(14,2), required=True)
+    apres_ttc  = fields.Boolean("Après TTC", default=False, help="Appliquer cette remise après le montant TTC de la facture")
 
 
 class IsAffaire(models.Model):

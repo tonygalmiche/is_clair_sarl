@@ -267,6 +267,30 @@
                                             </td>
                                         </tr>
                                     </t>
+
+
+                                    <!-- Déductions après le TTC (ex : retenue de garantie) -->
+                                    <t t-foreach="o.is_remise_ids" t-as="line">
+                                        <tr>
+                                            <td class="text-left" style="background-color:white;color:black"><span t-field="line.libelle"/></td>
+                                            <td class="text-right">
+                                                <span t-field="line.montant"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <tr t-if="o.is_remise_ids">
+                                        <td style="background-color:white"><strong style="color:black">Reste dû TTC</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.is_reste_du_ttc"/>
+                                        </td>
+                                    </tr>
+
+
+
+
+
+
                                 </table>
                             </div>
                         </div>

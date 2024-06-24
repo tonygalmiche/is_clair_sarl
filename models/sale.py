@@ -396,6 +396,7 @@ class sale_order(models.Model):
             #** Création des lignes *******************************************
             total_cumul_ht=0
             invoice_line_ids=[]
+            remise_ids=[]
             sequence=0
             is_a_facturer = 0
             for line in obj.order_line:
@@ -478,16 +479,24 @@ class sale_order(models.Model):
                         tax_ids.append(tax.id)
                     sequence+=10
                     name="%s %s%%"%(product.name,line.remise)
-                    vals={
-                        'sequence'  : sequence,
-                        'product_id': product.id,
-                        'account_id': account_id,
-                        'name'      : name,
-                        'quantity'  : -sens*line.remise/100,
-                        'price_unit': sens*round(total_cumul_ht,2), # La remise est calculée sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
-                        'tax_ids'   : tax_ids,
-                    }
-                    invoice_line_ids.append(vals)
+                    if line.apres_ttc==False:
+                        vals={
+                            'sequence'  : sequence,
+                            'product_id': product.id,
+                            'account_id': account_id,
+                            'name'      : name,
+                            'quantity'  : -sens*line.remise/100,
+                            'price_unit': sens*round(total_cumul_ht,2), # La remise est calculée sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
+                            'tax_ids'   : tax_ids,
+                        }
+                        invoice_line_ids.append(vals)
+                    else:
+                        vals={
+                            'product_id': product.id,
+                            'libelle'   : name,
+                            'montant'   : round(total_cumul_ht*line.remise/100,2)
+                        }
+                        remise_ids.append(vals)
             #******************************************************************
 
 
@@ -501,6 +510,7 @@ class sale_order(models.Model):
                 'is_order_id'        : obj.id,
                 'move_type'          : move_type,
                 'invoice_line_ids'   : invoice_line_ids,
+                'is_remise_ids'      : remise_ids,
             }
             move=self.env['account.move'].create(vals)
             move._onchange_partner_id()
