@@ -47,6 +47,7 @@ Module Odoo 15 pour CLAIR-SARL
         "report/sale_report_templates.xml",
         "report/report_templates.xml",
         "report/is_chantier_report_templates.xml",
+        "report/retenue_de_garantie_report_template.xml",
         "report/report.xml",
     ],
     'assets': {

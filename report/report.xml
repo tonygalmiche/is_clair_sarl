@@ -29,6 +29,16 @@
             <field name="paperformat_id" ref="is_clair_sarl.is_chantier_paperformat"/>
         </record>
 
-
+        <!-- Retenue de garantie -->
+        <record id="retenue_de_garantie_reports" model="ir.actions.report">
+            <field name="name">Retenue de garantie</field>
+            <field name="model">sale.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">is_clair_sarl.retenue_de_garantie_report</field>
+            <field name="report_file">is_clair_sarl.retenue_de_garantie_report</field>
+            <field name="binding_model_id" ref="model_sale_order"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="base.paperformat_euro"/>
+        </record>
     </data>
 </odoo>
