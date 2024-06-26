@@ -57,6 +57,12 @@
                                     <b><span t-esc="total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></b>
                                 </td>
                             </tr>
+                            <tr>
+                                <td class="text-right"><b>MONTANT DE LA RETENUE DE GARANTIE : </b></td>
+                                <td class="text-right">
+                                    <b><span t-field="o.is_retenue_de_garantie"/></b>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </t>

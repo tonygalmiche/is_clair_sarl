@@ -69,17 +69,14 @@
                 <field name="client_order_ref"/>
                 <field name="is_affichage_pdf"/>
             </field>
-
-
             <xpath expr="//group[@name='order_details']/field[@name='payment_term_id']" position="after">
                 <field name="is_date_pv"/>
                 <field name="is_pv_ids" widget="many2many_binary"/>
+                <field name="is_retenue_de_garantie" attrs="{'invisible':[('is_retenue_de_garantie','=',0)]}"/>
             </xpath>
-
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree" position="attributes">
                 <attribute name="editable"></attribute>
             </xpath>
-
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/form/group/group/field[@name='price_unit']" position="after">
                 <field name="is_unite"/>
             </xpath>
