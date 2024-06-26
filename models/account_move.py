@@ -188,28 +188,29 @@ class AccountMove(models.Model):
 
     def initialiser_sections_facture_action(self):
         for obj in self:
-            sections={}
-            for line in obj.invoice_line_ids:
-                section = line.is_section_id
-                if section:
-                    if section not in sections:
-                        sections[section]={'montant_cde':0, 'montant_fac':0}
-                    sections[section]['montant_cde']+=line.is_montant_cde
-                    sections[section]['montant_fac']+=line.is_a_facturer
-            obj.is_section_ids.unlink()
-            for section in sections:
-                facture_pourcent = facture = 0
-                if sections[section]['montant_cde']!=0:
-                    facture          = sections[section]['montant_fac']
-                    facture_pourcent = 100 * sections[section]['montant_fac'] / sections[section]['montant_cde']
-                vals={
-                    'move_id'         : obj.id,
-                    'sequence'        : section.sequence,
-                    'section_id'      : section.id,
-                    'facture'         : facture,
-                    'facture_pourcent': facture_pourcent,
-                }
-                self.env['is.account.move.section'].create(vals)
+            if type(obj.id)==int:
+                sections={}
+                for line in obj.invoice_line_ids:
+                    section = line.is_section_id
+                    if section:
+                        if section not in sections:
+                            sections[section]={'montant_cde':0, 'montant_fac':0}
+                        sections[section]['montant_cde']+=line.is_montant_cde
+                        sections[section]['montant_fac']+=line.is_a_facturer
+                obj.is_section_ids.unlink()
+                for section in sections:
+                    facture_pourcent = facture = 0
+                    if sections[section]['montant_cde']!=0:
+                        facture          = sections[section]['montant_fac']
+                        facture_pourcent = 100 * sections[section]['montant_fac'] / sections[section]['montant_cde']
+                    vals={
+                        'move_id'         : obj.id,
+                        'sequence'        : section.sequence,
+                        'section_id'      : section.id,
+                        'facture'         : facture,
+                        'facture_pourcent': facture_pourcent,
+                    }
+                    self.env['is.account.move.section'].create(vals)
 
 
 class AccountMoveLine(models.Model):
