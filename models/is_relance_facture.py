@@ -39,6 +39,7 @@ class IsRelanceFactureLigne(models.Model):
     is_date_relance  = fields.Date(related='invoice_id.is_date_relance')
     is_date_releve   = fields.Date(related='invoice_id.is_date_releve')
     email            = fields.Char(related='contact_id.email')
+    payment_state    = fields.Selection(related='invoice_id.payment_state')
 
 
     def voir_facture_action(self):
@@ -95,7 +96,7 @@ class IsRelanceFacture(models.Model):
             filtre=[
                 ("state","=","posted"),
                 ("move_type","=","out_invoice"),
-                ('payment_state',"=","not_paid"),
+                ('payment_state',"!=","paid"),
             ]
             if obj.partner_id:
                 filtre.append(("partner_id","=",obj.partner_id.id))
