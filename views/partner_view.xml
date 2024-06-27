@@ -143,6 +143,20 @@
                     }
                 </style>
             </xpath>
+            <!-- <xpath expr="//sheet/group/group/field[@name='website']" position="before">
+                <field name="is_courriel_facturation" widget="email"/>
+            </xpath> -->
+
+            <xpath expr="//sheet/group/group/field[@name='website']" position="before">
+                <field 
+                   name="is_contact_relance_facture_id" 
+                   attrs="{'invisible': [('is_company', '=', False)]}"
+                   domain="[('parent_id','=',id)]"
+               />
+           </xpath>
+
+
+
             <xpath expr="//field[@name='vat']" position="after">
                 <field name="is_statut_id"/>
                 <field name="is_profil_id"/>

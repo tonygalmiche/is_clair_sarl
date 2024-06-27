@@ -19,6 +19,7 @@ class IsRelanceFactureLigne(models.Model):
         for obj in self:
             obj.amount_residual  = obj.invoice_id.amount_residual
             obj.partner_id       = obj.invoice_id.partner_id.id
+            obj.contact_id       = obj.partner_id.is_contact_relance_facture_id.id or obj.partner_id.id
             obj.invoice_date     = obj.invoice_id.invoice_date
             obj.invoice_date_due = obj.invoice_id.invoice_date_due
 
@@ -32,10 +33,12 @@ class IsRelanceFactureLigne(models.Model):
     currency_id      = fields.Many2one('res.currency', related='invoice_id.currency_id')
     amount_residual  = fields.Monetary(string="Montant dû"           , compute='_compute', readonly=True, store=True)
     partner_id       = fields.Many2one('res.partner', string="Client", compute='_compute', readonly=True, store=True)
+    contact_id       = fields.Many2one('res.partner', 'Contact'      , compute='_compute', readonly=True, store=True)
     invoice_date     = fields.Date(string="Date facture"             , compute='_compute', readonly=True, store=True)
     invoice_date_due = fields.Date(string="Date d'échéance"          , compute='_compute', readonly=True, store=True)
     is_date_relance  = fields.Date(related='invoice_id.is_date_relance')
     is_date_releve   = fields.Date(related='invoice_id.is_date_releve')
+    email            = fields.Char(related='contact_id.email')
 
 
     def voir_facture_action(self):
@@ -155,10 +158,6 @@ class IsRelanceFacture(models.Model):
         for obj in self:
             mails={}
             for line in obj.ligne_ids:
-                if obj.type_document=="relance_facture":
-                    line.invoice_id.is_date_relance = date.today()
-                if obj.type_document=="releve_facture":
-                    line.invoice_id.is_date_releve = date.today()
                 partner=line.invoice_id.partner_id
                 if partner not in mails:
                     mails[partner]=[]
@@ -207,11 +206,11 @@ class IsRelanceFacture(models.Model):
 
         #** body **************************************************************
         if self.type_document=="relance_facture":
-            body="""
-                <p>Bonjour,</p> 
-                <p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p> 
-                <ul>
-            """
+            if len(invoices)>1:
+                body="""<p>Bonjour,</p><p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p><ul>"""
+            else:
+                body="""<p>Bonjour,</p><p>Sauf erreur de notre part, la facture ci-dessous reste impayée:</p><ul>"""
+
             total=0
             for invoice in invoices:
                 total+=invoice.amount_residual
@@ -222,11 +221,10 @@ class IsRelanceFacture(models.Model):
                 <p>Merci de régulariser votre compte</p> 
             """%(total)
         if self.type_document=="releve_facture":
-            body="""
-                <p>Bonjour,</p> 
-                <p>Veuillez trouver ci-dessous les factures à échéance ces prochains jours:</p> 
-                <ul>
-            """
+            if len(invoices)>1:
+                body="""<p>Bonjour,</p><p>Veuillez trouver ci-dessous les factures à échéance ces prochains jours:</p><ul>"""
+            else:
+                body="""<p>Bonjour,</p><p>Veuillez trouver ci-dessous la facture à échéance ces prochains jours:</p><ul>"""
             total=0
             for invoice in invoices:
                 total+=invoice.amount_residual
@@ -251,17 +249,22 @@ class IsRelanceFacture(models.Model):
 
 
         #**********************************************************************
-        #destinataire = invoice.partner_id.is_contact_relance_facture_id or invoice.partner_id
-        destinataire = invoice.partner_id
-        vals={
-            "model"         : "account.move",
-            "subject"       : subject,
-            "body"          : body,
-            #"partner_ids"   : [invoice.partner_id.id],
-            "partner_ids"   : [destinataire.id],
-            "attachment_ids": attachment_ids,
-        }
-        wizard = self.env['mail.compose.message'].with_context(ctx).create(vals)
-        wizard.action_send_mail()
-        #wizard.send_mail()
+        destinataire = invoice.partner_id.is_contact_relance_facture_id or invoice.partner_id
+        if destinataire.email:
+            vals={
+                "model"         : "account.move",
+                "subject"       : subject,
+                "body"          : body,
+                #"partner_ids"   : [invoice.partner_id.id],
+                "partner_ids"   : [destinataire.id],
+                "attachment_ids": attachment_ids,
+            }
+            wizard = self.env['mail.compose.message'].with_context(ctx).create(vals)
+            wizard.action_send_mail()
+            if self.type_document=="relance_facture":
+                invoice.is_date_relance = date.today()
+            if self.type_document=="releve_facture":
+                invoice.is_date_releve = date.today()
+
+
 
