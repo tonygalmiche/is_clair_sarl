@@ -117,6 +117,8 @@
                 <field name="is_purchase_order_id"  attrs="{'invisible': [('is_purchase_order_id', '=', False)]}"/>
                 <field name="is_export_compta_id"/>
                 <field name="is_traite_id"/>
+                <field name="is_date_relance" attrs="{'invisible':[('is_date_relance','=',False)]}"/>
+                <field name="is_date_releve"  attrs="{'invisible':[('is_date_releve','=',False)]}"/>
                 <field 
                     name="is_courrier_id"
                     attrs="{'invisible': [('is_courrier_id', '=', False)], 'readonly': True}"

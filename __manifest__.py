@@ -41,6 +41,7 @@ Module Odoo 15 pour CLAIR-SARL
         "views/res_company_view.xml",
         "views/report_invoice.xml",
         "views/is_chantier.xml",
+        "views/is_relance_facture_view.xml",
         "views/menu.xml",
         "report/purchase_quotation_templates.xml",
         "report/purchase_order_templates.xml",

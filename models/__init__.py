@@ -17,5 +17,6 @@ from . import ir_attachment
 from . import is_mem_var
 from . import is_purchase_order_line
 from . import is_chantier
+from . import is_relance_facture
 
 
