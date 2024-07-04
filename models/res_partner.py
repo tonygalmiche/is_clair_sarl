@@ -52,7 +52,7 @@ class ResPartner(models.Model):
     is_affaire_ids              = fields.One2many('is.affaire', 'client_id', 'Affaires')
     is_sale_order_ids           = fields.One2many('sale.order', 'partner_id', 'Commandes client')
     is_type_paiement            = fields.Selection(_TYPE_PAIEMENT, 'Type de paiement')
-    is_contact_relance_facture_id = fields.Many2one('res.partner', 'Contact relance facture')
+    is_contact_relance_facture_id = fields.Many2one('res.partner', 'Contact facture')
     
 
     @api.depends('name', 'street','street2','city','zip')

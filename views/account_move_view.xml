@@ -181,6 +181,7 @@
                 <field name="is_courrier_id"      optional="show"/>
             </field>
             <field name="payment_state" position="after">
+                <field name="is_date_relance"      optional="hide"/>
                 <field name="is_remarque_paiement" optional="hide"/>
             </field>
         </field>
