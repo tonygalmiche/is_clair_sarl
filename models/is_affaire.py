@@ -252,9 +252,12 @@ class IsAffaire(models.Model):
 
 
     def write(self, vals):
+        state=self.state
         res = super(IsAffaire, self).write(vals)
         if 'state' in vals:
-            self.creer_chantier_affaire_action()
+            if vals['state']=='commande' and state=='offre':
+                print('offre => commande')
+                self.creer_chantier_affaire_action()
         return res
 
 
