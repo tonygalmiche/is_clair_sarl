@@ -190,6 +190,7 @@ class AccountMove(models.Model):
 
     def initialiser_sections_facture_action(self):
         for obj in self:
+            print('TEST',obj)
             if type(obj.id)==int:
                 sections={}
                 for line in obj.invoice_line_ids:
@@ -198,7 +199,8 @@ class AccountMove(models.Model):
                         if section not in sections:
                             sections[section]={'montant_cde':0, 'montant_fac':0}
                         sections[section]['montant_cde']+=line.is_montant_cde
-                        sections[section]['montant_fac']+=line.is_a_facturer
+                        sections[section]['montant_fac']+=line.price_subtotal
+                        #sections[section]['montant_fac']+=line.is_a_facturer
                 obj.is_section_ids.unlink()
                 for section in sections:
                     facture_pourcent = facture = 0
