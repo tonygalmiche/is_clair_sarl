@@ -40,8 +40,8 @@ class sale_order_line(models.Model):
                 cr.execute(SQL,[obj.id])
                 for row in cr.fetchall():
                     sens=1
-                    #if row[0]=='out_refund':
-                    #    sens=-1
+                    if row[0]=='out_refund':
+                       sens=-1
                     is_deja_facture += sens*(row[1] or 0)
             is_facturable = obj.price_subtotal*obj.is_facturable_pourcent/100
             is_a_facturer = is_facturable - is_deja_facture
