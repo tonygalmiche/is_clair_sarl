@@ -151,7 +151,6 @@
                 <field 
                    name="is_contact_relance_facture_id" 
                    attrs="{'invisible': [('is_company', '=', False)]}"
-                   domain="[('parent_id','=',id)]"
                />
            </xpath>
 
