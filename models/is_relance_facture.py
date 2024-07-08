@@ -219,8 +219,9 @@ class IsRelanceFacture(models.Model):
             body+="""
                     </ul>
                 <p>Total à devoir : %0.2f€</p> 
+                <p>Affaire : [%s] %s</p>
                 <p>Merci de régulariser votre compte</p> 
-            """%(total)
+            """%(total,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
         if self.type_document=="releve_facture":
             if len(invoices)>1:
                 body="""<p>Bonjour,</p><p>Veuillez trouver ci-dessous les factures à échéance ces prochains jours:</p><ul>"""
@@ -233,7 +234,8 @@ class IsRelanceFacture(models.Model):
             body+="""
                     </ul>
                 <p>Total à devoir : %0.2f€</p> 
-            """%(total)
+                <p>Affaire : [%s] %s</p>
+            """%(total,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
         #**********************************************************************
 
 
