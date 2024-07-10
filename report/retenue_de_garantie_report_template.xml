@@ -66,7 +66,7 @@
                         </tbody>
                     </table>
                 </t>
-                <h2><span>PV reçu le : <span t-field="o.is_date_pv"/></span></h2>
+                <h2 t-if="o.is_date_pv"><span>PV reçu le : <span t-field="o.is_date_pv"/></span></h2>
                 <div style="page-break-after:always;" />
             </div>
         </t>
