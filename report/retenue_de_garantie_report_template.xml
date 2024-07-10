@@ -58,7 +58,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="text-right"><b>MONTANT DE LA RETENUE DE GARANTIE : </b></td>
+                                <td class="text-right"><b>LEVÉE DE LA RETENUE DE GARANTIE <span t-field="o.is_taux_retenue_de_garantie"/>% : </b></td>
                                 <td class="text-right">
                                     <b><span t-field="o.is_retenue_de_garantie"/></b>
                                 </td>
@@ -66,13 +66,7 @@
                         </tbody>
                     </table>
                 </t>
-
-            
                 <h2><span>PV reçu le : <span t-field="o.is_date_pv"/></span></h2>
-
-
-
-
                 <div style="page-break-after:always;" />
             </div>
         </t>
