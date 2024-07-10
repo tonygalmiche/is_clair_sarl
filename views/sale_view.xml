@@ -15,7 +15,7 @@
     </record>
 
 
-    <!-- sale.order  -->
+    <!-- sale.order  -->   
     <record id="actualiser_total_facture_action_server" model="ir.actions.server">
         <field name="name">Actualiser total facturé</field>
         <field name="model_id" ref="sale.model_sale_order"/>
@@ -68,6 +68,7 @@
                 <field name="is_affaire_id"/>
                 <field name="client_order_ref"/>
                 <field name="is_affichage_pdf"/>
+                <field name="is_commande_soldee"/>
             </field>
             <xpath expr="//group[@name='order_details']/field[@name='payment_term_id']" position="after">
                 <field name="is_date_pv"/>
@@ -320,9 +321,21 @@
         <field name="limit">500</field>
     </record>
 
+    <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
+        <field name="domain">[('state', 'not in', ('sale', 'done'))]</field>
+    </record>
+    <record id="sale.action_orders" model="ir.actions.act_window">
+        <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')),('is_commande_soldee','=',False)]</field>
+    </record>
+    <record id="is_commande_soldee_action" model="ir.actions.act_window">
+        <field name="name">Commandes soldées</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')),('is_commande_soldee','=',True)]</field>
+    </record>
 
 
-
+    <!-- sale.order.line -->
     <record id="is_view_order_line_tree" model="ir.ui.view">
         <field name="name">is_view_order_line_tree</field>
         <field name="model">sale.order.line</field>
@@ -344,5 +357,4 @@
             </tree>
         </field>
     </record>
-
 </odoo>

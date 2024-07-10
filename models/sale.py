@@ -257,6 +257,7 @@ class sale_order(models.Model):
     is_echeance_1an        = fields.Date("Échéance 1an", store=True, readonly=True, compute='_compute_is_echeance_1an')
     is_retenue_de_garantie      = fields.Monetary("Retenue de garantie"  , store=False, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
     is_taux_retenue_de_garantie = fields.Float("Taux retenue de garantie (%)", store=False, readonly=True, compute='_compute_is_retenue_de_garantie')
+    is_commande_soldee          = fields.Boolean("Commande soldée",default=False)
 
 
     def voir_commande_action(self):

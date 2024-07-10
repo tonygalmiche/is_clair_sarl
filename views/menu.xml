@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Ventes -->
+    <!-- Ventes / Commandes -->
+    <menuitem 
+        id="is_commande_soldee_menu" 
+        sequence="2" 
+        name="Commandes soldées"
+        action="is_commande_soldee_action" 
+        parent="sale.sale_order_menu" 
+    />
     <menuitem 
         id="is_affaire_menu" 
         sequence="900" 
