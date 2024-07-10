@@ -43,7 +43,11 @@ class sale_order_line(models.Model):
                     if row[0]=='out_refund':
                        sens=-1
                     is_deja_facture += sens*(row[1] or 0)
-            is_facturable = obj.price_subtotal*obj.is_facturable_pourcent/100
+            #is_facturable = obj.price_subtotal*obj.is_facturable_pourcent/100
+            is_facturable = obj.product_uom_qty*obj.price_unit*obj.is_facturable_pourcent/100
+
+
+
             is_a_facturer = is_facturable - is_deja_facture
             obj.is_facturable   = is_facturable
             obj.is_deja_facture = is_deja_facture
