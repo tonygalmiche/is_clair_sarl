@@ -221,13 +221,18 @@ class sale_order(models.Model):
     @api.depends('is_affaire_id','amount_untaxed')
     def _compute_is_retenue_de_garantie(self):
         for obj in self:
-            retenue = taux = 0
+            retenue = taux = compte_prorata = taux_compte_prorata = 0
             for line in obj.is_affaire_id.remise_ids:
                 if line.product_id.default_code=='RETENUE_GARANTIE':
                     retenue = round(obj.amount_untaxed*line.remise/100,2)
                     taux = line.remise
+                if line.product_id.default_code=='COMPTE_PRORATA':
+                    compte_prorata = round(obj.amount_untaxed*line.remise/100,2)
+                    taux_compte_prorata = line.remise
             obj.is_retenue_de_garantie      = retenue
             obj.is_taux_retenue_de_garantie = taux
+            obj.is_compte_prorata      = compte_prorata
+            obj.is_taux_compte_prorata = taux_compte_prorata
            
 
     is_import_excel_ids     = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Devis .xlsx à importer')
@@ -255,8 +260,10 @@ class sale_order(models.Model):
     is_date_pv             = fields.Date("Date PV", help="Date de réception du PV")
     is_pv_ids              = fields.Many2many('ir.attachment' , 'sale_order_is_pv_ids_rel', 'order_id', 'attachment_id', 'PV de réception')
     is_echeance_1an        = fields.Date("Échéance 1an", store=True, readonly=True, compute='_compute_is_echeance_1an')
-    is_retenue_de_garantie      = fields.Monetary("Retenue de garantie"  , store=False, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
+    is_retenue_de_garantie      = fields.Monetary("Retenue de garantie"      , store=False, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
     is_taux_retenue_de_garantie = fields.Float("Taux retenue de garantie (%)", store=False, readonly=True, compute='_compute_is_retenue_de_garantie')
+    is_compte_prorata           = fields.Monetary("Compte prorata"           , store=False, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
+    is_taux_compte_prorata      = fields.Float("Taux compte prorata (%)"     , store=False, readonly=True, compute='_compute_is_retenue_de_garantie')
     is_commande_soldee          = fields.Boolean("Commande soldée",default=False)
 
 

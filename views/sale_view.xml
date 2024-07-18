@@ -30,6 +30,9 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet[1]" position="inside">
                 <style>
+                    .o_form_view .o_td_label .o_form_label:not(.o_status), .o_form_view .o_checkbox_optional_field > .o_form_label {
+                        min-height: 0px;
+                    }
                     .o_form_view .o_form_sheet_bg > .o_form_sheet{
                         max-width: 1800px;
                     }
@@ -41,8 +44,6 @@
                     }
                 </style>
             </xpath>
-
-
             <xpath expr="//button[@name='287'][1]" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
@@ -75,6 +76,8 @@
                 <field name="is_pv_ids" widget="many2many_binary"/>
                 <field name="is_retenue_de_garantie"      attrs="{'invisible':[('is_retenue_de_garantie','=',0)]}"/>
                 <field name="is_taux_retenue_de_garantie" attrs="{'invisible':[('is_retenue_de_garantie','=',0)]}"/>
+                <field name="is_compte_prorata"           attrs="{'invisible':[('is_compte_prorata','=',0)]}"/>
+                <field name="is_taux_compte_prorata"      attrs="{'invisible':[('is_taux_compte_prorata','=',0)]}"/>
             </xpath>
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree" position="attributes">
                 <attribute name="editable"></attribute>
@@ -251,6 +254,10 @@
                 <field name="is_total_facture"    sum="Total" widget="monetary" decoration-bf="1" optional="show"/>
                 <field name="is_reste_a_facturer" sum="Total" widget="monetary" decoration-bf="1" optional="show"/>
                 <field name="is_pourcent_a_facturer" optional="show"/>
+                <field name="is_retenue_de_garantie"      optional="hide" sum="Total"/>
+                <field name="is_taux_retenue_de_garantie" optional="hide"/>
+                <field name="is_compte_prorata"           optional="hide" sum="Total"/>
+                <field name="is_taux_compte_prorata"      optional="hide"/>
             </field>
             <field name="user_id" position="attributes">
                 <attribute name="invisible">1</attribute>
