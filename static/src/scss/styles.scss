@@ -1,13 +1,19 @@
+body {
+    line-height: 1.1;
+}
 
-
+.table-sm th, .table-sm td {
+    padding: 0.1rem;
+}
 
 .white_space_normal{
-    // max-width: 250px !important;
     white-space: normal !important;
 }
 
-// .test_scss2{
-//     overflow: visible !important;
-//     width: 0;
-//     min-width: fit-content;
-//}
+.o_form_view .o_td_label .o_form_label:not(.o_status), .o_form_view .o_checkbox_optional_field > .o_form_label {
+    min-height: 0px;
+}
+
+.o_form_label{
+    white-space: nowrap;
+}

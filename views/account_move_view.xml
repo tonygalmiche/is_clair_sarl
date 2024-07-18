@@ -39,9 +39,6 @@
                     .o_form_view .o_form_sheet_bg > .o_form_sheet{
                         max-width: 1800px;
                     }
-                    .o_form_label{
-                        white-space: nowrap;
-                    }
                     .modal-lg, .modal-xl {
                         max-width: 1400px;
                     }
@@ -50,6 +47,16 @@
             <xpath expr="//widget[@name='web_ribbon'][1]" position="after">
                 <widget name="web_ribbon" title="Archivée" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
                 <field name="active" invisible="1"/> 
+            </xpath>
+
+            <xpath expr="//button[@name='action_invoice_sent'][1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_invoice_sent'][2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='preview_invoice'][1]" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
             <button name="action_post" position="after">
                 <button 
@@ -117,6 +124,7 @@
                 <field name="is_purchase_order_id"  attrs="{'invisible': [('is_purchase_order_id', '=', False)]}"/>
                 <field name="is_export_compta_id"/>
                 <field name="is_traite_id"/>
+                <field name="is_date_envoi"   attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
                 <field name="is_date_relance" attrs="{'invisible':[('is_date_relance','=',False)]}"/>
                 <field name="is_date_releve"  attrs="{'invisible':[('is_date_releve','=',False)]}"/>
                 <field 
@@ -179,6 +187,9 @@
             <field name="state" position="before">
                 <field name="is_export_compta_id" optional="show"/>
                 <field name="is_courrier_id"      optional="show"/>
+            </field>
+            <field name="payment_state" position="before">
+                <field name="is_date_envoi"       optional="show"/>
             </field>
             <field name="payment_state" position="after">
                 <field name="is_date_relance"      optional="hide"/>

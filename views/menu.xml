@@ -247,6 +247,13 @@
         action="is_suivi_facturation_mensuel_action"
     />
     <menuitem
+        id="is_envoi_facture_menu"
+        name="Envoi de factures"
+        parent="account.menu_finance_receivables"
+        sequence="805"
+        action="is_envoi_facture_action"
+    />
+    <menuitem
         id="is_suivi_retard_paiement_menu"
         name="Suivi retard paiement"
         parent="account.menu_finance_receivables"
@@ -261,10 +268,22 @@
         action="is_suivi_partiellemnt_regle_action"
     />
     <menuitem
+        id="is_relance_facture_menu"
+        name="Relance factures"
+        parent="account.menu_finance_receivables"
+        sequence="830"
+        action="is_relance_facture_action"
+    />
+
+
+
+
+
+    <menuitem
         id="is_suivi_reste_a_facturer_menu"
         name="Suivi RG 5% à facturer"
         parent="account.menu_finance_receivables"
-        sequence="830"
+        sequence="840"
         action="is_suivi_reste_a_facturer_action"
     />
     <menuitem

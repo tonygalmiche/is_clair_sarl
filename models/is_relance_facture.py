@@ -38,6 +38,7 @@ class IsRelanceFactureLigne(models.Model):
     invoice_date_due = fields.Date(string="Date d'échéance"          , compute='_compute', readonly=True, store=True)
     is_date_relance  = fields.Date(related='invoice_id.is_date_relance')
     is_date_releve   = fields.Date(related='invoice_id.is_date_releve')
+    is_date_envoi    = fields.Date(related='invoice_id.is_date_envoi')
     email            = fields.Char(related='contact_id.email')
     payment_state    = fields.Selection(related='invoice_id.payment_state')
 
@@ -72,7 +73,8 @@ class IsRelanceFacture(models.Model):
     type_document = fields.Selection([
             ('relance_facture', 'Relance de facture'),
             ('releve_facture' , 'Relevé de facture'),
-        ], 'Type de document', default='relance_facture', required=True)
+            ('envoi_facture'  , 'Envoi des factures'),
+        ], 'Type de document', readonly=True)
     partner_id        = fields.Many2one('res.partner', string="Client")
     nb_jours          = fields.Integer("Nombre de jours de retard mini", default=1)
     nb_jours_relance  = fields.Integer("Nombre de jours depuis la dernière relance", default=14)
@@ -95,7 +97,7 @@ class IsRelanceFacture(models.Model):
             lines=[]
             filtre=[
                 ("state","=","posted"),
-                ("move_type","=","out_invoice"),
+                ("move_type","in",('out_invoice','out_refund')),
                 ('payment_state',"!=","paid"),
             ]
             if obj.partner_id:
@@ -114,6 +116,18 @@ class IsRelanceFacture(models.Model):
                 filtre.append(
                     ('is_date_releve','=',False)
                 )
+
+            if obj.type_document=="envoi_facture":
+                filtre.append(
+                    ('is_date_envoi','=',False)
+                )
+                filtre.append(
+                    ('invoice_date','>=','2024-07-01')
+                )
+
+
+
+
             invoices = self.env['account.move'].search(filtre, order="partner_id,name")
             for invoice in invoices:
                 if obj.type_document=="relance_facture":
@@ -124,6 +138,12 @@ class IsRelanceFacture(models.Model):
                         lines.append([0,0,vals])
                 if obj.type_document=="releve_facture":
                     if invoice.is_date_releve==False or invoice.is_date_releve<=date_maxi_echeance:
+                        vals = {
+                            'invoice_id': invoice.id
+                        }
+                        lines.append([0,0,vals])
+                if obj.type_document=="envoi_facture":
+                    if invoice.is_date_envoi==False:
                         vals = {
                             'invoice_id': invoice.id
                         }
@@ -141,6 +161,7 @@ class IsRelanceFacture(models.Model):
 
     def voir_factures_action(self):
         for obj in self:
+            tree_id = self.env.ref('is_clair_sarl.is_view_out_invoice_tree').id
             ids=[]
             for line in obj.ligne_ids:
                 ids.append(line.invoice_id.id)
@@ -152,6 +173,7 @@ class IsRelanceFacture(models.Model):
                 "domain": [
                     ('id','in',ids),
                 ],
+                "views": [[tree_id, "tree"],[False, "form"]],
             }
 
 
@@ -159,10 +181,11 @@ class IsRelanceFacture(models.Model):
         for obj in self:
             mails={}
             for line in obj.ligne_ids:
-                partner=line.invoice_id.partner_id
-                if partner not in mails:
-                    mails[partner]=[]
-                mails[partner].append(line.invoice_id)
+                if line.email:
+                    partner=line.invoice_id.partner_id
+                    if partner not in mails:
+                        mails[partner]=[]
+                    mails[partner].append(line.invoice_id)
             for partner in mails:
                 obj.send_mail(partner,mails[partner])
             obj.state="envoye"
@@ -186,26 +209,48 @@ class IsRelanceFacture(models.Model):
          #** Recherche des factures PDF et génération si non trouvée **********
         attachment_ids=[]
 
-        if self.type_document=="relance_facture":
-            for invoice in invoices:
-                filtre=[
-                    ("res_model","=","account.move"),
-                    ("res_id","=",invoice.id),
-                ]
-                attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
-                if len(attachments)>0:
-                    attachment=attachments[0]
-                else:
-                    pdf = request.env.ref('account.account_invoices_without_payment').sudo()._render_qweb_pdf([invoice.id])
-                    if pdf:
-                        attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
-                        if len(attachments)>0:
-                            attachment=attachments[0]
-                if attachment:
-                    attachment_ids.append(attachment.id)
+        for invoice in invoices:
+            filtre=[
+                ("res_model","=","account.move"),
+                ("res_id","=",invoice.id),
+            ]
+            attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
+            if len(attachments)>0:
+                attachment=attachments[0]
+            else:
+                pdf = request.env.ref('account.account_invoices_without_payment').sudo()._render_qweb_pdf([invoice.id])
+                if pdf:
+                    attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
+                    if len(attachments)>0:
+                        attachment=attachments[0]
+            if attachment:
+                attachment_ids.append(attachment.id)
         #**********************************************************************
 
         #** body **************************************************************
+
+        if self.type_document=="envoi_facture":
+            if len(invoices)>1:
+                body="""<p>Bonjour,</p><p>Nous vous prions de trouver ci-joint nos factures:</p><ul>"""
+            else:
+                body="""<p>Bonjour,</p><p>Nous vous prions de trouver ci-joint notre facture:</p><ul>"""
+
+            total=0
+            for invoice in invoices:
+                total+=invoice.amount_residual
+                body+="<li>Facture N°%s à l'échéance du %s pour un montant de %0.2f€ (Affaire : [%s] %s) </li>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
+            body+="""
+                    </ul>
+                <p>Total à devoir : %0.2f€</p> 
+                <br>
+                <p>Vous en souhaitant bonne réception,</p> 
+                <p>Cordialement</p> 
+                <p>CLAIR SARL</p> 
+                <p>Rue Robert Schuman</p> 
+                <p>21800 CHEVIGNY SAINT SAUVEUR</p> 
+                <p>Tél : 08 80 46 70 60</p> 
+            """%(total)
+
         if self.type_document=="relance_facture":
             if len(invoices)>1:
                 body="""<p>Bonjour,</p><p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p><ul>"""
@@ -215,13 +260,12 @@ class IsRelanceFacture(models.Model):
             total=0
             for invoice in invoices:
                 total+=invoice.amount_residual
-                body+="<li>Facture N°%s à l'échéance du %s pour un montant de %0.2f€ </li>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual)
+                body+="<li>Facture N°%s à l'échéance du %s pour un montant de %0.2f€ (Affaire : [%s] %s) </li>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
             body+="""
                     </ul>
                 <p>Total à devoir : %0.2f€</p> 
-                <p>Affaire : [%s] %s</p>
                 <p>Merci de régulariser votre compte</p> 
-            """%(total,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
+            """%(total)
         if self.type_document=="releve_facture":
             if len(invoices)>1:
                 body="""<p>Bonjour,</p><p>Veuillez trouver ci-dessous les factures à échéance ces prochains jours:</p><ul>"""
@@ -230,12 +274,11 @@ class IsRelanceFacture(models.Model):
             total=0
             for invoice in invoices:
                 total+=invoice.amount_residual
-                body+="<li>Facture N°%s à l'échéance du %s pour un montant de %0.2f€ </li>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual)
+                body+="<li>Facture N°%s à l'échéance du %s pour un montant de %0.2f€ (Affaire : [%s] %s) </li>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
             body+="""
                     </ul>
                 <p>Total à devoir : %0.2f€</p> 
-                <p>Affaire : [%s] %s</p>
-            """%(total,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
+            """%(total)
         #**********************************************************************
 
 
@@ -243,7 +286,15 @@ class IsRelanceFacture(models.Model):
         invoice_name=[]
         for invoice in invoices:
             invoice_name.append(invoice.name)
+            if self.type_document=="envoi_facture":
+                invoice.is_date_envoi = date.today()
+            if self.type_document=="relance_facture":
+                invoice.is_date_relance = date.today()
+            if self.type_document=="releve_facture":
+                invoice.is_date_releve = date.today()
 
+        if self.type_document=="envoi_facture":
+            subject="Facturation %s (%s)"%(partner.parent_id.name or partner.name, ", ".join(invoice_name))
         if self.type_document=="relance_facture":
             subject="Relance de factures %s (%s)"%(partner.parent_id.name or partner.name, ", ".join(invoice_name))
         if self.type_document=="releve_facture":
@@ -258,16 +309,11 @@ class IsRelanceFacture(models.Model):
                 "model"         : "account.move",
                 "subject"       : subject,
                 "body"          : body,
-                #"partner_ids"   : [invoice.partner_id.id],
                 "partner_ids"   : [destinataire.id],
                 "attachment_ids": attachment_ids,
             }
             wizard = self.env['mail.compose.message'].with_context(ctx).create(vals)
             wizard.action_send_mail()
-            if self.type_document=="relance_facture":
-                invoice.is_date_relance = date.today()
-            if self.type_document=="releve_facture":
-                invoice.is_date_releve = date.today()
-
+ 
 
 

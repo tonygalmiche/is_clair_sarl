@@ -57,6 +57,7 @@ class AccountMove(models.Model):
     is_reste_du_ttc      = fields.Monetary(string='Reste dû TTC', store=True, readonly=True, compute='_compute_is_montant_paye', currency_field='company_currency_id')
     is_date_relance      = fields.Date(string='Date dernière relance', readonly=1)
     is_date_releve       = fields.Date(string='Date dernier relevé'  , readonly=1)
+    is_date_envoi        = fields.Date(string="Date d'envoi", help="Date d'envoi de la facture par mail")
     # is_courriel_facturation = fields.Char(related="partner_id.is_courriel_facturation")
 
 
@@ -190,7 +191,6 @@ class AccountMove(models.Model):
 
     def initialiser_sections_facture_action(self):
         for obj in self:
-            print('TEST',obj)
             if type(obj.id)==int:
                 sections={}
                 for line in obj.invoice_line_ids:
