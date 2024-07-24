@@ -209,25 +209,25 @@ class IsAffaire(models.Model):
     _order='name desc'
 
     name                = fields.Char("N° d'Affaire", index=True, help="Sous la forme AA-XXXX")
-    nom                 = fields.Char("Nom de l'affaire")
-    date_creation       = fields.Date("Date de création", default=lambda *a: fields.Date.today(), required=True)
-    client_id           = fields.Many2one('res.partner' , 'Client')
-    maitre_oeuvre_id    = fields.Many2one('res.partner' , "Maitre d'œuvre")
-    street              = fields.Char("Rue")
-    street2             = fields.Char("Rue 2")
-    zip                 = fields.Char("CP")
-    city                = fields.Char("Ville")
+    nom                 = fields.Char("Nom de l'affaire", tracking=True)
+    date_creation       = fields.Date("Date de création", default=lambda *a: fields.Date.today(), required=True, tracking=True)
+    client_id           = fields.Many2one('res.partner' , 'Client', tracking=True)
+    maitre_oeuvre_id    = fields.Many2one('res.partner' , "Maitre d'œuvre", tracking=True)
+    street              = fields.Char("Rue", tracking=True)
+    street2             = fields.Char("Rue 2", tracking=True)
+    zip                 = fields.Char("CP", tracking=True)
+    city                = fields.Char("Ville", tracking=True)
     adresse_chantier    = fields.Text('Adresse du chantier', store=True, readonly=True, compute='_compute_adresse_chantier')
-    nature_travaux_ids  = fields.Many2many('is.nature.travaux', 'is_affaire_nature_travaux_rel', 'affaire_id', 'nature_id'     , string="Nature des travaux")
-    type_travaux_ids    = fields.Many2many('is.type.travaux'  , 'is_affaire_type_travaux_rel'  , 'affaire_id', 'type_id'       , string="Type des travaux")
-    specificite_ids     = fields.Many2many('is.specificite'   , 'is_affaire_specificite_rel'   , 'affaire_id', 'specificite_id', string="Spécificités")
-    commentaire         = fields.Text("Commentaire")
-    contact_chantier_id = fields.Many2one('res.users' , 'Contact chantier')
+    nature_travaux_ids  = fields.Many2many('is.nature.travaux', 'is_affaire_nature_travaux_rel', 'affaire_id', 'nature_id'     , string="Nature des travaux", tracking=True)
+    type_travaux_ids    = fields.Many2many('is.type.travaux'  , 'is_affaire_type_travaux_rel'  , 'affaire_id', 'type_id'       , string="Type des travaux", tracking=True)
+    specificite_ids     = fields.Many2many('is.specificite'   , 'is_affaire_specificite_rel'   , 'affaire_id', 'specificite_id', string="Spécificités", tracking=True)
+    commentaire         = fields.Text("Commentaire", tracking=True)
+    contact_chantier_id = fields.Many2one('res.users' , 'Contact chantier', tracking=True)
     analyse_ids         = fields.One2many('is.affaire.analyse'       , 'affaire_id', 'Analyse de commandes')
     budget_famille_ids  = fields.One2many('is.affaire.budget.famille', 'affaire_id', 'Budget par famille')
-    active              = fields.Boolean("Active", default=True)
-    compte_prorata      = fields.Float("Compte prorata (%)", digits=(14,2))
-    retenue_garantie    = fields.Float("Retenue de garantie (%)", digits=(14,2))
+    active              = fields.Boolean("Active", default=True, tracking=True)
+    compte_prorata      = fields.Float("Compte prorata (%)", digits=(14,2), tracking=True)
+    retenue_garantie    = fields.Float("Retenue de garantie (%)", digits=(14,2), tracking=True)
     salaire_ids         = fields.One2many('is.affaire.salaire', 'affaire_id', 'Salaires')
     remise_ids          = fields.One2many('is.affaire.remise', 'affaire_id', 'Remises')
     montant_salaire      = fields.Float("Montant salaire"     , digits=(14,2), store=True , readonly=True, compute='_compute_montant_salaire')
@@ -243,12 +243,12 @@ class IsAffaire(models.Model):
         ('entretien', 'Entretien'),
         ('sav'      , 'SAV'),
         ('interne'  , 'Interne'),
-    ], 'Type affaire', index=True, default="chantier", required=True)
+    ], 'Type affaire', index=True, default="chantier", required=True, tracking=True)
     state = fields.Selection([
         ('offre'   , 'Offre'),
         ('commande', 'Commande'),
         ('terminee', 'Terminée'),
-    ], 'Etat', index=True, default="offre", required=True)
+    ], 'Etat', index=True, default="offre", required=True, tracking=True)
 
 
     def write(self, vals):
