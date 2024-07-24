@@ -42,9 +42,10 @@
                             <field name="name"/>
                             <field name="type_document" force_save="1"/>
                             <field name="partner_id"/>
-                            <field name="nb_jours"          attrs="{'invisible': [('type_document', '!=', 'relance_facture')]}"/>
-                            <field name="nb_jours_relance"  attrs="{'invisible': [('type_document', '!=', 'relance_facture')]}"/>
-                            <field name="nb_jours_echeance" attrs="{'invisible': [('type_document', '!=', 'releve_facture')]}"/>
+                            <field name="nb_jours"            attrs="{'invisible': [('type_document', '!=', 'relance_facture')]}"/>
+                            <field name="nb_jours_relance"    attrs="{'invisible': [('type_document', '!=', 'relance_facture')]}"/>
+                            <field name="nb_jours_echeance"   attrs="{'invisible': [('type_document', '!=', 'releve_facture')]}"/>
+                            <field name="non_paye_uniquement" attrs="{'invisible': [('type_document', '!=', 'relance_facture')]}"/> 
                         </group>
                         <group>
                             <field name="currency_id" invisible="1"/>
@@ -84,7 +85,8 @@
                 <field name="type_document"/>
                 <field name="create_date" string="Date création"/>
                 <field name="partner_id"/>
-                <field name="nb_jours" optional="hide"/>
+                <field name="nb_jours"            optional="hide"/>
+                <field name="non_paye_uniquement" optional="hide"/>
                 <field name="currency_id" invisible="1"/>
                 <field name="amount_residual" sum="Total"/>
                 <field name="state"/>
