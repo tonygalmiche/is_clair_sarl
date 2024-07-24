@@ -55,8 +55,8 @@ class AccountMove(models.Model):
     is_section_ids       = fields.One2many('is.account.move.section', 'move_id', 'Sections', readonly=True)
     is_remise_ids        = fields.One2many('is.account.move.remise' , 'move_id', 'Remises' , readonly=True)
     is_reste_du_ttc      = fields.Monetary(string='Reste dû TTC', store=True, readonly=True, compute='_compute_is_montant_paye', currency_field='company_currency_id')
-    is_date_relance      = fields.Date(string='Date dernière relance', readonly=1)
-    is_date_releve       = fields.Date(string='Date dernier relevé'  , readonly=1)
+    is_date_relance      = fields.Date(string='Date relance', help='Date dernière relance', readonly=1)
+    is_date_releve       = fields.Date(string='Date relevé' , help='Date dernier relevé'  , readonly=1)
     is_date_envoi        = fields.Date(string="Date d'envoi", help="Date d'envoi de la facture par mail")
     # is_courriel_facturation = fields.Char(related="partner_id.is_courriel_facturation")
 
