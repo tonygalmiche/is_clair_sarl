@@ -184,7 +184,7 @@
                     <group>
                         <button 
                             name="import_pdf_action" 
-                            string="Importation du PDF (Loxam)" type="object" 
+                            string="Importation du PDF" type="object" 
                         />
                     </group>
                     <group string="Résultat importation" attrs="{'invisible':[('is_import_pdf_resultat','=',False)]}" >
