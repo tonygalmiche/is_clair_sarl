@@ -79,17 +79,21 @@ class IsRelanceFacture(models.Model):
     nb_jours            = fields.Integer("Nombre de jours de retard mini", default=1)
     nb_jours_relance    = fields.Integer("Nombre de jours depuis la dernière relance", default=14)
     nb_jours_echeance   = fields.Integer("Nombre de jours avant l'échéance", default=7)
-    non_paye_uniquement = fields.Boolean("État 'Non payées' uniquement", default=False)
     ligne_ids           = fields.One2many('is.relance.facture.ligne', 'relance_id', 'Lignes')
     currency_id         = fields.Many2one('res.currency'     , compute='_compute', readonly=True, store=True)
     amount_residual     = fields.Monetary(string="Montant dû", compute='_compute', readonly=True, store=True)
     state      = fields.Selection([
             ('brouillon', 'Brouillon'),
             ('envoye'   , 'Envoyé'),
-        ], 'Etat', default='brouillon')
+        ], 'État', default='brouillon')
+
+    payment_state = fields.Selection([
+            ('not_paid', 'Non payé'),
+            ('partial'   , 'Partiellement réglé'),
+        ], 'État du paiement')
 
 
-    @api.onchange('type_document','nb_jours','nb_jours_relance','nb_jours_echeance','partner_id','non_paye_uniquement')
+    @api.onchange('type_document','nb_jours','nb_jours_relance','nb_jours_echeance','partner_id','payment_state')
     def cherche_factures(self):
         for obj in self:
             date_maxi          = date.today()-timedelta(days=obj.nb_jours)
@@ -100,8 +104,8 @@ class IsRelanceFacture(models.Model):
                 ("state","=","posted"),
                 ("move_type","in",('out_invoice','out_refund')),
             ]
-            if obj.non_paye_uniquement:
-                filtre.append(("payment_state","=",'not_paid'))
+            if obj.payment_state:
+                filtre.append(("payment_state","=",obj.payment_state))
             else:
                 filtre.append(('payment_state',"not in",('paid','reversed')))
             if obj.partner_id:
