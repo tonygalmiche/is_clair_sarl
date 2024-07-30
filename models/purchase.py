@@ -439,12 +439,16 @@ class purchase_order(models.Model):
                     for line in lines:
                         code_pum    = line[0:19].strip()
                         designation = line[19:85].strip()
-                        quantite    = txt2float(line[86:95])
-                        prix_net    = txt2float(line[138:149])
-                        montant     = txt2float(line[151:166])
-                        if round(quantite*prix_net,2)==round(montant,2) and montant>0:
-                            description="%s (%s)"%(designation,code_pum)
-                            order_lines.append([quantite, description, prix_net])
+                        reste = line[86:].strip()
+                        x1 = ' '.join(reste.split()) # Supprimer les espaces en double
+                        x2 = x1.split()
+                        if len(x2)==5:
+                            quantite = txt2float(x2[0])
+                            prix_net = txt2float(x2[3])
+                            montant  = txt2float(x2[4])
+                            if round(quantite*prix_net,2)==round(montant,2) and montant>0:
+                                description="%s (%s)"%(designation,code_pum)
+                                order_lines.append([quantite, description, prix_net])
                 #**************************************************************
 
                 #** Eco-contribution ******************************************
