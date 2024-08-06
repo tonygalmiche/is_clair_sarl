@@ -234,16 +234,15 @@ class IsRelanceFacture(models.Model):
 
         if self.type_document=="envoi_facture":
             if len(invoices)>1:
-                body="""<p>Bonjour,</p><p>Nous vous prions de trouver ci-joint nos factures:</p><ul>"""
+                body="""<p>Bonjour,</p><p>Nous vous prions de trouver ci-joint nos factures:</p>"""
             else:
-                body="""<p>Bonjour,</p><p>Nous vous prions de trouver ci-joint notre facture:</p><ul>"""
+                body="""<p>Bonjour,</p><p>Nous vous prions de trouver ci-joint notre facture:</p>"""
 
             total=0
             for invoice in invoices:
                 total+=invoice.amount_residual
-                body+="<li>Facture N°%s à l'échéance du %s pour un montant de %0.2f€ (Affaire : [%s] %s) </li>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
+                body+="- Facture N°%s à l'échéance du %s pour un montant de %0.2f€ (Affaire : [%s] %s) <br>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
             body+="""
-                    </ul>
                 <p>Total à devoir : %0.2f€</p> 
                 <br>
                 <p>Vous en souhaitant bonne réception,</p> 
@@ -256,30 +255,28 @@ class IsRelanceFacture(models.Model):
 
         if self.type_document=="relance_facture":
             if len(invoices)>1:
-                body="""<p>Bonjour,</p><p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p><ul>"""
+                body="""<p>Bonjour,</p><p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p>"""
             else:
-                body="""<p>Bonjour,</p><p>Sauf erreur de notre part, la facture ci-dessous reste impayée:</p><ul>"""
+                body="""<p>Bonjour,</p><p>Sauf erreur de notre part, la facture ci-dessous reste impayée:</p>"""
 
             total=0
             for invoice in invoices:
                 total+=invoice.amount_residual
-                body+="<li>Facture N°%s à l'échéance du %s pour un montant de %0.2f€ (Affaire : [%s] %s) </li>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
+                body+="- Facture N°%s à l'échéance du %s pour un montant de %0.2f€ (Affaire : [%s] %s) <br>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
             body+="""
-                    </ul>
                 <p>Total à devoir : %0.2f€</p> 
                 <p>Merci de régulariser votre compte</p> 
             """%(total)
         if self.type_document=="releve_facture":
             if len(invoices)>1:
-                body="""<p>Bonjour,</p><p>Veuillez trouver ci-dessous les factures à échéance ces prochains jours:</p><ul>"""
+                body="""<p>Bonjour,</p><p>Veuillez trouver ci-dessous les factures à échéance ces prochains jours:</p>"""
             else:
-                body="""<p>Bonjour,</p><p>Veuillez trouver ci-dessous la facture à échéance ces prochains jours:</p><ul>"""
+                body="""<p>Bonjour,</p><p>Veuillez trouver ci-dessous la facture à échéance ces prochains jours:</p>"""
             total=0
             for invoice in invoices:
                 total+=invoice.amount_residual
-                body+="<li>Facture N°%s à l'échéance du %s pour un montant de %0.2f€ (Affaire : [%s] %s) </li>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
+                body+="- Facture N°%s à l'échéance du %s pour un montant de %0.2f€ (Affaire : [%s] %s) <br>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual,invoice.is_affaire_id.name,invoice.is_affaire_id.nom)
             body+="""
-                    </ul>
                 <p>Total à devoir : %0.2f€</p> 
             """%(total)
         #**********************************************************************
