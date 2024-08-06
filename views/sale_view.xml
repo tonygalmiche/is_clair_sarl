@@ -59,6 +59,9 @@
             <field name="client_order_ref" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
+            <button name="action_draft" position="after">
+                <button name="modifier_pourcentage_action" string="Modifier % facturable" type="object"/>
+            </button>
             <field name="partner_shipping_id" position="after">
                 <field name="is_affaire_id"/>
                 <field name="client_order_ref"/>

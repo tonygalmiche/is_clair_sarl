@@ -543,3 +543,24 @@ class sale_order(models.Model):
             move._onchange_invoice_date()
             move.action_post()
 
+
+    def modifier_pourcentage_action(self):
+        print(self)
+        for obj in self:
+            tree_id = self.env.ref('is_clair_sarl.is_view_order_line_tree').id
+
+            print(obj,tree_id)
+            return {
+                "name": obj.name,
+                "view_mode": "tree",
+                "res_model": "sale.order.line",
+                "domain": [
+                    ("order_id","=",obj.id),
+                ],
+                "type": "ir.actions.act_window",
+                "views"    : [[tree_id, "tree"]],
+                "limit": 1000,
+            }
+
+
+
