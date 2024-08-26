@@ -352,18 +352,42 @@ class purchase_order(models.Model):
                     #**************************************************************
 
                 #** Recherche de l'affaire ************************************
+                def supprime_petit_mots(phrase,taille=4):
+                    "Supprime tous les mots de phrase <= taille"
+                    mots=phrase.split(' ')
+                    k=0
+                    for mot in mots:
+                        if len(mot)<taille:
+                            mots[k]=""
+                        k+=1
+                    phrase=' '.join(mots).strip()
+                    return phrase
                 if test and not affaire:
                     chantier = dict["Chantier"].upper()
                     filtre=[]
                     if chantier_zip:
                         filtre=[('zip','=',chantier_zip)]
-                    affaires = self.env['is.affaire'].search(filtre,order="adresse_chantier")
+                    #** Recherche dans l'adresse ******************************
                     affaire_dict={}
+                    affaires = self.env['is.affaire'].search(filtre,order="adresse_chantier")
                     for line in affaires:
                         adresse = line.adresse_chantier.replace('\n',' ').strip().upper()
                         if adresse!='':
                             ratio = fuzz.ratio(chantier, adresse)
                             affaire_dict[ratio] = (line, line.name)
+                    #** Recherche dans le nom *********************************
+                    affaires = self.env['is.affaire'].search(filtre,order="nom")
+                    for line in affaires:
+                        if line.nom:
+                            nom = line.nom.replace('\n',' ').strip().upper()
+                            nom_sans_petit_mot  = supprime_petit_mots(nom)
+                            chantier_sans_petit_mot = supprime_petit_mots(chantier)
+                            if nom_sans_petit_mot!='' and chantier_sans_petit_mot!='':
+                                ratio = fuzz.partial_ratio(chantier_sans_petit_mot, nom_sans_petit_mot)
+                                affaire_dict[ratio] = (line, line.name)
+                                #if ratio>60:
+                                #    print(chantier, ':',chantier_sans_petit_mot, ':',ratio,':', nom_sans_petit_mot,':',line.name)
+                    #** Tri par ratio *****************************************
                     key_sorted = sorted(affaire_dict, reverse=True)
                     for key in key_sorted:
                         if key>50:
@@ -621,7 +645,7 @@ class purchase_order(models.Model):
                     for line in order_lines:
                         libelle = line[1]
                         sequence+=10
-                        product = obj.get_product(libelle)
+                        product = obj.get_product(libelle, type_pdf)
                         if product:
                             vals={
                                 "order_id"       : obj.id,
@@ -636,7 +660,7 @@ class purchase_order(models.Model):
                     #**********************************************************
 
 
-    def get_product(self, libelle):
+    def get_product(self, libelle,type_pdf=False):
         for obj in self:
             dict={
                 'Gaz'	                            : 'GAZ',
@@ -670,10 +694,11 @@ class purchase_order(models.Model):
                     if len(products):
                         product = products[0]
             if not product:
-                filtre=[
-                    ("name"  ,"=", 'divers'),  
-                ]
-                products = self.env['product.product'].search(filtre)
+                if type_pdf=='PUM':
+                    domain=[("default_code"  ,"=", 'PVC')]
+                else:
+                    domain=[("name"  ,"=", 'divers')]
+                products = self.env['product.product'].search(domain)
                 if len(products):
                     product = products[0]
             return product
