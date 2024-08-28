@@ -260,10 +260,10 @@ class sale_order(models.Model):
     is_date_pv             = fields.Date("Date PV", help="Date de réception du PV")
     is_pv_ids              = fields.Many2many('ir.attachment' , 'sale_order_is_pv_ids_rel', 'order_id', 'attachment_id', 'PV de réception')
     is_echeance_1an        = fields.Date("Échéance 1an", store=True, readonly=True, compute='_compute_is_echeance_1an')
-    is_retenue_de_garantie      = fields.Monetary("Retenue de garantie"      , store=False, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
-    is_taux_retenue_de_garantie = fields.Float("Taux retenue de garantie (%)", store=False, readonly=True, compute='_compute_is_retenue_de_garantie')
-    is_compte_prorata           = fields.Monetary("Compte prorata"           , store=False, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
-    is_taux_compte_prorata      = fields.Float("Taux compte prorata (%)"     , store=False, readonly=True, compute='_compute_is_retenue_de_garantie')
+    is_retenue_de_garantie      = fields.Monetary("Retenue de garantie"      , store=True, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
+    is_taux_retenue_de_garantie = fields.Float("Taux retenue de garantie (%)", store=True, readonly=True, compute='_compute_is_retenue_de_garantie')
+    is_compte_prorata           = fields.Monetary("Compte prorata"           , store=True, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
+    is_taux_compte_prorata      = fields.Float("Taux compte prorata (%)"     , store=True, readonly=True, compute='_compute_is_retenue_de_garantie')
     is_commande_soldee          = fields.Boolean("Commande soldée",default=False)
 
 
@@ -410,6 +410,7 @@ class sale_order(models.Model):
     def generer_facture_action(self):
         cr,uid,context,su = self.env.args
         for obj in self:
+            obj._compute_is_retenue_de_garantie()
             if obj.is_a_facturer==0:
                 raise ValidationError("Il n'y a rien à facturer")
 
