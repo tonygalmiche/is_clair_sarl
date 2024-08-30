@@ -55,6 +55,16 @@ class purchase_order(models.Model):
 
     is_num_facture_fournisseur  = fields.Char("N°Facture")
     is_date_facture_fournisseur = fields.Date('Date Facture')
+    is_reste_a_facturer         = fields.Float("Reste à facturer", compute='_compute_is_reste_a_facturer', store=True, readonly=True)
+
+
+    @api.depends('order_line.qty_invoiced','order_line.product_qty','order_line.price_unit')
+    def _compute_is_reste_a_facturer(self):
+        for obj in self:
+            v=0
+            for line in obj.order_line:
+                v+=line.is_reste_a_facturer
+            obj.is_reste_a_facturer = v
 
 
     @api.depends('order_line.product_id','order_line.product_qty')
@@ -793,13 +803,21 @@ class purchase_order_line(models.Model):
     is_colisage               = fields.Text("Colisage", store=False, readonly=True, compute='_compute_is_colisage')
     is_repere_ids             = fields.One2many('is.purchase.order.line.repere', 'line_id', 'Repère de plan')
     is_mois_ids               = fields.One2many('is.purchase.order.line.mois'  , 'line_id', 'Mois')
-    is_preparation_id         = fields.Many2one('is.preparation.facture', 'Préparation facture')
-    is_qt_a_facturer          = fields.Float('Qt à facturer', digits='Product Unit of Measure')
-    is_montant_a_facturer     = fields.Float("Montant à facturer")
+    is_preparation_id         = fields.Many2one('is.preparation.facture', 'Préparation facture', help="Utilisé par IsPreparationFacture")
+    is_qt_a_facturer          = fields.Float('Qt à facturer', digits='Product Unit of Measure' , help="Utilisé par IsPreparationFacture")
+    is_montant_a_facturer     = fields.Float("Montant à facturer"                              , help="Utilisé par IsPreparationFacture")
 
     is_date_livraison = fields.Date(related='order_id.is_date_livraison')
     is_sequence_facturation = fields.Integer("Ordre") #, store=True, readonly=True, compute='_compute_is_sequence_facturation') #, default=lambda self: self._default_is_sequence_facturation())
     is_eco_contribution = fields.Float("Montant Eco-contribution", digits=(14,6), store=False, readonly=True, compute='_compute_is_eco_contribution')
+    is_reste_a_facturer = fields.Float("Reste à facturer", compute='_compute_is_reste_a_facturer', store=True, readonly=True)
+
+
+    @api.depends('qty_invoiced','product_qty','price_unit')
+    def _compute_is_reste_a_facturer(self):
+        for obj in self:
+            v=(obj.product_qty - obj.qty_invoiced)*obj.price_unit
+            obj.is_reste_a_facturer = v
 
 
     @api.depends('product_id','product_qty')

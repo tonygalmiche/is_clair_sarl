@@ -11,8 +11,8 @@ class IsPreparationFacture(models.Model):
 
     partner_id     = fields.Many2one('res.partner' , 'Fournisseur', required=True)
     montant        = fields.Float("Montant", digits=(14,2), store=True, readonly=True, compute='_compute_montant')
-    invoice_id     = fields.Many2one('account.move' , 'Facture créée', readonly=True)
-    ligne_ids      = fields.One2many('purchase.order.line', 'is_preparation_id', 'Lignes')
+    invoice_id     = fields.Many2one('account.move' , 'Facture créée', readonly=True, copy=False)
+    ligne_ids      = fields.One2many('purchase.order.line', 'is_preparation_id', 'Lignes', copy=True)
 
 
     @api.depends('ligne_ids')

@@ -51,6 +51,7 @@
                 <field name="is_date_livraison"/>
                 <field name="is_lieu_livraison"/>
                 <field name="is_eco_contribution"/>
+                <field name="is_reste_a_facturer"/>
             </field>
 
             <field name="origin" position="after">
@@ -136,7 +137,8 @@
             </xpath>
 
             <xpath expr="//page[@name='products']/field[@name='order_line']/tree/field[@name='price_subtotal']" position="after">
-                <field name="is_eco_contribution" optional="hide"/>
+                <field name="is_reste_a_facturer"   optional="hide"/>
+                <field name="is_eco_contribution"   optional="hide"/>
             </xpath>
 
 
@@ -252,13 +254,22 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
         <field name="arch" type="xml">
+            <field name="activity_ids" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="origin" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
             <field name="partner_id" position="after">
                 <field name="is_affaire_id" class="white_space_normal"/>
                 <field name="is_contact_chantier_id"  optional="hide"/>
                 <field name="is_date"                 optional="show"/>
-                <field name="is_delai"                optional="show"/>
+                <field name="is_delai"                optional="hide"/>
                 <field name="is_date_livraison"       optional="show"/>
                 <field name="is_lieu_livraison"       optional="show" class="white_space_normal"/>
+            </field>
+            <field name="amount_total" position="after">
+                <field name="is_reste_a_facturer"     optional="show" sum="Total"/>
             </field>
             <field name="date_planned" position="replace"/>
             <field name="user_id" position="replace"/>
