@@ -42,7 +42,7 @@ class IsRelanceFactureLigne(models.Model):
     email            = fields.Char(related='contact_id.email')
     payment_state    = fields.Selection(related='invoice_id.payment_state')
     is_affaire_id    = fields.Many2one(related='invoice_id.is_affaire_id')
-    is_remarque_paiement = fields.Char(related='invoice_id.is_remarque_paiement')
+    is_remarque_paiement   = fields.Char(related='invoice_id.is_remarque_paiement')
 
 
     def voir_facture_action(self):

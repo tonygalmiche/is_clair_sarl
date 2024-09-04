@@ -340,6 +340,8 @@
                 <field name="is_montant_paye"         optional="show" string="Montant payé" sum="Total"/>
                 <field name="amount_residual_signed"  optional="show" string="Montant dû"   sum="Total"/>
                 <field name="is_pourcent_du"          optional="show"/>
+                <field name="is_taux_retenue_de_garantie" optional="show"/>
+                <field name="is_retenue_de_garantie"      optional="hide"/>
                 <field name="invoice_payment_term_id" optional="hide" />
                 <field name="is_echeance_1an"         widget="remaining_days"/>
                 <field name="is_situation"            optional="hide"/>

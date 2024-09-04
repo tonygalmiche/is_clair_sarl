@@ -58,7 +58,10 @@ class AccountMove(models.Model):
     is_date_relance      = fields.Date(string='Date relance', help='Date dernière relance', readonly=1)
     is_date_releve       = fields.Date(string='Date relevé' , help='Date dernier relevé'  , readonly=1)
     is_date_envoi        = fields.Date(string="Date d'envoi", help="Date d'envoi de la facture par mail")
-    # is_courriel_facturation = fields.Char(related="partner_id.is_courriel_facturation")
+
+    is_retenue_de_garantie      = fields.Monetary(related='is_order_id.is_retenue_de_garantie')
+    is_taux_retenue_de_garantie = fields.Float(related='is_order_id.is_taux_retenue_de_garantie',string="RG", help="Taux retenue de garantie (%)")
+
 
 
     @api.depends('state')
