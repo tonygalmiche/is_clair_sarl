@@ -345,6 +345,7 @@
                 <field name="invoice_payment_term_id" optional="hide" />
                 <field name="is_echeance_1an"         widget="remaining_days"/>
                 <field name="is_situation"            optional="hide"/>
+                <field name="is_date_relance"         optional="show"/>
                 <field name="payment_state"           optional="show" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"/>
                 <field name="is_remarque_paiement"    optional="hide"/>
                 <field name="state" invisible="1"/>
