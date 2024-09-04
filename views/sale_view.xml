@@ -281,6 +281,11 @@
         </field>
     </record>
 
+    <record id="sale.action_orders_to_invoice" model="ir.actions.act_window">
+        <field name="domain">[('invoice_status','=','to invoice'),('is_commande_soldee','=',False)]</field>
+    </record>
+
+
 
     <!-- Suivi RG 5% à facturer -->
     <record id="is_suivi_reste_a_facturer_tree_view" model="ir.ui.view">
