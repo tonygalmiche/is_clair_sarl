@@ -281,6 +281,15 @@ class sale_order(models.Model):
     is_commande_soldee          = fields.Boolean("Commande soldée",default=False)
 
 
+    @api.onchange('partner_id')
+    def onchange_for_is_contact_facture_id(self):
+        for obj in self:
+            contact_id=False
+            if obj.partner_id.is_contact_relance_facture_id:
+                contact_id = obj.partner_id.is_contact_relance_facture_id.id
+        obj.is_contact_facture_id = contact_id
+
+
     def voir_commande_action(self):
         for obj in self:
             return {
