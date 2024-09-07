@@ -19,7 +19,7 @@ class IsRelanceFactureLigne(models.Model):
         for obj in self:
             obj.amount_residual  = obj.invoice_id.amount_residual
             obj.partner_id       = obj.invoice_id.partner_id.id
-            obj.contact_id       = obj.partner_id.is_contact_relance_facture_id.id or obj.partner_id.id
+            obj.contact_id       = obj.is_order_id.is_contact_facture_id.id or obj.partner_id.is_contact_relance_facture_id.id or obj.partner_id.id
             obj.invoice_date     = obj.invoice_id.invoice_date
             obj.invoice_date_due = obj.invoice_id.invoice_date_due
 
@@ -42,6 +42,7 @@ class IsRelanceFactureLigne(models.Model):
     email            = fields.Char(related='contact_id.email')
     payment_state    = fields.Selection(related='invoice_id.payment_state')
     is_affaire_id    = fields.Many2one(related='invoice_id.is_affaire_id')
+    is_order_id      = fields.Many2one(related='invoice_id.is_order_id')
     is_remarque_paiement   = fields.Char(related='invoice_id.is_remarque_paiement')
 
 

@@ -58,6 +58,7 @@
                             <field name="sequence" widget="handle"/>
                             <field name="invoice_id" widget="many2one_clickable"/>
                             <field name="is_affaire_id"    optional="show" widget="many2one_clickable"/>
+                            <field name="is_order_id"      optional="show" widget="many2one_clickable"/>
                             <field name="partner_id"       optional="show" widget="many2one_clickable"/>
                             <field name="contact_id"       optional="hide" widget="many2one_clickable"/>
                             <field name="email"            optional="show" widget="email"/>

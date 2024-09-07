@@ -64,6 +64,7 @@
             </button>
             <field name="partner_shipping_id" position="after">
                 <field name="is_affaire_id"/>
+                <field name="is_contact_facture_id"/>
                 <field name="client_order_ref"/>
                 <field name="is_affichage_pdf"/>
                 <field name="is_commande_soldee"/>

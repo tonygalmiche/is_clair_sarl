@@ -251,6 +251,7 @@ class sale_order(models.Model):
     is_import_alerte        = fields.Text('Alertes importation')
     is_taches_associees_ids = fields.One2many('purchase.order', 'is_sale_order_id', 'Tâches associées')
     is_affaire_id           = fields.Many2one('is.affaire', 'Affaire')
+    is_contact_facture_id   = fields.Many2one('res.partner', 'Contact facture')
     is_section_ids          = fields.One2many('is.sale.order.section', 'order_id', 'Sections')
     is_invoice_ids          = fields.One2many('account.move', 'is_order_id', 'Factures', readonly=True) #, domain=[('state','=','posted')])
     is_a_facturer           = fields.Float("Lignes à facturer"    , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
