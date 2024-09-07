@@ -59,9 +59,19 @@ class AccountMove(models.Model):
     is_date_releve       = fields.Date(string='Date relevé' , help='Date dernier relevé'  , readonly=1)
     is_date_envoi        = fields.Date(string="Date d'envoi", help="Date d'envoi de la facture par mail")
 
-    is_retenue_de_garantie      = fields.Monetary(related='is_order_id.is_retenue_de_garantie')
-    is_taux_retenue_de_garantie = fields.Float(related='is_order_id.is_taux_retenue_de_garantie',string="RG", help="Taux retenue de garantie (%)")
+    is_retenue_de_garantie      = fields.Monetary(related='is_order_id.is_retenue_de_garantie',string="RG",)
+    is_taux_retenue_de_garantie = fields.Float(related='is_order_id.is_taux_retenue_de_garantie',string="Taux RG", help="Taux retenue de garantie (%)")
+    is_rg_deduite               = fields.Monetary('Cumul RG déduite', store=True, readonly=True, compute='_compute_is_rg_deduite')
 
+
+    @api.depends('state','amount_total_signed','invoice_line_ids','invoice_date')
+    def _compute_is_rg_deduite(self):
+        for obj in self:
+            rg = 0
+            for line in obj.invoice_line_ids:
+                if line.product_id.default_code=='RETENUE_GARANTIE':
+                    rg-=line.price_subtotal
+            obj.is_rg_deduite = rg
 
 
     @api.depends('state')

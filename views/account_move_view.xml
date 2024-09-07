@@ -189,6 +189,8 @@
             </field>
             <field name="payment_state" position="before">
                 <field name="is_taux_retenue_de_garantie" optional="show"/>
+                <field name="is_retenue_de_garantie"      optional="show"/>
+                <field name="is_rg_deduite"               optional="show"/>                
                 <field name="is_date_envoi"       optional="show"/>
             </field>
             <field name="payment_state" position="after">
@@ -246,6 +248,7 @@
             </filter>
             <field name="partner_id" position="after">
                 <field name="is_affaire_id"/>
+                <field name="is_order_id"/>
                 <field name="is_type_paiement"/>
             </field>
         </field>
