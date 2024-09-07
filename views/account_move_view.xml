@@ -176,10 +176,10 @@
         <field name="arch" type="xml">
             <field name="invoice_date" position="before">
                 <field name="is_affaire_id" optional="show" widget="many2one_clickable" class="white_space_normal"/>
+                <field name="is_situation" optional="show"/>
                 <field name="is_order_id"   optional="show" widget="many2one_clickable"/>
             </field>
             <field name="invoice_date_due" position="replace">
-                <field name="is_situation" optional="show"/>
                 <field name="invoice_payment_term_id" optional="show"/>
                 <field name="invoice_date_due"        optional="show"/>
             </field>
@@ -264,9 +264,9 @@
                 <field name="name"                  optional="show" string="N°Facture"/>
                 <field name="partner_id"            optional="show" string="Client" widget="many2one_clickable"/>
                 <field name="is_affaire_id"         optional="show" widget="many2one_clickable"/>
+                <field name="is_situation"          optional="show"/>
                 <field name="amount_untaxed_signed" optional="show" string="Montant HT" sum="Total"/>
                 <field name="invoice_date_due"      optional="show" string="Échéance"/>
-                <field name="is_situation"          optional="show"/>
                 <field name="move_type"             optional="show" widget="badge" decoration-danger="move_type == 'out_refund'" decoration-success="move_type == 'out_invoice'"/>
                 <field name="payment_state"         optional="hide" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"/>
                 <field name="state"                 optional="hide" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'"/>
@@ -295,12 +295,12 @@
                 <field name="name"                    optional="show" string="N°Facture"/>
                 <field name="partner_id"              optional="show" string="Client" widget="many2one_clickable"/>
                 <field name="is_affaire_id"           optional="show" widget="many2one_clickable"/>
+                <field name="is_situation"            optional="hide"/>
                 <field name="amount_untaxed_signed"   optional="show" string="Montant HT" sum="Total"/>
                 <field name="invoice_payment_term_id" optional="show" />
                 <field name="invoice_date_due"        string="Échéance"/>
                 <field name="invoice_date_due"        string="Échéance" widget="remaining_days"  attrs="{'invisible': [['payment_state', 'in', ('paid', 'in_payment', 'reversed')]]}"/>
                 <field name="is_date_envoi"           optional="hide"/>
-                <field name="is_situation"            optional="hide"/>
                 <field name="payment_state"           optional="show" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"/>
                 <field name="is_date_relance"         optional="show"/>
                 <field name="is_remarque_paiement"    optional="show"/>
@@ -336,6 +336,7 @@
                 <field name="name"                    optional="show" string="N°Facture"/>
                 <field name="partner_id"              optional="show" string="Client" widget="many2one_clickable"/>
                 <field name="is_affaire_id"           optional="show" widget="many2one_clickable"/>
+                <field name="is_situation"            optional="hide"/>
                 <field name="is_order_id"             optional="show" widget="many2one_clickable"/>
                 <field name="is_date_pv"              optional="show"/>
                 <field name="amount_total_signed"     optional="show" string="Montant TTC"  sum="Total"/>
@@ -346,7 +347,6 @@
                 <field name="is_retenue_de_garantie"      optional="hide"/>
                 <field name="invoice_payment_term_id" optional="hide" />
                 <field name="is_echeance_1an"         widget="remaining_days"/>
-                <field name="is_situation"            optional="hide"/>
                 <field name="is_date_relance"         optional="show"/>
                 <field name="payment_state"           optional="show" widget="badge" decoration-danger="payment_state == 'not_paid'" decoration-warning="payment_state in ('partial', 'in_payment')" decoration-success="payment_state in ('paid', 'reversed')"/>
                 <field name="is_remarque_paiement"    optional="hide"/>
