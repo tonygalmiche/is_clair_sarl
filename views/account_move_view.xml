@@ -175,7 +175,8 @@
         <field name="inherit_id" ref="account.view_out_invoice_tree" />
         <field name="arch" type="xml">
             <field name="invoice_date" position="before">
-                <field name="is_affaire_id" optional="show" class="white_space_normal"/>
+                <field name="is_affaire_id" optional="show" widget="many2one_clickable" class="white_space_normal"/>
+                <field name="is_order_id"   optional="show" widget="many2one_clickable"/>
             </field>
             <field name="invoice_date_due" position="replace">
                 <field name="is_situation" optional="show"/>
@@ -183,10 +184,11 @@
                 <field name="invoice_date_due"        optional="show"/>
             </field>
             <field name="state" position="before">
-                <field name="is_export_compta_id" optional="show"/>
-                <field name="is_courrier_id"      optional="show"/>
+                <field name="is_export_compta_id" widget="many2one_clickable" optional="show"/>
+                <field name="is_courrier_id"      widget="many2one_clickable" optional="show"/>
             </field>
             <field name="payment_state" position="before">
+                <field name="is_taux_retenue_de_garantie" optional="show"/>
                 <field name="is_date_envoi"       optional="show"/>
             </field>
             <field name="payment_state" position="after">
@@ -201,7 +203,7 @@
         <field name="inherit_id" ref="account.view_in_invoice_tree" />
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <field name="is_affaire_id" optional="show" class="white_space_normal"/>
+                <field name="is_affaire_id" optional="show" widget="many2one_clickable" class="white_space_normal"/>
             </field>
             <field name="invoice_date_due" position="before">
                 <field name="invoice_payment_term_id" optional="show"/>
@@ -209,7 +211,7 @@
             </field>
             <field name="state" position="before">
                 <field name="is_purchase_order_id" optional="hide" widget="many2one_clickable"/>
-                <field name="is_export_compta_id"  optional="show"/>
+                <field name="is_export_compta_id"  optional="show" widget="many2one_clickable"/>
                 <field name="is_attente_avoir"     optional="hide"/>
                 <field name="is_banque_id"         optional="hide"/>
                 <field name="is_traite_id"         optional="show" widget="many2one_clickable"/>
