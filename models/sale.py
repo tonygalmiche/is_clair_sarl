@@ -15,7 +15,7 @@ class sale_order_line(models.Model):
     _inherit = "sale.order.line"
 
     order_id               = fields.Many2one('sale.order', string='Order Reference', required=False, ondelete='cascade', index=True, copy=False)
-    is_section_id          = fields.Many2one('is.sale.order.section', 'Section', index=True, domain="[('order_id','=',order_id)]")
+    is_section_id          = fields.Many2one('is.sale.order.section', 'Section', index=True, domain="[('order_id','=',order_id)]", copy=False)
     is_facturable_pourcent = fields.Float("% facturable", digits=(14,2), copy=False)
     is_facturable          = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
     is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
