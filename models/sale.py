@@ -268,15 +268,15 @@ class sale_order(models.Model):
         ('total_section'  , 'Afficher uniquement le total des sections'),
     ], 'Affichage PDF', default='standard', required=True)
 
-    is_date_facture   = fields.Date("Date de la facture à générer")
-    is_numero_facture = fields.Char("Numéro de la facture à générer")
-    is_situation      = fields.Char("Situation facture à générer")
+    is_date_facture   = fields.Date("Date de la facture à générer"  , tracking=True)
+    is_numero_facture = fields.Char("Numéro de la facture à générer", tracking=True)
+    is_situation      = fields.Char("Situation facture à générer"   , tracking=True)
 
     is_total_facture       = fields.Float("Total facturé"   , digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
     is_reste_a_facturer    = fields.Float("Reste à facturer", digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
     is_pourcent_a_facturer = fields.Float("% à facturer"    , digits=(14,2), store=True, readonly=True, compute='_compute_is_total_facture')
 
-    is_date_pv             = fields.Date("Date PV", help="Date de réception du PV")
+    is_date_pv             = fields.Date("Date PV", help="Date de réception du PV", tracking=True)
     is_pv_ids              = fields.Many2many('ir.attachment' , 'sale_order_is_pv_ids_rel', 'order_id', 'attachment_id', 'PV de réception')
     is_echeance_1an        = fields.Date("Échéance 1an"                      , store=True, readonly=True, compute='_compute_is_echeance_1an')
     is_taux_retenue_de_garantie = fields.Float("Taux RG"                     , store=True, readonly=True, compute='_compute_is_retenue_de_garantie')
@@ -284,7 +284,7 @@ class sale_order(models.Model):
     is_rg_deduite               = fields.Monetary('RG déduite'               , store=True, readonly=True, compute='_compute_is_rg_deduite')
     is_compte_prorata           = fields.Monetary("Compte prorata"           , store=True, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
     is_taux_compte_prorata      = fields.Float("Taux compte prorata (%)"     , store=True, readonly=True, compute='_compute_is_retenue_de_garantie')
-    is_commande_soldee          = fields.Boolean("Commande soldée",default=False)
+    is_commande_soldee          = fields.Boolean("Commande soldée",default=False, tracking=True)
 
 
     def write(self, vals):
