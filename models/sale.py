@@ -287,6 +287,13 @@ class sale_order(models.Model):
     is_commande_soldee          = fields.Boolean("Commande soldée",default=False)
 
 
+    def write(self, vals):
+        res = super(sale_order, self).write(vals)
+        if self.is_commande_soldee and not self.is_date_pv:
+            raise ValidationError("Il est obligatoire de renseigner le champ 'Date PV' pour solder une commande")
+        return res
+
+
     @api.onchange('partner_id')
     def onchange_for_is_contact_facture_id(self):
         for obj in self:
