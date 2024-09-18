@@ -17,15 +17,15 @@ class sale_order_line(models.Model):
     order_id               = fields.Many2one('sale.order', string='Order Reference', required=False, ondelete='cascade', index=True, copy=False)
     is_section_id          = fields.Many2one('is.sale.order.section', 'Section', index=True, domain="[('order_id','=',order_id)]", copy=False)
     is_facturable_pourcent = fields.Float("% facturable", digits=(14,2), copy=False)
-    is_facturable          = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    is_a_facturer          = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    is_facturable          = fields.Float("Facturable"  , digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
+    is_deja_facture        = fields.Float("Déja facturé", digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
+    is_a_facturer          = fields.Float("En cours facturable", digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
     is_prix_achat          = fields.Float("Prix d'achat", digits=(14,4))
     is_masquer_ligne       = fields.Boolean("Masquer",default=False,help="Masquer la ligne sur le PDF de la commande")
     is_unite               = fields.Char("Unité")
 
 
-    @api.depends('is_facturable_pourcent','price_unit','product_uom_qty')
+    @api.depends('order_id.is_invoice_ids','order_id.is_invoice_ids.state','is_facturable_pourcent','price_unit','product_uom_qty')
     def _compute_facturable(self):
         cr,uid,context,su = self.env.args
         for obj in self:
@@ -43,11 +43,7 @@ class sale_order_line(models.Model):
                     if row[0]=='out_refund':
                        sens=-1
                     is_deja_facture += sens*(row[1] or 0)
-            #is_facturable = obj.price_subtotal*obj.is_facturable_pourcent/100
             is_facturable = obj.product_uom_qty*obj.price_unit*obj.is_facturable_pourcent/100
-
-
-
             is_a_facturer = is_facturable - is_deja_facture
             obj.is_facturable   = is_facturable
             obj.is_deja_facture = is_deja_facture
@@ -71,25 +67,35 @@ class is_sale_order_section(models.Model):
     sequence    = fields.Integer("Sequence")
     section     = fields.Char("Section", required=True)
     facturable_pourcent = fields.Float("% facturable", digits=(14,2))
-    facturable_pourcent_calcule = fields.Float("% facturable calculé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable_pourcent_calcule')
+    facturable_pourcent_calcule = fields.Float("% facturable calculé", digits=(14,2), store=True, readonly=True, compute='_compute_facturable_pourcent_calcule')
     option      = fields.Boolean("Option", default=False)
     line_ids    = fields.One2many('sale.order.line', 'is_section_id', 'Lignes')
     currency_id = fields.Many2one(related='order_id.currency_id')
-    montant     = fields.Monetary("Montant HT", currency_field='currency_id', store=False, readonly=True, compute='_compute_montant')
+    montant     = fields.Monetary("Montant HT"                      , store=True, readonly=True, compute='_compute_facturable', currency_field='currency_id')
+    facturable   = fields.Float("Facturable"         , digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
+    deja_facture = fields.Float("Déja facturé"       , digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
+    a_facturer   = fields.Float("En cours facturable", digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
 
-    facturable   = fields.Float("Facturable"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    deja_facture = fields.Float("Déja facturé", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    a_facturer   = fields.Float("A Facturer"  , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
 
-
-    def unlink(self):
+    @api.depends('line_ids.is_facturable','line_ids.is_deja_facture','line_ids.is_a_facturer','line_ids.price_subtotal')
+    def _compute_facturable(self):
         for obj in self:
-            if obj.deja_facture>0:
-                raise ValidationError("Il n'est pas possible de supprimer une section contenant des lignes déjà facturées")
-            obj.line_ids.unlink()
-        super(is_sale_order_section, self).unlink()
+            facturable   = 0
+            deja_facture = 0
+            a_facturer   = 0
+            montant      = 0
+            for line in obj.line_ids:
+                facturable   +=line.is_facturable
+                deja_facture +=line.is_deja_facture
+                a_facturer   +=line.is_a_facturer
+                montant      +=line.price_subtotal
+            obj.facturable   = facturable
+            obj.deja_facture = deja_facture
+            obj.a_facturer   = a_facturer
+            obj.montant      = montant
 
 
+    @api.depends('order_id.order_line.price_subtotal','order_id.order_line.is_facturable')
     def _compute_facturable_pourcent_calcule(self):
         for obj in self:
             pourcent = 0
@@ -103,26 +109,20 @@ class is_sale_order_section(models.Model):
             obj.facturable_pourcent_calcule = pourcent
 
 
-    def _compute_montant(self):
-        for obj in self:
-            montant = 0
-            for line in obj.line_ids:
-                montant+=line.price_subtotal
-            obj.montant = montant
+    # def _compute_montant(self):
+    #     for obj in self:
+    #         montant = 0
+    #         for line in obj.line_ids:
+    #             montant+=line.price_subtotal
+    #         obj.montant = montant
 
 
-    def _compute_facturable(self):
+    def unlink(self):
         for obj in self:
-            facturable   = 0
-            deja_facture = 0
-            a_facturer   = 0
-            for line in obj.line_ids:
-                facturable+=line.is_facturable
-                deja_facture+=line.is_deja_facture
-                a_facturer+=line.is_a_facturer
-            obj.facturable   = facturable
-            obj.deja_facture = deja_facture
-            obj.a_facturer   = a_facturer
+            if obj.deja_facture>0:
+                raise ValidationError("Il n'est pas possible de supprimer une section contenant des lignes déjà facturées")
+            obj.line_ids.unlink()
+        super(is_sale_order_section, self).unlink()
 
 
     def write(self, vals):
@@ -176,7 +176,7 @@ class is_sale_order_section(models.Model):
 class sale_order(models.Model):
     _inherit = "sale.order"
 
-    @api.depends('order_line','is_section_ids', 'is_section_ids.facturable_pourcent')
+    @api.depends('is_invoice_ids','is_invoice_ids.state','amount_total','order_line','order_line.is_a_facturer','order_line.is_deja_facture','is_section_ids', 'is_section_ids.facturable_pourcent')
     def _compute_facturable(self):
         for obj in self:
             is_a_facturer=0
@@ -184,13 +184,18 @@ class sale_order(models.Model):
             for line in obj.order_line:
                 is_a_facturer+=line.is_a_facturer
                 is_deja_facture+=line.is_deja_facture
-            obj.is_a_facturer=is_a_facturer
-            obj.is_deja_facture=is_deja_facture
+            is_a_facturer_abs = abs(is_a_facturer)
+            if is_a_facturer_abs<=0.02:
+                is_a_facturer_abs=0
+            obj.is_deja_facture   = is_deja_facture
+            obj.is_a_facturer     = is_a_facturer
+            obj.is_a_facturer_abs = is_a_facturer_abs
 
 
     @api.depends('is_invoice_ids','is_invoice_ids.state','amount_total')
     def _compute_is_total_facture(self):
         for obj in self:
+            obj.order_line._compute_facturable()
             is_total_facture = 0
             for invoice in obj.is_invoice_ids:
                 if invoice.state=='posted':
@@ -254,8 +259,9 @@ class sale_order(models.Model):
     is_contact_facture_id   = fields.Many2one('res.partner', 'Contact facture')
     is_section_ids          = fields.One2many('is.sale.order.section', 'order_id', 'Sections')
     is_invoice_ids          = fields.One2many('account.move', 'is_order_id', 'Factures', readonly=True) #, domain=[('state','=','posted')])
-    is_a_facturer           = fields.Float("Lignes à facturer"    , digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
-    is_deja_facture         = fields.Float("Lignes déjà facturées", digits=(14,2), store=False, readonly=True, compute='_compute_facturable')
+    is_a_facturer           = fields.Float("En cours facturable"        , digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
+    is_a_facturer_abs       = fields.Float("En cours facturable (>0.02)", digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
+    is_deja_facture         = fields.Float("Lignes déjà facturées"      , digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
     is_affichage_pdf        = fields.Selection([
         ('standard'       , 'Standard'),
         ('masquer_montant', 'Masquer le détail des montants'),
@@ -272,10 +278,10 @@ class sale_order(models.Model):
 
     is_date_pv             = fields.Date("Date PV", help="Date de réception du PV")
     is_pv_ids              = fields.Many2many('ir.attachment' , 'sale_order_is_pv_ids_rel', 'order_id', 'attachment_id', 'PV de réception')
-    is_echeance_1an        = fields.Date("Échéance 1an"       , store=True, readonly=True, compute='_compute_is_echeance_1an')
-    is_taux_retenue_de_garantie = fields.Float("Taux RG"      , store=True, readonly=True, compute='_compute_is_retenue_de_garantie')
-    is_retenue_de_garantie      = fields.Monetary("RG"        , store=True, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
-    is_rg_deduite               = fields.Monetary('RG déduite', store=True, readonly=True, compute='_compute_is_rg_deduite')
+    is_echeance_1an        = fields.Date("Échéance 1an"                      , store=True, readonly=True, compute='_compute_is_echeance_1an')
+    is_taux_retenue_de_garantie = fields.Float("Taux RG"                     , store=True, readonly=True, compute='_compute_is_retenue_de_garantie')
+    is_retenue_de_garantie      = fields.Monetary("RG"                       , store=True, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
+    is_rg_deduite               = fields.Monetary('RG déduite'               , store=True, readonly=True, compute='_compute_is_rg_deduite')
     is_compte_prorata           = fields.Monetary("Compte prorata"           , store=True, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
     is_taux_compte_prorata      = fields.Float("Taux compte prorata (%)"     , store=True, readonly=True, compute='_compute_is_retenue_de_garantie')
     is_commande_soldee          = fields.Boolean("Commande soldée",default=False)
@@ -566,14 +572,15 @@ class sale_order(models.Model):
             move._onchange_partner_id()
             move._onchange_invoice_date()
             move.action_post()
+            obj.order_line
+
+
 
 
     def modifier_pourcentage_action(self):
         print(self)
         for obj in self:
             tree_id = self.env.ref('is_clair_sarl.is_view_order_line_tree').id
-
-            print(obj,tree_id)
             return {
                 "name": obj.name,
                 "view_mode": "tree",
@@ -585,6 +592,26 @@ class sale_order(models.Model):
                 "views"    : [[tree_id, "tree"]],
                 "limit": 1000,
             }
+
+
+
+    def en_cours_facturable_action(self):
+        print(self)
+        for obj in self:
+            tree_id = self.env.ref('is_clair_sarl.is_view_order_line_tree').id
+            return {
+                "name": obj.name,
+                "view_mode": "tree",
+                "res_model": "sale.order.line",
+                "domain": [
+                    ("order_id","=",obj.id),
+                    ("is_a_facturer","!=",0),
+                ],
+                "type": "ir.actions.act_window",
+                "views"    : [[tree_id, "tree"]],
+                "limit": 1000,
+            }
+
 
 
 

@@ -61,6 +61,7 @@
             </field>
             <button name="action_draft" position="after">
                 <button name="modifier_pourcentage_action" string="Modifier % facturable" type="object"/>
+                <button name="en_cours_facturable_action"  string="En cours facturable"   type="object"/>
             </button>
             <field name="partner_shipping_id" position="after">
                 <field name="is_affaire_id"/>
@@ -289,9 +290,13 @@
     </record>
 
     <record id="sale.action_orders_to_invoice" model="ir.actions.act_window">
-        <field name="domain">[('invoice_status','=','to invoice'),('is_commande_soldee','=',False)]</field>
+        <field name="domain">[
+                ('invoice_status','=','to invoice'),
+                ('is_commande_soldee','=',False),
+                ('is_a_facturer_abs','!=',0),
+            ]
+        </field>
     </record>
-
 
 
     <!-- Suivi RG 5% à facturer -->
@@ -355,6 +360,21 @@
 
 
     <!-- sale.order.line -->
+    <record id="is_view_sales_order_line_filter" model="ir.ui.view">
+        <field name="name">is_view_sales_order_line_filter</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale.view_sales_order_line_filter"/>
+        <field name="arch" type="xml">
+            <filter name="my_sales_order_lines" position="replace">
+                <filter string="En cours facturable" name="en_cours_facturable" domain="[('is_a_facturer','!=', 0)]"/>
+            </filter>
+            <filter name="salesperson" position="replace">
+                <filter string="Section" name="group_by_section" domain="[]" context="{'group_by':'is_section_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+
     <record id="is_view_order_line_tree" model="ir.ui.view">
         <field name="name">is_view_order_line_tree</field>
         <field name="model">sale.order.line</field>
@@ -367,12 +387,12 @@
                 <field name="product_uom_qty" readonly="1"/>
                 <field name="price_unit"      readonly="1"/>
                 <field name="is_facturable_pourcent"/>
-                <field name="is_facturable"/>
-                <field name="is_deja_facture"/>
-                <field name="is_a_facturer"/>
+                <field name="is_facturable"   sum="Total"/>
+                <field name="is_deja_facture" sum="Total"/>
+                <field name="is_a_facturer"   sum="Total"/>
                 <field name="product_uom_category_id" invisible="1"/>
                 <field name="product_uom" string="Unité"  optional="hide" readonly="1"/>
-                <field name="price_subtotal" sum="Total" widget="monetary"/>
+                <field name="price_subtotal" sum="Total" widget="monetary" string="Montant HT"/>
                 <field name="currency_id" invisible="1"/>
             </tree>
         </field>
