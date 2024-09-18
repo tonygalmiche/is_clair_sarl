@@ -358,7 +358,7 @@
         </field>
     </record>
     <record id="is_suivi_partiellemnt_regle_action" model="ir.actions.act_window">
-        <field name="name">Suivi partiellement réglé</field>
+        <field name="name">Suivi paiement RG</field>
         <field name="res_model">account.move</field>
         <field name="view_mode">tree,form,pivot,graph</field>
         <field name="view_id" ref="is_clair_sarl.is_suivi_partiellemnt_regle_tree_view"/>

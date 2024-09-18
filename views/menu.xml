@@ -262,7 +262,7 @@
     />
     <menuitem
         id="is_suivi_partiellemnt_regle_menu"
-        name="Suivi partiellement réglé"
+        name="Suivi paiement RG"
         parent="account.menu_finance_receivables"
         sequence="820"
         action="is_suivi_partiellemnt_regle_action"
