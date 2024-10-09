@@ -259,7 +259,7 @@ class sale_order(models.Model):
     is_section_ids          = fields.One2many('is.sale.order.section', 'order_id', 'Sections')
     is_invoice_ids          = fields.One2many('account.move', 'is_order_id', 'Factures', readonly=True) #, domain=[('state','=','posted')])
     is_a_facturer           = fields.Float("En cours facturable"        , digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
-    is_a_facturer_abs       = fields.Float("En cours facturable (>0.02)", digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
+    is_a_facturer_abs       = fields.Float("En cours facturable (>1€)"  , digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
     is_deja_facture         = fields.Float("Lignes déjà facturées"      , digits=(14,2), store=True, readonly=True, compute='_compute_facturable')
     is_affichage_pdf        = fields.Selection([
         ('standard'       , 'Standard'),
