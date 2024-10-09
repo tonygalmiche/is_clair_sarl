@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from . import ir_ui_view
-from . import ir_mail_server
+#from . import ir_mail_server
 from . import res_company
 from . import is_affaire
 from . import is_import_clair
