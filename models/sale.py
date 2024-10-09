@@ -4,6 +4,7 @@ from odoo.http import request
 from odoo.exceptions import UserError, ValidationError
 import datetime
 from dateutil.relativedelta import relativedelta
+import math
 import base64
 import os
 import openpyxl
@@ -184,7 +185,7 @@ class sale_order(models.Model):
             for line in obj.order_line:
                 is_a_facturer+=line.is_a_facturer
                 is_deja_facture+=line.is_deja_facture
-            is_a_facturer_abs = round(abs(is_a_facturer))
+            is_a_facturer_abs = math.ceil(abs(is_a_facturer))
             obj.is_deja_facture   = is_deja_facture
             obj.is_a_facturer     = is_a_facturer
             obj.is_a_facturer_abs = is_a_facturer_abs
