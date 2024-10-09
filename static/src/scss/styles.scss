@@ -17,3 +17,8 @@
 .o_form_label{
     white-space: nowrap;
 }
+
+.o_list_view .o_optional_columns_dropdown_toggle {
+    z-index: 999 !important;
+    padding-right: 10px;
+}
