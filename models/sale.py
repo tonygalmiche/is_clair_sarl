@@ -184,9 +184,7 @@ class sale_order(models.Model):
             for line in obj.order_line:
                 is_a_facturer+=line.is_a_facturer
                 is_deja_facture+=line.is_deja_facture
-            is_a_facturer_abs = abs(is_a_facturer)
-            if is_a_facturer_abs<=0.02:
-                is_a_facturer_abs=0
+            is_a_facturer_abs = round(abs(is_a_facturer))
             obj.is_deja_facture   = is_deja_facture
             obj.is_a_facturer     = is_a_facturer
             obj.is_a_facturer_abs = is_a_facturer_abs
@@ -285,6 +283,7 @@ class sale_order(models.Model):
     is_compte_prorata           = fields.Monetary("Compte prorata"           , store=True, readonly=True, compute='_compute_is_retenue_de_garantie', currency_field='currency_id')
     is_taux_compte_prorata      = fields.Float("Taux compte prorata (%)"     , store=True, readonly=True, compute='_compute_is_retenue_de_garantie')
     is_commande_soldee          = fields.Boolean("Commande soldée",default=False, tracking=True)
+    is_note_facturation         = fields.Char("Note facturation", tracking=True, copy=False)
 
 
     def write(self, vals):

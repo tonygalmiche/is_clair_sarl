@@ -180,6 +180,7 @@
                         </field>
                     </group>        
                     <group string="Factures" states="sale">
+                        <field name="is_note_facturation"/>
                         <field name="is_a_facturer"/>
                         <field name="is_date_facture"    attrs="{'invisible':[('is_a_facturer','=',0)]}"/>
                         <field name="is_numero_facture"  attrs="{'invisible':[('is_a_facturer','=',0)]}"/>
@@ -263,6 +264,7 @@
                 <field name="is_rg_deduite"               optional="hide" />
                 <field name="is_compte_prorata"           optional="hide" sum="Total"/>
                 <field name="is_taux_compte_prorata"      optional="hide"/>
+                <field name="is_note_facturation"         optional="show" class="white_space_normal"/>
             </field>
             <field name="user_id" position="attributes">
                 <attribute name="invisible">1</attribute>
