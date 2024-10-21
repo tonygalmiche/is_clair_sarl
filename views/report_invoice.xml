@@ -286,11 +286,24 @@
                                         </td>
                                     </tr>
 
-
-
-
-
-
+                                   <!-- Ajout des règlements -->
+                                   <t t-set="paiements" t-value="o.get_detail_paiements()"/>
+                                   <t t-if="len(paiements)>0">
+                                        <t t-foreach="paiements" t-as="line">
+                                            <tr>
+                                                <td class="text-left" style="background-color:white;color:black"><span t-esc="line[1]"/></td>
+                                                <td class="text-right">
+                                                    <span t-esc="line[0]"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <tr>
+                                            <td style="background-color:white"><strong style="color:black">Reste dû</strong></td>
+                                            <td class="text-right">
+                                                <span t-field="o.amount_residual"/>
+                                            </td>
+                                        </tr>
+                                    </t>
                                 </table>
                             </div>
                         </div>

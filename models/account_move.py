@@ -161,8 +161,34 @@ class AccountMove(models.Model):
             return res
 
 
+    def get_detail_paiements(self):
+        """
+            Retourne le détail des paiements.
+            Les paiements partiels sont attachés à la ligne de facture type 'receivable' ou 'payable' (411xx)
+            Chaque paiment partiel est attaché à une facture de réglement (credit_move_id => account.move)
+            Chaque facture de réglement est attachée à un réglement (account.payment) contenant le détail du réglement
+            cf _get_reconciled_invoices_partials pour plus d'infos 
+        """
+        for obj in self:
+            res=[]
+            for line in obj.line_ids:
+                internal_type = line.account_internal_type
+                if internal_type in ('receivable', 'payable'):
+                    for partial in line.matched_credit_ids:
+                        payment = partial.credit_move_id.payment_id
+                        type_paiement = dict(payment._fields['is_type_paiement'].selection).get(payment.is_type_paiement)
+                        num_cheque=''
+                        if payment.is_num_cheque:
+                            num_cheque = " %s"%payment.is_num_cheque
+                        montant = ("%.2f €"%payment.amount).replace('.',',')
+                        txt="Votre règlement par %s%s du %s"%(type_paiement,num_cheque,payment.date.strftime('%d/%m/%Y'))
+                        res.append([montant,txt])
+            return res
+
+
     def enregistre_courrier_action(self):
         for obj in self:
+            #obj.get_detail_paiemnts()
             vals={
                 "partner_id": obj.partner_id.id,
                 "affaire_id": obj.is_affaire_id.id,
