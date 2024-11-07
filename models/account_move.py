@@ -25,6 +25,7 @@ class is_account_move_remise(models.Model):
     product_id       = fields.Many2one('product.product', 'Remise', index=True)
     libelle          = fields.Text("Libellé")
     currency_id      = fields.Many2one(related='move_id.currency_id')
+    remise           = fields.Float("Remise (%)", digits=(14,2))
     montant          = fields.Monetary("Montant", currency_field='currency_id')
 
 
@@ -53,7 +54,7 @@ class AccountMove(models.Model):
     is_purchase_order_id = fields.Many2one('purchase.order', 'Commande fournisseur', compute='_compute_is_purchase_order_id', store=False, readonly=True)
     is_type_paiement     = fields.Selection(related='partner_id.is_type_paiement')
     is_section_ids       = fields.One2many('is.account.move.section', 'move_id', 'Sections', readonly=True)
-    is_remise_ids        = fields.One2many('is.account.move.remise' , 'move_id', 'Remises' , readonly=True)
+    is_remise_ids        = fields.One2many('is.account.move.remise' , 'move_id', 'Remises' , readonly=False)
     is_reste_du_ttc      = fields.Monetary(string='Reste dû TTC', store=True, readonly=True, compute='_compute_is_montant_paye', currency_field='company_currency_id')
     is_date_relance      = fields.Date(string='Date relance', help='Date dernière relance', readonly=1)
     is_date_releve       = fields.Date(string='Date relevé' , help='Date dernier relevé'  , readonly=1)
@@ -84,7 +85,7 @@ class AccountMove(models.Model):
             obj.is_purchase_order_id=purchase_id
 
 
-    @api.depends('state','amount_total_signed','amount_residual_signed','invoice_date','is_order_id', 'is_order_id.is_date_pv')
+    @api.depends('state','amount_total_signed','amount_residual_signed','invoice_date','is_order_id', 'is_order_id.is_date_pv', 'is_remise_ids','is_remise_ids.montant')
     def _compute_is_montant_paye(self):
         for obj in self:
             montant = obj.amount_total_signed-obj.amount_residual_signed

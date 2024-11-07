@@ -557,7 +557,8 @@ class sale_order(models.Model):
                         vals={
                             'product_id': product.id,
                             'libelle'   : name,
-                            'montant'   : round(total_cumul_ht*line.remise/100,2)
+                            'remise'    : line.remise,
+                            #'montant'   : round(total_cumul_ht*line.remise/100,2)
                         }
                         remise_ids.append(vals)
             #******************************************************************
@@ -579,13 +580,15 @@ class sale_order(models.Model):
             move._onchange_partner_id()
             move._onchange_invoice_date()
             move.action_post()
-            obj.order_line
+            #obj.order_line
 
-
+            #** Calcul des remises sur le TTC *********************************
+            for line in move.is_remise_ids:
+                montant = move.amount_total_signed * line.remise/100
+                line.montant = montant
 
 
     def modifier_pourcentage_action(self):
-        print(self)
         for obj in self:
             tree_id = self.env.ref('is_clair_sarl.is_view_order_line_tree').id
             return {
@@ -603,7 +606,6 @@ class sale_order(models.Model):
 
 
     def en_cours_facturable_action(self):
-        print(self)
         for obj in self:
             tree_id = self.env.ref('is_clair_sarl.is_view_order_line_tree').id
             return {
