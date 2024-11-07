@@ -799,6 +799,7 @@ class purchase_order_line(models.Model):
     is_largeur         = fields.Float('Largeur')
     is_hauteur         = fields.Float('Hauteur')
     is_colis_ids       = fields.One2many('is.purchase.order.line.colis', 'line_id', 'Colis', copy=True)
+    is_nb_colis        = fields.Integer('Nb colis', store=True, readonly=True, compute='_compute_is_nb_colis')
     is_liste_colis_action_vsb = fields.Boolean("Liste colis vsb", store=False, readonly=True, compute='_compute_is_liste_colis_action_vsb')
     is_colisage               = fields.Text("Colisage", store=False, readonly=True, compute='_compute_is_colisage')
     is_repere_ids             = fields.One2many('is.purchase.order.line.repere', 'line_id', 'Repère de plan')
@@ -811,6 +812,14 @@ class purchase_order_line(models.Model):
     is_sequence_facturation = fields.Integer("Ordre") #, store=True, readonly=True, compute='_compute_is_sequence_facturation') #, default=lambda self: self._default_is_sequence_facturation())
     is_eco_contribution = fields.Float("Montant Eco-contribution", digits=(14,6), store=False, readonly=True, compute='_compute_is_eco_contribution')
     is_reste_a_facturer = fields.Float("Reste à facturer", compute='_compute_is_reste_a_facturer', store=True, readonly=True)
+
+
+    @api.depends('is_colis_ids')
+    def _compute_is_nb_colis(self):
+        for obj in self:
+            nb_colis = len(obj.is_colis_ids)
+            obj.is_nb_colis = nb_colis
+            obj.is_colis_ids._compute_surface()
 
 
     @api.depends('qty_invoiced','product_qty','price_unit')
@@ -999,7 +1008,7 @@ class IsPurchaseOrderLineColis(models.Model):
             obj.poids_colis=poids
 
 
-    @api.depends('line_ids')
+    @api.depends('line_ids','line_ids.longueur')
     def _compute_surface(self):
         for obj in self:
             surface=0
