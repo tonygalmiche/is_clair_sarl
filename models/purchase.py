@@ -498,6 +498,34 @@ class purchase_order(models.Model):
                                 break
                 #**************************************************************
 
+                #** Transport *************************************************
+                if type_pdf=='PUM':
+                    for line in lines:
+                        x = re.search("Transport : (.*)", line) 
+                        if x:
+                            v = x.groups()
+                            if len(v)==1:
+                                t = v[0].split(' ')
+                                montant=txt2float(t[0])
+                                order_lines.append([1, "Transport", montant])
+                                dict["Transport"] = montant
+                                break
+                #**************************************************************
+
+                #** Surcharge gasoil ******************************************
+                if type_pdf=='PUM':
+                    for line in lines:
+                        x = re.search("Surcharge gasoil : (.*)", line) 
+                        if x:
+                            v = x.groups()
+                            if len(v)==1:
+                                t = v[0].split(' ')
+                                montant=txt2float(t[0])
+                                order_lines.append([1, "Surcharge gasoil", montant])
+                                dict["Surcharge gasoil"] = montant
+                                break
+                #**************************************************************
+
                 #** Lignes avec des Quantités ou des montants *****************
                 if type_pdf=='LOXAM':
                     if test:
@@ -693,6 +721,8 @@ class purchase_order(models.Model):
                 'CONST. MODULAIRE'                  : 'BUNGALOW',
                 'WC AUTONOME'                       : 'WC',
                 'Eco-contribution'                  : 'ECOCON',
+                'Transport'                         : 'TCHANTIER',
+                'Surcharge gasoil'                  : 'GNR',
             }
             product = False
             for key in dict:
