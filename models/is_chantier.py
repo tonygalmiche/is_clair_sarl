@@ -250,7 +250,7 @@ class IsChantier(models.Model):
                 colspan = nb_jours_dans_semaine
                 vals={
                     "key"    : str(jour),
-                    "semaine": jour.strftime('S%W'),
+                    "semaine": jour.strftime('S%V'),
                     "jour"   : jour.strftime('%d'),
                     "colspan": colspan,
                 }
