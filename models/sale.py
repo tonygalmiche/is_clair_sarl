@@ -136,10 +136,10 @@ class is_sale_order_section(models.Model):
         if "sequence" in vals:
             for obj in self:
                 x=10
-                for line in obj.order_id.order_line:
-                    if line.is_section_id==obj:
-                        line.sequence = vals["sequence"]*10000+x
-                    x+=10
+                for section in obj.order_id.is_section_ids:
+                    for line in section.line_ids:
+                        line.sequence = x
+                        x+=10
         if 'section' in vals:
             for obj in self:
                 for line in obj.line_ids:
@@ -316,7 +316,22 @@ class sale_order(models.Model):
 
     def import_fichier_xlsx(self):
         for obj in self:
+            #** Recherche de la sequence de la dernière section ***************
+            sequence_section=0
+            for section in obj.is_section_ids:
+                if section.sequence>sequence_section:
+                    sequence_section=section.sequence
+            sequence_section+=10
+            #******************************************************************
+
+            #** Recherche de la sequence de la dernière ligne *****************
             sequence=0
+            for line in obj.order_line:
+                if line.sequence>sequence:
+                    sequence=line.sequence
+            sequence+=10
+            #******************************************************************
+
             alertes=[]
             section_id=False
             for attachment in obj.is_import_excel_ids:
@@ -353,7 +368,7 @@ class sale_order(models.Model):
                     if ref in ["SECTION", "OPTION"] and name:
                         vals={
                             "order_id"       : obj.id,
-                            "sequence"       : sequence,
+                            "sequence"       : sequence_section,
                             "section"        : name,
                         }
                         option=False
@@ -362,6 +377,7 @@ class sale_order(models.Model):
                             option=True
                         section = self.env['is.sale.order.section'].create(vals)
                         section_id=section.id
+                        sequence_section+=10
 
                         vals={
                             "order_id"       : not option and obj.id,

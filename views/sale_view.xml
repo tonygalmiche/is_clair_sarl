@@ -96,6 +96,11 @@
                 <field name="is_deja_facture"/>
                 <field name="is_a_facturer"/>
             </xpath>
+
+            <!-- <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree/field[@name='sequence']" position="attributes">
+                <attribute name="widget"></attribute>
+            </xpath>
+ -->
             <xpath expr="//page[@name='order_lines']/field[@name='order_line']/tree/field[@name='product_id']" position="before">
                 <field name="is_section_id" readonly="1" optional="hide"/>
             </xpath>
@@ -156,7 +161,8 @@
                     <group string="Sections">
                         <field name="is_section_ids" nolabel="1">
                             <tree editable="bottom">
-                                <field name="sequence" widget="handle"/>
+                                <!-- <field name="sequence" widget="handle"/> -->
+                                <field name="sequence"/>
                                 <button 
                                     name="lignes_section_action" 
                                     type="object" icon="fa-list" 
