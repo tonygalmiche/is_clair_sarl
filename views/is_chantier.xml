@@ -79,9 +79,6 @@
                             <field name="alerte"/>                           
                         </tree>
                     </field>
-                    <!-- <group>
-                        <field name="alerte_html"/>
-                    </group>-->
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" />
@@ -134,9 +131,6 @@
             </calendar>
         </field>
     </record>
-
-
-
     <record id="is_chantier_search" model="ir.ui.view">
         <field name="name">is.chantier.search</field>
         <field name="model">is.chantier</field>
@@ -280,6 +274,52 @@
         <field name="name">Alertes</field>
         <field name="res_model">is.chantier.alerte</field>
         <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+    <!--is.fermeture -->
+    <record id="is_fermeture_form_view" model="ir.ui.view">
+        <field name="name">is_fermeture_from_view</field>
+        <field name="model">is.fermeture</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="date_debut" />
+                        <field name="date_fin" />
+                        <field name="commentaire" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="is_fermeture_tree_view">
+        <field name="name">is_fermeture_tree_view</field>
+        <field name="model">is.fermeture</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="commentaire"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_fermeture_search_view" model="ir.ui.view">
+        <field name="name">is_fermeture_search_view</field>
+        <field name="model">is.fermeture</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="date_debut"/>
+                <field name="commentaire"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_fermeture_action" model="ir.actions.act_window">
+        <field name="name">Fermetures</field>
+        <field name="res_model">is.fermeture</field>
+        <field name="view_mode">tree</field>
     </record>
 
 

@@ -200,6 +200,21 @@ class IsChantier(models.Model):
             alertes[chantier_id][date_alerte].append(line)
         #**********************************************************************
 
+
+        #** Recherche des jours de fermeture **********************************
+        lines=self.env['is.fermeture'].search([], order='date_debut')
+        fermetures=[]
+        for line in lines:
+            date_debut = line.date_debut
+            date_fin   = line.date_fin or line.date_debut
+            nb_jours = (date_fin - date_debut).days+1
+            if nb_jours>0:
+                for i in range(0,nb_jours):
+                    if date_debut not in fermetures:
+                        fermetures.append(date_debut)
+                    date_debut+=timedelta(days=1)
+        #**********************************************************************
+
         try:
             nb_semaines = int(nb_semaines)
         except:
@@ -346,12 +361,17 @@ class IsChantier(models.Model):
                     duree=1
                 debut = decal+1
                 fin = decal + duree 
-
-
-
-
                 for i in range(0, nb_jours):
                     date_jour = debut_planning+timedelta(days=i)
+
+                    #** Couleur de la fermeture *******************************
+                    fermeture=''
+                    if date_jour in fermetures:
+                        fermeture='#FFE4C4'
+                    #if int(date_jour.strftime('%w')) in [0,6]:
+                    #    fermeture='#F5F5DC'
+                    #**********************************************************                    
+                    
                     alerte=False
                     alerte_id=False
                     if chantier.id in alertes:
@@ -375,15 +395,18 @@ class IsChantier(models.Model):
                         "alerte"   : alerte,
                         "alerte_id": alerte_id,
                         "width"    : width_jour,
+                        "fermeture": fermeture
                     }
                     if i>=decal and i<(decal+duree-1):
-                        jour["color"]  = color
-                        jour["cursor"] = "move"
-                        jour["border"] = "none"
+                        jour["color"]     = color
+                        jour["cursor"]    = "move"
+                        jour["border"]    = "none"
+                        jour["fermeture"] = False
                     if i==(decal+duree-1):
-                        jour["color"]  = color
-                        jour["cursor"] = "col-resize"
-                        jour["border"] = "none"
+                        jour["color"]     = color
+                        jour["cursor"]    = "col-resize"
+                        jour["border"]    = "none"
+                        jour["fermeture"] = False
                     jours[i]=jour
                 name=chantier.commentaire or chantier.name
                 if chantier.affaire_id:
@@ -487,4 +510,14 @@ class IsChantierAlerte(models.Model):
     affaire_id  = fields.Many2one(related="chantier_id.affaire_id")
     alerte      = fields.Text('Alerte'                     , required=True)
     date        = fields.Date('Date alerte', default=fields.Datetime.now, index=True, help="Date à laquelle l'alerte sera positionnée sur le planning des chantiers")
+
+
+class IsFermeture(models.Model):
+    _name='is.fermeture'
+    _description = "Fermetures de la société pour les chantiers"
+    _order='date_debut desc'
+
+    date_debut  = fields.Date('Date début fermeture', required=True)
+    date_fin    = fields.Date('Date fin fermeture')
+    commentaire = fields.Char('Commentaire')
 

@@ -38,13 +38,7 @@
                 <t t-set="mois"        t-value="res['mois']"/>
                 <t t-set="semaines"    t-value="res['semaines']"/>
                 <t t-set="chantiers"   t-value="res['dict']"/>
-
-                <!-- <div t-esc="chantiers.items()"/> -->
-
-
-
                 <div class="row" style="background-color:white">
-                    <!-- semaines = <t t-esc="semaines"/> <br /> -->
                     <table style="width:100%">
                         <thead>
                             <tr>
@@ -88,12 +82,25 @@
                                     </td>
                                     <td style="width:9%;white-space: nowrap;"><t t-esc="chantiers[key]['equipe']"/></td>
                                     <td style="width:7%;white-space: nowrap;"><t t-esc="chantiers[key]['travaux']"/></td>
+
+
+
                                     <t t-foreach="jours" t-as="j">
-                                        <td t-att-style="'width:'+jours[j]['width']+';background-color:'+jours[j]['color'] + ';border-left:'+jours[j]['border']"> 
-                                            <t  t-if="jours[j]['alerte']">
-                                                <span class="alerte">!</span>
-                                            </t>
-                                        </td>
+
+                                        <t t-set="fermeture" t-value="jours[j]['fermeture'] or ''"/>
+
+
+                                        <t t-if="fermeture==''">
+                                            <td t-att-style="'width:'+jours[j]['width']+';background-color:'+jours[j]['color'] + ';border-left:'+jours[j]['border']"> 
+                                                <t  t-if="jours[j]['alerte']">
+                                                    <span class="alerte">!</span>
+                                                </t>
+                                            </td>
+                                        </t>
+                                        <t t-if="fermeture!=''">
+                                            <td t-att-style="'background-color:'+fermeture">
+                                            </td>
+                                        </t>
                                     </t>
                                 </tr>
                             </t>

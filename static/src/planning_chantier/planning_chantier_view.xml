@@ -167,25 +167,33 @@
                             <td style="width:100px;white-space:nowrap;background-color:orange"></td>
                         </t>
                         <t t-foreach="Object.values(chantier.jours or {})" t-as="jour" t-key="jour.key">
-                            <td 
-                                style="width:20px;text-align:center;font-size: 7pt;"
-                                t-on-mousedown="tdMouseDown" 
-                                t-on-mousemove="tdMouseMove" 
-                                t-on-mouseup="tdMouseUp" 
-                                t-att-jour="jour.key"
-                                t-att-style="'cursor:' + jour.cursor + ';background-color:'+jour.color + ';border-left:'+jour.border"
-                                t-att-color="jour.color"
-                            > 
-                                <t  t-if="jour.alerte">
-                                    <span 
-                                        class="fa fa-exclamation-circle alerte"  
-                                        t-att-id="jour.alerte_id"
-                                        t-on-click="alerteClick" 
-                                        t-att-jour="jour.key"
-                                        t-att-title="jour.alerte"
-                                    />
-                                </t>
-                            </td>
+
+
+                            <t t-if="jour.fermeture==''">
+                                <td 
+                                    style="width:20px;text-align:center;font-size: 7pt;"
+                                    t-on-mousedown="tdMouseDown" 
+                                    t-on-mousemove="tdMouseMove" 
+                                    t-on-mouseup="tdMouseUp" 
+                                    t-att-jour="jour.key"
+                                    t-att-style="'cursor:' + jour.cursor + ';background-color:'+jour.color + ';border-left:'+jour.border"
+                                    t-att-color="jour.color"
+                                > 
+                                    <t  t-if="jour.alerte">
+                                        <span 
+                                            class="fa fa-exclamation-circle alerte"  
+                                            t-att-id="jour.alerte_id"
+                                            t-on-click="alerteClick" 
+                                            t-att-jour="jour.key"
+                                            t-att-title="jour.alerte"
+                                        />
+                                    </t>
+                                </td>
+                            </t>
+                            <t t-if="jour.fermeture!=''">
+                                <td t-att-style="'background-color:'+jour.fermeture">
+                                </td>
+                            </t>
                         </t>
                     </tr>
                 </t>

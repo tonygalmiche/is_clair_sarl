@@ -380,6 +380,13 @@
         action="is_chantier_alerte_action"
     />
     <menuitem
+        id="is_fermeture_menu"
+        name="Fermetures"
+        parent="is_chantier_top_menu"
+        sequence="40"
+        action="is_fermeture_action"
+    />
+    <menuitem
         id="is_chantier_table_menu"
         name="Tables"
         parent="is_chantier_top_menu"
