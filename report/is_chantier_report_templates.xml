@@ -98,7 +98,8 @@
                                             </td>
                                         </t>
                                         <t t-if="fermeture!=''">
-                                            <td t-att-style="'background-color:'+fermeture">
+                                            <!-- <td t-att-style="'background-color:'+fermeture"> -->
+                                            <td t-att-style="'width:'+jours[j]['width']+';background-color:'+fermeture+';border-left:'+jours[j]['border']">
                                             </td>
                                         </t>
                                     </t>
