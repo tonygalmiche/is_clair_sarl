@@ -191,7 +191,10 @@
                                 </td>
                             </t>
                             <t t-if="jour.fermeture!=''">
-                                <td t-att-style="'background-color:'+jour.fermeture">
+                                    <!-- t-att-style="'background-color:'+jour.fermeture" -->
+                                <td 
+                                    t-att-style="'background-color:'+jour.fermeture + ';border-left:'+jour.border"
+                                >
                                 </td>
                             </t>
                         </t>
