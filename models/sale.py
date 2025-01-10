@@ -44,8 +44,21 @@ class sale_order_line(models.Model):
                     if row[0]=='out_refund':
                        sens=-1
                     is_deja_facture += sens*(row[1] or 0)
+
+
+
             is_facturable = obj.product_uom_qty*obj.price_unit*obj.is_facturable_pourcent/100
-            is_a_facturer = is_facturable - is_deja_facture
+
+
+
+            is_a_facturer = round(is_facturable - is_deja_facture,2)
+
+            if obj.is_facturable_pourcent==100 and abs(is_a_facturer)<0.02:
+                is_a_facturer=0
+                print(obj.is_facturable_pourcent,is_a_facturer, obj.name)
+
+
+
             obj.is_facturable   = is_facturable
             obj.is_deja_facture = is_deja_facture
             obj.is_a_facturer   = is_a_facturer
@@ -463,8 +476,8 @@ class sale_order(models.Model):
         cr,uid,context,su = self.env.args
         for obj in self:
             obj._compute_is_retenue_de_garantie()
-            if obj.is_a_facturer==0:
-                raise ValidationError("Il n'y a rien à facturer")
+            #if obj.is_a_facturer==0:
+            #    raise ValidationError("Il n'y a rien à facturer")
 
             move_type = 'out_invoice'
             sens = 1

@@ -188,15 +188,17 @@
                     <group string="Factures" states="sale">
                         <field name="is_note_facturation"/>
                         <field name="is_a_facturer"/>
-                        <field name="is_date_facture"    attrs="{'invisible':[('is_a_facturer','=',0)]}"/>
-                        <field name="is_numero_facture"  attrs="{'invisible':[('is_a_facturer','=',0)]}"/>
-                        <field name="is_situation"       attrs="{'invisible':[('is_a_facturer','=',0)]}"/>
+                        <field name="is_date_facture"/>
+                        <field name="is_numero_facture" />
+                        <field name="is_situation"/>
                         <button
                             name="generer_facture_action"
                             type="object"
                             string="Générer nouvelle facture"
-                            attrs="{'invisible':[('is_a_facturer','=',0)]}" 
                         />
+                            <!-- attrs="{'invisible':[('is_a_facturer','=',0)]}"  -->
+
+
                     </group>
                     <group>
                         <field name="is_invoice_ids" nolabel="1">
@@ -388,21 +390,22 @@
         <field name="name">is_view_order_line_tree</field>
         <field name="model">sale.order.line</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <tree editable="bottom" decoration-info="display_type=='line_note'" decoration-warning="display_type=='line_section'">
                 <field name="order_id"         optional="hide" widget="many2one_clickable"/>
                 <field name="is_section_id"    optional="hide" widget="many2one_clickable"/>
                 <field name="order_partner_id" optional="hide" widget="many2one_clickable"/>
                 <field name="name"            readonly="1"/>
-                <field name="product_uom_qty" readonly="1"/>
-                <field name="price_unit"      readonly="1"/>
-                <field name="is_facturable_pourcent"/>
-                <field name="is_facturable"   sum="Total"/>
-                <field name="is_deja_facture" sum="Total"/>
-                <field name="is_a_facturer"   sum="Total"/>
+                <field name="product_uom_qty" readonly="1" attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                <field name="price_unit"      readonly="1" attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                <field name="is_facturable_pourcent"       attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                <field name="is_facturable"   sum="Total"  attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                <field name="is_deja_facture" sum="Total"  attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                <field name="is_a_facturer"   sum="Total"  attrs="{'invisible': [('display_type', '!=', False)]}"/>
                 <field name="product_uom_category_id" invisible="1"/>
-                <field name="product_uom" string="Unité"  optional="hide" readonly="1"/>
-                <field name="price_subtotal" sum="Total" widget="monetary" string="Montant HT"/>
-                <field name="currency_id" invisible="1"/>
+                <field name="product_uom" string="Unité"  optional="hide" readonly="1"         attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                <field name="price_subtotal" sum="Total" widget="monetary" string="Montant HT" attrs="{'invisible': [('display_type', '!=', False)]}"/>
+                <field name="display_type" invisible="1"/>
+                <field name="currency_id"  invisible="1"/>
             </tree>
         </field>
     </record>
