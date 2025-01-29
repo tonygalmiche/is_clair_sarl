@@ -13,10 +13,6 @@ class IrMailServer(models.Model):
         if message['From']:
             cc=message['From']
         message['Cc'] = cc
-
-        print('send_email',message)
-
-
         res = super(IrMailServer, self).send_email(message, mail_server_id, smtp_server, smtp_port,
                    smtp_user, smtp_password, smtp_encryption, smtp_debug)
         return res

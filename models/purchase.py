@@ -395,8 +395,6 @@ class purchase_order(models.Model):
                             if nom_sans_petit_mot!='' and chantier_sans_petit_mot!='':
                                 ratio = fuzz.partial_ratio(chantier_sans_petit_mot, nom_sans_petit_mot)
                                 affaire_dict[ratio] = (line, line.name)
-                                #if ratio>60:
-                                #    print(chantier, ':',chantier_sans_petit_mot, ':',ratio,':', nom_sans_petit_mot,':',line.name)
                     #** Tri par ratio *****************************************
                     key_sorted = sorted(affaire_dict, reverse=True)
                     for key in key_sorted:

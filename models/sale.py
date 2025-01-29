@@ -44,21 +44,10 @@ class sale_order_line(models.Model):
                     if row[0]=='out_refund':
                        sens=-1
                     is_deja_facture += sens*(row[1] or 0)
-
-
-
             is_facturable = obj.product_uom_qty*obj.price_unit*obj.is_facturable_pourcent/100
-
-
-
             is_a_facturer = round(is_facturable - is_deja_facture,2)
-
             if obj.is_facturable_pourcent==100 and abs(is_a_facturer)<0.02:
                 is_a_facturer=0
-                print(obj.is_facturable_pourcent,is_a_facturer, obj.name)
-
-
-
             obj.is_facturable   = is_facturable
             obj.is_deja_facture = is_deja_facture
             obj.is_a_facturer   = is_a_facturer
@@ -572,13 +561,17 @@ class sale_order(models.Model):
                     sequence+=10
                     name="%s %s%%"%(product.name,line.remise)
                     if line.apres_ttc==False:
+                        if line.caution:
+                            price_unit = 0
+                        else:
+                            price_unit = sens*round(total_cumul_ht,2)
                         vals={
                             'sequence'  : sequence,
                             'product_id': product.id,
-                            'account_id': account_id,
+                            'account_id': account_id.id,
                             'name'      : name,
                             'quantity'  : -sens*line.remise/100,
-                            'price_unit': sens*round(total_cumul_ht,2), # La remise est calculée sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
+                            'price_unit': price_unit, # La remise est calculée sur le cumul et ensuite il y a une déduction des facutres précédentes et de leur prorata
                             'tax_ids'   : tax_ids,
                         }
                         invoice_line_ids.append(vals)

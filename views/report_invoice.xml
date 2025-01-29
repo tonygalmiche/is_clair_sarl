@@ -242,7 +242,12 @@
                                                 <tr>
                                                     <td class="text-left" style="color:black"><span t-field="line.name"/></td>
                                                     <td class="text-right">
-                                                        <span t-field="line.price_subtotal"/>
+                                                        <t t-if="line.price_subtotal">
+                                                            <span t-field="line.price_subtotal"/>
+                                                        </t>
+                                                        <t t-if="line.price_subtotal==0">
+                                                            Caution
+                                                        </t>
                                                     </td>
                                                 </tr>
                                             </t>
