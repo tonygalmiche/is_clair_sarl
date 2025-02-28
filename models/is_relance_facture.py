@@ -19,7 +19,8 @@ class IsRelanceFactureLigne(models.Model):
         for obj in self:
             obj.amount_residual  = obj.invoice_id.amount_residual
             obj.partner_id       = obj.invoice_id.partner_id.id
-            obj.contact_id       = obj.is_order_id.is_contact_facture_id.id or obj.partner_id.is_contact_relance_facture_id.id or obj.partner_id.id
+            #obj.contact_id       = obj.is_order_id.is_contact_facture_id.id or obj.partner_id.is_contact_relance_facture_id.id or obj.partner_id.id
+            obj.contact_id       = obj.partner_id.is_contact_relance_facture_id.id or obj.partner_id.id
             obj.invoice_date     = obj.invoice_id.invoice_date
             obj.invoice_date_due = obj.invoice_id.invoice_date_due
 
@@ -220,20 +221,30 @@ class IsRelanceFacture(models.Model):
                 ("res_model","=","account.move"),
                 ("res_id","=",invoice.id),
             ]
-            attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
-            if len(attachments)>0:
-                attachment=attachments[0]
-            else:
-                pdf = request.env.ref('account.account_invoices_without_payment').sudo()._render_qweb_pdf([invoice.id])
-                if pdf:
-                    attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
-                    if len(attachments)>0:
-                        attachment=attachments[0]
-            if attachment:
-                attachment_ids.append(attachment.id)
-        #**********************************************************************
+            # attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
+            # if len(attachments)>0:
+            #     attachment=attachments[0]
+            # else:
+            #     pdf = request.env.ref('account.account_invoices_without_payment').sudo()._render_qweb_pdf([invoice.id])
+            #     if pdf:
+            #         attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
+            #         if len(attachments)>0:
+            #             attachment=attachments[0]
+            # if attachment:
+            #     attachment_ids.append(attachment.id)
+
+            pdf = request.env.ref('account.account_invoices_without_payment').sudo()._render_qweb_pdf([invoice.id])
+            if pdf:
+                attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
+                if len(attachments)>0:
+                    attachment=attachments[0]
+                    attachment_ids.append(attachment.id)
+         #**********************************************************************
 
         #** body **************************************************************
+
+
+
 
         if self.type_document=="envoi_facture":
             if len(invoices)>1:
@@ -302,8 +313,6 @@ class IsRelanceFacture(models.Model):
             subject="Relance de factures %s (%s)"%(partner.parent_id.name or partner.name, ", ".join(invoice_name))
         if self.type_document=="releve_facture":
             subject="Relevé de factures %s (%s)"%(partner.parent_id.name or partner.name, ", ".join(invoice_name))
-
-
 
         #**********************************************************************
         destinataire = invoice.partner_id.is_contact_relance_facture_id or invoice.partner_id
