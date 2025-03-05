@@ -303,6 +303,7 @@ class purchase_order(models.Model):
 
 
                 #** Recherche de l'adresse du chantier ************************
+                dict["Chantier"] = ''
                 if type_pdf=="PUM":
                     chantier=[]
                     if test:
