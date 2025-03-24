@@ -343,6 +343,17 @@
 
 
 
+    <!-- Facturation / Suivi de trésorerie -->
+    <menuitem
+        id="is_suivi_tresorerie_menu"
+        name="Suivi de trésorerie"
+        parent="account.menu_finance"
+        sequence="5"
+        action="is_suivi_tresorerie_action"
+    />
+
+
+
 
 
 

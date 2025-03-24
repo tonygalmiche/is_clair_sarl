@@ -57,7 +57,9 @@ class purchase_order(models.Model):
     is_date_facture_fournisseur = fields.Date('Date Facture')
     is_reste_a_facturer         = fields.Float("Reste à facturer", compute='_compute_is_reste_a_facturer', store=True, readonly=True)
 
+    user_id = fields.Many2one(copy=False) # Ne pas copier le "Responsable achats" lors de la copie de la commande
 
+    
     @api.depends('order_line.qty_invoiced','order_line.product_qty','order_line.price_unit')
     def _compute_is_reste_a_facturer(self):
         for obj in self:

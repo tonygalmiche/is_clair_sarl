@@ -230,9 +230,6 @@
             </xpath>
         </field>
     </record>
-
-
-
     <record id="is_purchase_order_kpis_tree" model="ir.ui.view">
         <field name="name">is_purchase_order_kpis_tree</field>
         <field name="model">purchase.order</field>
@@ -245,6 +242,9 @@
                 <field name="is_delai"                optional="show"/>
                 <field name="is_date_livraison"       optional="show"/>
                 <field name="is_lieu_livraison"       optional="show" class="white_space_normal"/>
+            </field>
+            <field name="amount_total" position="after">
+                <field name="is_reste_a_facturer" optional="show"/>
             </field>
             <field name="date_order" position="replace"/>
             <field name="user_id" position="replace"/>
