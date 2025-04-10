@@ -264,7 +264,7 @@ class IsRelanceFacture(models.Model):
                 <p>CLAIR SARL</p> 
                 <p>Rue Robert Schuman</p> 
                 <p>21800 CHEVIGNY SAINT SAUVEUR</p> 
-                <p>Tél : 08 80 46 70 60</p> 
+                <p>Tél : 03 80 46 70 60</p> 
             """%(total)
 
         if self.type_document=="relance_facture":
