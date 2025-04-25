@@ -124,6 +124,7 @@
                 <field name="is_date_envoi"   attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
                 <field name="is_date_relance" attrs="{'invisible':[('is_date_relance','=',False)]}"/>
                 <field name="is_date_releve"  attrs="{'invisible':[('is_date_releve','=',False)]}"/>
+                <field name="is_date_abandon" attrs="{'invisible': [('move_type', 'in', ['in_invoice','in_refund'])]}"/>
                 <field 
                     name="is_courrier_id"
                     attrs="{'invisible': [('is_courrier_id', '=', False)], 'readonly': True}"
@@ -321,7 +322,8 @@
             ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
             ('payment_state', 'in', ('not_paid', 'partial')),
-            ('invoice_date_due', '&lt;', time.strftime('%Y-%m-%d'))
+            ('invoice_date_due', '&lt;', time.strftime('%Y-%m-%d')),
+            ('is_date_abandon', '=', False)
         ]
         </field>
         <field name="context">{'default_move_type': 'out_invoice'}</field>

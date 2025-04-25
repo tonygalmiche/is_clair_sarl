@@ -38,6 +38,9 @@
                             <field name="montant_achat" readonly="1"/>
                             <field name="montant_vente" readonly="1"/>
                             <field name="solde"         readonly="1"/>
+                            <field name="montant_achat_ce_jour" readonly="1"/>
+                            <field name="montant_vente_ce_jour" readonly="1"/>
+                            <field name="solde_ce_jour"         readonly="1"/>
                             <field name="commentaire"/>
                         </group>
                     </group>
@@ -49,13 +52,15 @@
         <field name="name">is.suivi.tresorerie.tree</field>
         <field name="model">is.suivi.tresorerie</field>
         <field name="arch" type="xml">
-        <!-- decoration-danger="solde &lt; 0"  -->
             <tree create="0" editable="bottom">
-                <field name="mois"          readonly="1"/>
-                <field name="montant_achat" readonly="1" sum="Total"/>
-                <field name="montant_vente" readonly="1" sum="Total"/>
-                <field name="solde"         readonly="1" sum="Total"/>
-                <field name="commentaire"   optional="show"/>
+                <field name="mois"                  readonly="1"/>
+                <field name="montant_achat"         readonly="1" sum="Total" class="tresorerie"/>
+                <field name="montant_vente"         readonly="1" sum="Total" class="tresorerie"/>
+                <field name="solde"                 readonly="1" sum="Total" class="tresorerie"/>
+                <field name="montant_achat_ce_jour" readonly="1" sum="Total"/>
+                <field name="montant_vente_ce_jour" readonly="1" sum="Total"/>
+                <field name="solde_ce_jour"         readonly="1" sum="Total"/>
+                <field name="commentaire"           optional="show" class="tresorerie"/>
             </tree>
         </field>
     </record>
