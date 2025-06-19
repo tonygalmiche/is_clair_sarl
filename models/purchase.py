@@ -489,7 +489,7 @@ class purchase_order(models.Model):
                 #** Eco-contribution ******************************************
                 if type_pdf=='PUM':
                     for line in lines:
-                        x = re.search("    Eco contribution :(.*)", line) 
+                        x = re.search(r"\s*Eco contribution :(.*)", line) 
                         if x:
                             v = x.groups()
                             if len(v)==1:
