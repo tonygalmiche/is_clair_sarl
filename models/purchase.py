@@ -546,6 +546,18 @@ class purchase_order(models.Model):
                                 break
                 #**************************************************************
 
+                #** Surcharge énergie ******************************************
+                if type_pdf=='PUM':
+                    for line in lines:
+                        # Recherche du motif "Surcharge énergie : <montant>"
+                        x = re.search(r"Surcharge énergie\s*:\s*([0-9]+,[0-9]{2})", line)
+                        if x:
+                            montant = txt2float(x.group(1))
+                            order_lines.append([1, "Surcharge énergie", montant])
+                            dict["Surcharge énergie"] = montant
+                            break
+                #**************************************************************
+
                 #** Lignes avec des Quantités ou des montants *****************
                 if type_pdf=='LOXAM':
                     if test:
@@ -747,6 +759,7 @@ class purchase_order(models.Model):
                 'Eco-contribution'                  : 'ECOCON',
                 'Transport'                         : 'TCHANTIER',
                 'Surcharge gasoil'                  : 'GNR',
+                'Surcharge énergie'                 : 'GNR',
             }
             product = False
             for key in dict:
