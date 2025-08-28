@@ -181,7 +181,7 @@ class AccountMove(models.Model):
                 if internal_type in ('receivable', 'payable'):
                     for partial in line.matched_credit_ids:
                         payment = partial.credit_move_id.payment_id
-                        type_paiement = dict(payment._fields['is_type_paiement'].selection).get(payment.is_type_paiement).lower()
+                        type_paiement = (dict(payment._fields['is_type_paiement'].selection).get(payment.is_type_paiement) or '').lower()
                         num_cheque=''
                         if payment.is_num_cheque:
                             num_cheque = " %s"%payment.is_num_cheque
